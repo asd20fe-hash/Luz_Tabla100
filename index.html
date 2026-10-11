@@ -2,9 +2,14 @@
 <!--
   ============================================================
   Saltos en la Tabla del 100 (práctica de matemática, 1er grado)
-  Versión: v1.0 (2026-10-11)
+  Versión: v1.1 (2026-10-11)
   ------------------------------------------------------------
   Historial de cambios
+  v1.1  Panel de suma y resta más grande
+    + En Suma y Resta en 3 pasos el panel ocupa más o menos la mitad de la pantalla.
+    + La cuenta con casilleros va siempre en una sola línea (sin saltos que confundan);
+      si no entra, la letra y los casilleros se achican solos.
+    + El tablero se vuelve a encuadrar cuando el panel cambia de tamaño.
   v1.0  Primera versión (MVP)
     + Tablero 3D (1 al 100 o 0 al 99) con colores por fila.
     + Controles estilo Fusion: rueda = zoom hacia el cursor, click medio = mover,
@@ -145,6 +150,7 @@ button:focus-visible{outline:3px solid var(--accent3);outline-offset:2px}
 .ptitle{font-weight:700;font-size:20px;flex:1;display:flex;align-items:center;gap:9px}
 .collapse{border:0;background:var(--chip);color:var(--text);width:36px;height:36px;border-radius:12px;font-size:15px;cursor:pointer;flex:none}
 #panel.collapsed .pbody{display:none}
+#panel.steps{width:clamp(410px,calc(50vw - 21px),780px)}
 .lead{color:var(--muted);font-size:15.5px;margin:8px 0;line-height:1.4}
 .center{text-align:center;justify-content:center}
 .legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:14.5px;margin:10px 0}
@@ -178,8 +184,9 @@ button:focus-visible{outline:3px solid var(--accent3);outline-offset:2px}
 .done small{display:block;font-size:13px;color:var(--muted);font-weight:600}
 .done b{font-size:19px}
 .step-title{font-size:15px;font-weight:600;color:var(--muted);margin-top:12px}
-.eqline{display:flex;flex-wrap:wrap;align-items:center;gap:7px;font-size:27px;font-weight:600;margin:8px 0}
-.box{min-width:60px;height:54px;border-radius:15px;border:2px solid var(--glass-border);background:var(--box-bg);display:grid;place-items:center;font-weight:700;font-size:28px;color:var(--text);cursor:pointer;padding:0 8px;transition:border-color .15s,box-shadow .15s}
+.eqline{display:flex;flex-wrap:nowrap;white-space:nowrap;align-items:center;gap:.26em;font-size:30px;font-weight:600;margin:8px 0;padding:4px 0}
+.eqline>span{flex:none}
+.box{flex:none;min-width:2.1em;height:1.9em;border-radius:.52em;border:2px solid var(--glass-border);background:var(--box-bg);display:grid;place-items:center;font-weight:700;font-size:1em;color:var(--text);cursor:pointer;padding:0 .3em;transition:border-color .15s,box-shadow .15s}
 .box.focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(139,92,246,.25)}
 .box.good{border-color:var(--ok);color:var(--ok)}
 .box.bad{border-color:var(--bad);color:var(--bad)}
@@ -224,8 +231,8 @@ body.portrait #cubeBack,body.portrait #cubeSlot{width:88px;height:88px;right:10p
 body.portrait #homeBtn{top:calc(var(--top-h,64px) + 104px);right:32px;width:40px;height:40px;font-size:18px}
 body.portrait #helpPop{bottom:auto;top:calc(var(--top-h,64px) + 8px)}
 body.portrait .key{height:42px;font-size:20px}
-body.portrait .box{height:48px;min-width:54px;font-size:25px}
-body.portrait .eqline{font-size:23px}
+body.portrait #panel.steps{width:auto}
+body.portrait .eqline{font-size:26px}
 </style>
 </head>
 <body>
@@ -295,9 +302,9 @@ body.portrait .eqline{font-size:23px}
 (function(){
 'use strict';
 /* ============================================================
-   Saltos en la Tabla del 100 v1.0
+   Saltos en la Tabla del 100 v1.1
    ============================================================ */
-const APP_VERSION='1.0';
+const APP_VERSION='1.1';
 const TAG='[Tabla100 v'+APP_VERSION+']';
 const LOG=(...a)=>console.log(TAG,...a);
 LOG('Iniciando');
@@ -699,6 +706,7 @@ const view={W:innerWidth,H:innerHeight,top:0,bot:0,left:0,right:0,cube:null};
 function updateLayout(){
   const W=innerWidth, H=innerHeight;
   document.body.classList.toggle('portrait',W<720||W/H<.9);
+  fitEq();
   const portrait=document.body.classList.contains('portrait');
   root.style.setProperty('--top-h',$('#topbar').getBoundingClientRect().bottom+'px');
   const pr=$('#panel').getBoundingClientRect();
@@ -1136,7 +1144,15 @@ function renderPanel(){
   panel.innerHTML=S.mode==='libre'?panelLibre():(S.mode==='saltos'?panelSaltos():panelSteps());
   panel.classList.toggle('collapsed',panelCollapsed);
   panel.classList.toggle('practice',S.mode!=='libre');
-  syncSegs();
+  panel.classList.toggle('steps',S.mode==='suma'||S.mode==='resta');
+  syncSegs(); fitEq();
+}
+/* La cuenta con casilleros va siempre en una línea: si no entra, se achica la letra (y con ella los casilleros). */
+function fitEq(){
+  const el=panel.querySelector('.eqline'); if(!el) return;
+  el.style.fontSize=''; if(!el.clientWidth) return;
+  const over=el.scrollWidth/el.clientWidth;
+  if(over>1) el.style.fontSize=Math.max(14,Math.floor(parseFloat(getComputedStyle(el).fontSize)/over*.97))+'px';
 }
 panel.addEventListener('click',e=>{
   if(e.target.closest('.seg')) return;
@@ -1168,7 +1184,10 @@ function setMode(m){
   if(m==='libre'){ S.fichaLocked=false; clearTarget(); renderPanel(); }
   else if(m==='saltos') newSaltosRound();
   else startSteps(m);
-  requestAnimationFrame(updateLayout);
+  requestAnimationFrame(()=>{
+    const r0=view.right, b0=view.bot; updateLayout();
+    if(Math.abs(view.right-r0)>20||Math.abs(view.bot-b0)>20){ const h=homeView(); animateCam(h.theta,h.phi,h.radius,h.target,.8); }
+  });
 }
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{ ensureAudio(); sfx.click(); setMode(t.dataset.mode); }));
 function currentSetting(k){ return k==='layout'?String(S.layout):k==='jumpStyle'?S.jumpStyle:(S.sound?'1':'0'); }
