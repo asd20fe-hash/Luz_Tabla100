@@ -1,38 +1,54 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guía para Claude Code (claude.ai/code) en este repositorio.
 
 ## Qué es
 
-"Saltos en la Tabla del 100": una app de práctica de matemática para chicos de primer grado (Argentina), armada alrededor de una tabla del 100 en 3D. La app entera es un único archivo, `index.html` (HTML + CSS + un script inline). No hay compilación, ni gestor de paquetes, ni tests, ni linter.
+"Matemática": app de práctica de matemática para Luz (1ro, 6 años) e Ian (4to, 10 años). Un shell con perfiles y menú abre actividades independientes. Hoy hay una: la Tabla del 100 (`actividades/1ro-tabla100/`, de Luz). El diseño de la estructura está en `PLAN.md`.
 
-- **Ejecutar:** abrir `index.html` en el navegador, o servir la carpeta (por ejemplo `python -m http.server`) y abrirla. Necesita internet para three.js r128 (cdnjs) y la fuente Fredoka (Google Fonts). Si three.js no carga, se muestra el mensaje `#fallback`.
-- **Depurar:** todo se registra en la consola con el prefijo `[Tabla100 vX.Y]`. `window.__tabla100` expone `state` (el objeto `S`) y `cellXY(n)` (posición en pantalla del casillero `n`), útil para manejar la app desde automatización de navegador.
+- **Ejecutar:** abrir `index.html` en el navegador, o servir la carpeta (`python -m http.server`). Con `file://` Chrome comparte localStorage entre archivos y Firefox lo aísla por archivo; con `http://localhost` todo se comparte. El perfil y el tema viajan también por la URL (`?p=luz&t=dark`). Hace falta internet para three.js r128 (cdnjs) y la fuente Fredoka.
+- **Depurar:** logs con prefijo `[Mate vX.Y]` (core y shell) y `[Tabla100 vX.Y]` (actividad).
 
-## Reglas del proyecto
+## Estructura
 
-- **Todo en un solo archivo, sin compilar.** Todo va dentro de `index.html`: nada de archivos aparte, bundlers, npm ni pasos de build. Lo único externo es three.js y la fuente de Google Fonts.
-- **three.js r128 desde cdnjs** (`https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js`). No cambiar de versión ni de CDN. Usar solo APIs de r128: `THREE.Geometry` ya no existe en esa versión, y lo que se agregó después de r128 no está disponible.
-- **Versión y cambios, en el encabezado y en pantalla.** Cada cambio sube `APP_VERSION` en el script y agrega una entrada al historial del comentario al principio del archivo (formato `vX.Y  descripción`, seguido de viñetas con `+`), además de actualizar la línea `Versión: vX.Y (fecha)`. La versión se muestra en pantalla a través de los elementos `.ver`; mantener eso funcionando.
-- **Modo oscuro.** La app tiene modo claro y oscuro (sigue al sistema y se puede cambiar con un botón). Los colores son tokens CSS en `:root` con overrides por `[data-theme]`, y `applySceneTheme()` recolorea la escena 3D. Todo color o elemento nuevo tiene que verse bien en los dos modos.
-- **Textos en español para chicos.** Todo texto visible está en español rioplatense con voseo ("Desarmá", "Probá", "Fijate"), con frases cortas, simples y alentadoras, pensadas para chicos de 6 o 7 años. Los comentarios y los logs también van en español. Para el signo menos visible usar la constante `MINUS` (U+2212).
-- El estilo del código es compacto: nombres cortos, varias sentencias por línea, sin frameworks. Respetarlo.
+```
+index.html              shell: perfiles, menú, ajustes de padres con PIN (v2.0)
+perfiles.js             MATE.perfiles = [{id,nombre,grado,avatar,color}]
+core/core.css           tokens claro/oscuro y estilos base
+core/core.js            global MATE (único global)
+actividades/registro.js MATE.actividades = [{id,titulo,descripcion,icono,perfiles,ruta,version,stats?}]
+actividades/<id>/       cada actividad (con su propio CLAUDE.md)
+```
 
-## Arquitectura del script (`index.html`)
+Orden de scripts: `core.js`, `perfiles.js`, `registro.js`, y después el de la página. Todos clásicos.
 
-El script es una única IIFE en `'use strict'`, dividida en secciones con banners `/* ==== SECCIÓN ==== */`, en este orden: TABLERO, FICHA, ARCOS DE SALTOS, EFECTOS, SONIDO, CÁMARA, CUBO DE VISTA, INTERACCIÓN CON EL TABLERO, los dos modos de práctica, PANEL, MODOS/AJUSTES/BARRA, BUCLE DE ANIMACIÓN, INICIO.
+## Reglas
 
-Piezas clave que conectan varias secciones:
+- **Sin compilar:** sin bundlers, npm ni build. Varios archivos, scripts clásicos (sin ES modules ni `fetch` local, porque no funcionan en `file://`), todo colgado de `MATE`.
+- **Versiones:** el shell tiene la suya (v2.0) y cada actividad la suya. Cada cambio sube la versión, agrega una entrada al historial del comentario del principio del archivo (`vX.Y  descripción`, viñetas con `+`) y actualiza la línea `Versión:`. Se muestra en pantalla en elementos `.ver`. Si cambia una actividad, actualizar `version` en el registro.
+- **Modo claro/oscuro:** tokens CSS en `:root` con overrides por `[data-theme]` (media query y atributo). Todo color o elemento nuevo tiene que verse bien en los dos modos.
+- **Textos en español rioplatense con voseo** ("Elegí", "Probá"); comentarios y logs también en español. Cada actividad decide su tono y tipografía: la de Luz usa frases cortas y MAYÚSCULAS de imprenta; eso no es regla del shell.
+- Estilo compacto: nombres cortos, varias sentencias por línea, sin frameworks.
 
-- **Estado global `S`:** `mode` (`'libre' | 'saltos' | 'suma' | 'resta'`), `layout` (primer número del tablero: 1 → 1 al 100, 0 → 0 al 99), `jumpStyle` (`'diez' | 'uno'`), `sound`, `stars`, `ficha` (número donde está la ficha), `target` (casillero elegido), `hintCol` (columna que brilla). Los helpers de casilleros (`inRange`, `colOf`, `cellXZ`, `topPos`) dependen de `S.layout`; `cells[i]` se indexa con `n - S.layout`.
-- **Guardado:** `store.get/set` envuelve `localStorage` con el prefijo `tabla100.` y try/catch. Solo se guardan preferencias por dispositivo y la cantidad de estrellas.
-- **Animación:** no hay librerías aparte de three.js. `tween(dur, update, done, ease)` agrega a `tweens`; los efectos sueltos se agregan a `fx` como objetos `{update(dt)}` (se quitan cuando `update` devuelve false). `loop()` actualiza todo en cada cuadro y después dibuja la escena principal y el cubo de vista (una segunda escena dibujada con viewport recortado).
-- **Flujo ficha → casillero:** `setFicha(n)` / `setTarget(n)` → `rebuildArcs()` (saltos calculados por `computeJumps(from, to)`: de 10 y después de 1, o de a 1, según `jumpStyle`) → arcos animados en `updateArcs` → `onArcsDone()` ejecuta el callback `afterArcs`. `refreshEquation()` mantiene sincronizada la cuenta de arriba (por ejemplo `37 + 20 + 2 = 59`).
-- **Modos:** `setMode(m)` reinicia el estado y delega. `libre` → tablero libre. `saltos` → objeto `SAL`, rondas de 10 preguntas de ±10/20/30 (`makeSalto`, `saltosClick`). `suma`/`resta` → objeto `ST`, ejercicios de 3 pasos: `makeSuma`/`makeResta` devuelven `{a, b, result, sym, steps[]}`, donde cada paso tiene `tpl` con huecos `[]`, `ans`, `help`, `hint(vals)`, `done(vals)`, y opcionalmente `start` y `pairs`. Las respuestas se cargan con el teclado en pantalla (`keyDigit`, `keyDel`, `moveFocus`, `checkStep`).
-- **Invariante pedagógica:** `makeSuma` genera sumas **sin llevarse** (sin "me llevo uno") (dieces y unos suman ≤ 9 cada uno) y `makeResta` genera restas **sin pedir prestado** (`b0 ≤ a0`, `b1 < a1`). Las pistas están escritas suponiendo eso; si se cambian los generadores, hay que revisar las pistas.
-- **Panel:** `renderPanel()` reconstruye el `innerHTML` del panel lateral según el estado (`panelLibre` / `panelSaltos` / `panelSteps`) y maneja los clicks por atributos `data-*`. Los mensajes van por el global `FB = {text, type}` (`'ok' | 'bad' | 'tip'`).
-- **Skins de la ficha:** `SKINS` asocia nombres con funciones `{crear()}` que devuelven un `THREE.Group`; la activa se monta en `fichaRoot` con `setSkin(k)`. Las piezas se arman con los helpers `skinMat`, `pedestal` y `part`.
-- **Fondos:** `S.bg` se aplica como `data-bg` en `<html>` (`applyBg()`; "aurora" no tiene atributo). Cada fondo solo redefine `--bg`, `--blob1..5` y `--blob-op`, con su versión clara y oscura (las dos variantes de dark: media query y `[data-theme="dark"]`). La lista válida está en `BGS`.
-- **Ajustes:** cada `.seg[data-set=k]` del popup pasa por `applySetting(k, v)` y `currentSetting(k)`; un ajuste nuevo tiene que agregarse en las dos.
-- **Sonido:** sintetizado con Web Audio (`tone`, `noise`, `sfx.*`), sin archivos de audio. `ensureAudio()` tiene que llamarse en un gesto del usuario.
-- **Cámara:** coordenadas esféricas en `CAM` (`theta`, `phi`, `radius`, `target`), aplicadas con `applyCam()`. `homeView()` calcula el encuadre según el tamaño de la pantalla y la posición del panel (`updateLayout()`).
+## API de MATE (core.js)
+
+- `MATE.tema.get/set/oscuro/alternar()`: guarda `mate.global.theme` y aplica `data-theme`.
+- `MATE.store(idActividad)` → `{get,set}` en `mate.<perfil>.<actividad>.<clave>` (sin perfil no guarda). `MATE.global.get/set` → `mate.global.<clave>`.
+- `MATE.perfil()` (activo o null), `MATE.setPerfil(id)`, `MATE.perfiles`, `MATE.actividades`.
+- `MATE.irMenu()` y `MATE.abrir(id)`: navegan conservando `?p=&t=`. `MATE.raiz`: URL de la raíz del proyecto.
+- `MATE.log(tag, ...)`, `MATE.ver(el)`.
+- `MATE.pin.check/set`: en `mate.global.pin`, por defecto 1234 (hash simple; es un candado para chicos, no seguridad).
+
+## Contrato de una actividad
+
+- Incluye `core.css`, `core.js`, `perfiles.js` y `registro.js` con rutas relativas.
+- Lee el perfil con MATE; sin perfil, vuelve al menú.
+- Guarda solo con `MATE.store(idActividad)`; lo global, en `mate.global.<clave>`.
+- Botón "Volver al menú", respeta el tema global y muestra su versión.
+- Opcional: `stats()` en su entrada del registro, que devuelve un texto para Ajustes de padres.
+
+## Cómo agregar una actividad
+
+1. Crear `actividades/<grado>-<nombre>/index.html` (y un `CLAUDE.md` con su arquitectura) siguiendo el contrato.
+2. Agregar su entrada a `actividades/registro.js` (`perfiles` = ids que la ven; `ruta` relativa a la raíz).
+3. Probar con `file://` y con `http.server`, en claro y oscuro, y revisar que la consola quede limpia.
