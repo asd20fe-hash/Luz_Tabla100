@@ -69,7 +69,7 @@ button{font:inherit;color:inherit}
 #globo.ok{border-color:var(--ok)} #globo.mal{border-color:var(--bad)}
 
 .ref-modal{position:fixed;inset:0;background:rgba(10,8,30,.55);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
-.ref-modal .ref-panel{max-width:420px;width:100%;text-align:center}
+.ref-modal .ref-panel{max-width:420px;width:100%;text-align:center;background:var(--box-bg)}
 .ref-estrellas{font-size:44px;letter-spacing:6px;margin:6px 0}
 .ref-estrellas .off{opacity:.25;filter:grayscale(1)}
 .ref-celebra{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:40;background:var(--ok-bg);color:var(--text);

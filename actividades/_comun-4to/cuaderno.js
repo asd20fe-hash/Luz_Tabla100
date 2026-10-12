@@ -67,7 +67,7 @@
       for (var q = 0; q < vista.igual.length; q++) html += cel(vista.igual[q], xR + c * (2.05 + q), Y(0), 'ok');
     }
     // --- casita (fila 1, a la derecha de la galera) ---
-    for (var k = 0; k < vista.cociente.length; k++) html += cel(vista.cociente[k], xR + k * c, Y(1), '');
+    for (var k = 0; k < vista.cociente.length; k++) html += cel(vista.cociente[k], xR + k * c, Y(1), vista.errCasita === k ? 'error' : '');
     if (act.zona === 'casita') html += cel(act.buf ? act.buf.slice(-1) : '', xR + act.vuelta * c, Y(1), 'slot') +
       (act.buf && act.buf.length > 1 ? cel(act.buf.slice(0, -1), xR + (act.vuelta - 1) * c, Y(1), 'slot') : '');
 
