@@ -1,0 +1,10 @@
+/* ¿Cuántas veces entra? — estilos propios (lo común está en _comun-4to/comun.css). */
+.ent-cab{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:16px}
+.escalera{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:10px 0}
+.esc{min-width:56px;min-height:56px;padding:4px 8px;border-radius:12px;border:2px solid var(--tecla-borde);background:var(--tecla);cursor:pointer;line-height:1.1}
+.esc small{display:block;font-size:13px;color:var(--muted)} .esc b{font-size:20px}
+.esc.tap:hover{background:var(--resalte)}
+.esc-n{align-self:center;padding:6px 10px;border-radius:999px;background:var(--accent);color:#fff;font-weight:700;font-size:20px}
+.ent-ctrl{text-align:center;margin-top:8px}
+.ent-acciones{display:flex;gap:10px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.ent-record{font-size:15px;color:var(--muted)}
