@@ -2,9 +2,14 @@
 <!--
   ============================================================
   Saltos en la Tabla del 100 (práctica de matemática, 1er grado)
-  Versión: v1.3 (2026-10-11)
+  Versión: v1.4 (2026-10-11)
   ------------------------------------------------------------
   Historial de cambios
+  v1.4  Pasa a ser una actividad del menú de Matemática
+    + Vive en actividades/1ro-tabla100 y usa core.css y core.js (MATE).
+    + El guardado va por MATE.store('tabla100') (mate.<perfil>.tabla100.*); el modo
+      claro/oscuro es global (MATE.tema). Botón "Menú" para volver; sin perfil, vuelve al menú.
+    + migrar(): copia una sola vez las claves viejas tabla100.* al perfil Luz (no borra las viejas).
   v1.3  Textos en imprenta mayúscula
     + Todos los textos se ven en MAYÚSCULAS de imprenta (CSS text-transform), porque
       todavía no se leen bien las minúsculas. Las etiquetas del tablero 3D también.
@@ -42,6 +47,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../core/core.css">
 <style>
 :root{
   --bg:#fff3fb; --text:#2b2453; --muted:#6e6797;
@@ -285,6 +291,7 @@ body.portrait .eqline{font-size:26px}
   <div class="spacer"></div>
   <div class="right glass">
     <div class="stars" id="stars" title="Estrellas ganadas">⭐ <span id="starsN">0</span></div>
+    <button class="icon-btn" id="menuBtn" title="Volver al menú">🏠</button>
     <button class="icon-btn" id="themeBtn" title="Cambiar modo claro u oscuro">🌙</button>
     <button class="icon-btn" data-pop="#settings" title="Ajustes">⚙️</button>
   </div>
@@ -340,13 +347,16 @@ body.portrait .eqline{font-size:26px}
 <div id="fallback" class="glass" hidden>No se pudo iniciar el 3D en este navegador. Probá con Chrome o Edge actualizados.</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="../../core/core.js"></script>
+<script src="../../perfiles.js"></script>
+<script src="../../actividades/registro.js"></script>
 <script>
 (function(){
 'use strict';
 /* ============================================================
-   Saltos en la Tabla del 100 v1.2
+   Saltos en la Tabla del 100
    ============================================================ */
-const APP_VERSION='1.3';
+const APP_VERSION='1.4';
 const TAG='[Tabla100 v'+APP_VERSION+']';
 const LOG=(...a)=>console.log(TAG,...a);
 LOG('Iniciando');
@@ -358,11 +368,19 @@ const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
 const MINUS='\u2212';
 document.querySelectorAll('.ver').forEach(el=>el.textContent='v'+APP_VERSION);
 
-/* ---------- guardado local (comodidades por dispositivo) ---------- */
-const store={
-  get(k,d){ try{ const v=localStorage.getItem('tabla100.'+k); return v===null?d:JSON.parse(v); }catch(e){ return d; } },
-  set(k,v){ try{ localStorage.setItem('tabla100.'+k,JSON.stringify(v)); }catch(e){} }
-};
+/* ---------- guardado (por perfil, vía MATE) ---------- */
+if(!window.MATE||!MATE.perfil()){ console.warn(TAG,'sin perfil: vuelvo al menú'); if(window.MATE) MATE.irMenu(); else location.href='../../index.html'; return; }
+const store=MATE.store('tabla100');
+// migra una sola vez las claves viejas tabla100.* al perfil Luz (no borra las viejas)
+(function migrar(){
+  if(MATE.perfil().id!=='luz'||MATE.global.get('migrado.tabla100',false)) return;
+  try{
+    const n=[];
+    ['layout','jumpStyle','sound','stars','skin','bg'].forEach(k=>{ const v=localStorage.getItem('tabla100.'+k); if(v!==null){ store.set(k,JSON.parse(v)); n.push(k); } });
+    const t=localStorage.getItem('tabla100.theme'); if(t!==null&&MATE.global.get('theme',null)===null){ const tv=JSON.parse(t); if(tv==='dark'||tv==='light'){ MATE.tema.set(tv); n.push('theme'); } }
+    MATE.global.set('migrado.tabla100',true); LOG('migrado',n.join(',')||'(nada para migrar)');
+  }catch(e){ console.warn(TAG,'migración falló',e); }
+})();
 
 /* ---------- estado ---------- */
 const S={
@@ -379,8 +397,6 @@ let FB={text:'',type:''};
 
 /* ---------- tema ---------- */
 const root=document.documentElement;
-const savedTheme=store.get('theme',null);
-if(savedTheme==='dark'||savedTheme==='light') root.dataset.theme=savedTheme;
 const mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):{matches:false,addEventListener(){}};
 const BGS=['aurora','oceano','bosque','atardecer','espacio'];
 function applyBg(){ if(!BGS.includes(S.bg)) S.bg='aurora'; if(S.bg==='aurora') delete root.dataset.bg; else root.dataset.bg=S.bg; }
@@ -1306,7 +1322,8 @@ function applySceneTheme(){
   cells.forEach(c=>{ c.color.copy(cellColor(c.i,d)); c.mesh.material.color.copy(c.color); });
   $('#themeBtn').textContent=d?'☀️':'🌙';
 }
-$('#themeBtn').addEventListener('click',()=>{ ensureAudio(); sfx.click(); const nt=isDark()?'light':'dark'; root.dataset.theme=nt; store.set('theme',nt); applySceneTheme(); LOG('tema',nt); });
+$('#menuBtn').addEventListener('click',()=>MATE.irMenu());
+$('#themeBtn').addEventListener('click',()=>{ ensureAudio(); sfx.click(); const nt=MATE.tema.alternar(); applySceneTheme(); LOG('tema',nt); });
 if(mq.addEventListener) mq.addEventListener('change',()=>{ if(!root.dataset.theme) applySceneTheme(); });
 
 function addStar(){ S.stars++; store.set('stars',S.stars); $('#starsN').textContent=S.stars; const w=$('#stars'); w.classList.remove('bump'); void w.offsetWidth; w.classList.add('bump'); }
