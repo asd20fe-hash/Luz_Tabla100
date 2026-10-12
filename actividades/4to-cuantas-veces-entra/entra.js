@@ -1,6 +1,8 @@
 /* ¿Cuántas veces entra? — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.1  (2026-10-12) Teclado
+     + Enter con una tecla del teclado en pantalla enfocada aprieta OK, no repite el número.
    v1.0.0  (2026-10-11) Primera versión
      + Tablas al revés: dados d y n, hallar cuántas veces entra y cuánto sobra.
      + Tres tipos de ítem: A (escribir), B (elegir el producto vecino) y C (verdadero o falso).
@@ -10,7 +12,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.0', ACT = '4to-cuantas-veces-entra', TITULO = '¿Cuántas veces entra?';
+  var VERSION = '1.0.1', ACT = '4to-cuantas-veces-entra', TITULO = '¿Cuántas veces entra?';
   var UI = REF4_UI, EN = REF4_ENTRA, $ = UI.$;
   var ctx = UI.base({ act: ACT, titulo: TITULO, version: VERSION, nivelMax: 4 });
   if (!ctx) return;

@@ -1,6 +1,8 @@
 /* Cálculo con ceros — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.1  (2026-10-12) Teclado
+     + Enter con una tecla del teclado en pantalla enfocada aprieta OK, no repite el número.
    v1.0.0  (2026-10-11) Primera versión
      + Cálculo mental registrando el paso del medio: descomponer y multiplicar (M1), compensación (M2),
        divisiones con ceros y la familia trampa 12 / 120 / 1.200 / 12.000 (M3) y suma en columna con reservas (M4).
@@ -10,7 +12,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.0', ACT = '4to-calculo-con-ceros', TITULO = 'Cálculo con ceros';
+  var VERSION = '1.0.1', ACT = '4to-calculo-con-ceros', TITULO = 'Cálculo con ceros';
   var UI = REF4_UI, CE = REF4_CEROS, $ = UI.$, esc = UI.esc, miles = UI.miles;
   var ctx = UI.base({ act: ACT, titulo: TITULO, version: VERSION, nivelMax: CE.MAX_NIVEL });
   if (!ctx) return;

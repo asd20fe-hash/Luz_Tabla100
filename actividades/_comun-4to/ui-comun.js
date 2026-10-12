@@ -117,7 +117,11 @@
     cont.onclick = function (e) { var b = e.target.closest('button'); if (b) pulsar(b.dataset.k); };
     var kd = function (e) {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
-      if (/^[0-9]$/.test(e.key)) pulsar(e.key); else if (e.key === 'Backspace') pulsar('del'); else if (e.key === 'Enter') { var f = document.activeElement; if (f && f.tagName === 'BUTTON') return; pulsar('ok'); }
+      if (/^[0-9]$/.test(e.key)) pulsar(e.key); else if (e.key === 'Backspace') pulsar('del'); else if (e.key === 'Enter') {
+        // con foco en una tecla del teclado en pantalla, Enter es OK (no repetir la tecla); en otros botones, su clic normal
+        var f = document.activeElement; if (f && f.tagName === 'BUTTON' && !cont.contains(f)) return;
+        e.preventDefault(); pulsar('ok');
+      }
     };
     if (UI._kd) document.removeEventListener('keydown', UI._kd);
     UI._kd = kd; document.addEventListener('keydown', kd);

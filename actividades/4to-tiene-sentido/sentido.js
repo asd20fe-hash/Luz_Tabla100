@@ -1,6 +1,8 @@
 /* ¿Tiene sentido? — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.2  (2026-10-12) Teclado
+     + Enter con una tecla del teclado en pantalla enfocada aprieta OK, no repite el número.
    v1.0.1  (2026-10-12) Textos
      + "Casillero" en vez de "casita" para el lugar del cociente.
    v1.0.0  (2026-10-11) Primera versión
@@ -12,7 +14,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.1', ACT = '4to-tiene-sentido', TITULO = '¿Tiene sentido?';
+  var VERSION = '1.0.2', ACT = '4to-tiene-sentido', TITULO = '¿Tiene sentido?';
   var UI = REF4_UI, SE = REF4_SENTIDO, $ = UI.$, esc = UI.esc, miles = UI.miles;
   var ctx = UI.base({ act: ACT, titulo: TITULO, version: VERSION, nivelMax: SE.MAX_NIVEL });
   if (!ctx) return;
