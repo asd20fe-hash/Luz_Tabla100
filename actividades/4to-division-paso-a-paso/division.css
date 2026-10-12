@@ -1,0 +1,7 @@
+/* División paso a paso: solo lo propio de esta actividad (lo común está en _comun-4to/comun.css). */
+.div-cabecera{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:16px}
+.div-zona-control{margin-top:8px;text-align:center}
+.div-acciones{display:flex;gap:10px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.div-fin{text-align:center;margin:10px 0;font-size:22px;font-weight:600}
+.div-fin small{display:block;font-weight:400;color:var(--muted);font-size:16px}
+#cuaderno{margin:6px 0}

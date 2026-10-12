@@ -1,0 +1,9 @@
+/* ¿Tiene sentido? — estilos propios (lo común está en _comun-4to/comun.css). */
+.sen-cab{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:16px}
+.sen-texto{font-size:22px;line-height:1.5;margin:10px 0;padding:12px 14px;border-radius:14px;background:var(--papel);color:var(--tinta);border:2px solid var(--glass-border)}
+.sen-escalera{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:8px 0;font-size:18px;font-weight:600}
+.sen-escalera span{padding:6px 12px;border-radius:12px;background:var(--chip)}
+.sen-opciones{display:grid;gap:8px}
+.sen-acc{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.sen-ctrl{text-align:center}
+#cuenta-mini{margin:8px 0}

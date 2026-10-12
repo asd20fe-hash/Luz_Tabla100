@@ -1,0 +1,21 @@
+/* Detective de problemas: estilos propios (lo común está en _comun-4to/comun.css). */
+.det-cab{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:16px}
+.det-texto{font-size:22px;line-height:1.5;margin:10px 0;padding:12px 14px;border-radius:14px;background:var(--papel);color:var(--tinta);border:2px solid var(--glass-border)}
+.det-texto u{text-decoration-thickness:3px;text-decoration-color:var(--accent);text-underline-offset:4px}
+.tok{border-radius:8px;padding:1px 4px;border-bottom:2px dotted var(--tinta-suave)}
+.tok.tocable{cursor:pointer;border-bottom-style:solid;border-bottom-color:var(--resalte-borde);background:var(--resalte);padding:3px 6px;margin:0 1px}
+.tok.sel{background:var(--accent);color:var(--sobre-acento);border-bottom-color:transparent}
+.tok.usado{background:var(--ok-bg);border-bottom-color:var(--ok)}
+.tok.suelto{opacity:.55}
+.det-paso{margin-top:8px}
+.det-opciones{display:grid;gap:8px}
+.det-plan .fila{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0}
+.det-plan .fila b{min-width:62px}
+.ref-sel{min-height:48px;font-size:18px;padding:4px 8px;border-radius:12px;border:2px solid var(--tecla-borde);background:var(--tecla);color:var(--text);max-width:100%}
+.det-cuentas{font-size:22px;font-weight:600;line-height:1.7;text-align:center}
+.det-acc{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.calc{max-width:260px;margin:10px auto;padding:8px;border-radius:14px;border:2px solid var(--tecla-borde);background:var(--box-bg)}
+.calc .pant{font-size:26px;text-align:right;min-height:40px;padding:4px 8px;font-weight:700}
+.calc .teclas{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.calc button{min-height:48px;font-size:20px;font-weight:600;border-radius:10px;border:2px solid var(--tecla-borde);background:var(--tecla);cursor:pointer}
+.det-unidades{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px}
