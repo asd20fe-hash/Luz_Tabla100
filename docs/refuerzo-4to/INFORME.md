@@ -27,7 +27,7 @@ Servir la carpeta (`python -m http.server 8000`) y abrir con el perfil de Ian. P
 
 | Actividad | URL de ejemplo | Qué mirar |
 |---|---|---|
-| División paso a paso | `actividades/4to-division-paso-a-paso/index.html?p=ian&debug=1&seed=5&nivel=2` | Cuaderno con galera, casita, restas escritas y flechas de bajada; tabla del divisor con 3 filas en blanco; en la 2ª vuelta de 300 : 8 elegir 4 y contestar "sí" al control muestra el resto mayor y vuelve al factor. Nivel 4: `nivel=4` y tocar "Revisar mi cuenta". |
+| División paso a paso | `actividades/4to-division-paso-a-paso/index.html?p=ian&debug=1&seed=5&nivel=2` | Cuaderno con galera, casillero, restas escritas y flechas de bajada; tabla del divisor con 3 filas en blanco; en la 2ª vuelta de 300 : 8 elegir 4 y contestar "sí" al control muestra el resto mayor y vuelve al factor. Nivel 4: `nivel=4` y tocar "Revisar mi cuenta". |
 | ¿Cuántas veces entra? | `actividades/4to-cuantas-veces-entra/index.html?p=ian&debug=1&seed=3&nivel=1` | Escalera visible en el nivel 1 con la marca de n; ítems A (cuántas veces y cuánto sobra), B (4 productos vecinos) y C (verdadero o falso). Nivel 4: récord de tiempo al terminar. |
 | Detective de problemas | `actividades/4to-detective-problemas/index.html?p=ian&debug=1&seed=42&nivel=3` | Los siete mini-pasos; datos tocables en el texto; plan con listas desplegables; calculadora en los niveles 3 y 4; botón de voz si el navegador tiene voz en español. |
 | ¿Tiene sentido? | `actividades/4to-tiene-sentido/index.html?p=ian&debug=1&seed=61&nivel=1` | T2 muestra una cuenta de la carpeta con un error plantado (30 % sin error): "Algo está mal" → tocar la zona → elegir el motivo. |

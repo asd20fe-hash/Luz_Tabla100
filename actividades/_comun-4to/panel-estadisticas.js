@@ -7,7 +7,7 @@
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
 
   var ERRORES = {
-    TABLA: 'Producto mal (tabla)', FACTOR_CHICO: 'Factor chico (uno menos)', FACTOR_GRANDE: 'Factor que se pasa', REGISTRO_COCIENTE: 'Anotó el producto en la casita',
+    TABLA: 'Producto mal (tabla)', FACTOR_CHICO: 'Factor chico (uno menos)', FACTOR_GRANDE: 'Factor que se pasa', REGISTRO_COCIENTE: 'Anotó el producto en el casillero',
     RESTA: 'Resta mal hecha', RESTO_MAYOR: 'No vio que el resto era mayor que el divisor', CONTROL: 'Control del resto', PARCIAL_CHICO: 'Primer parcial chico',
     BAJAR: 'Bajó una cifra equivocada', PASO_EXTRA: 'Restó sin bajar / cifra de más', CERO_OMITIDO: 'No puso el 0', ESTIMACION: 'Estimación', VERIFICACION: 'Verificación',
     PREGUNTA: 'No identificó la pregunta', DATOS_FALTAN: 'Faltó marcar un dato', DATOS_DE_MAS: 'Marcó un dato que sobra', PLAN_OPERACION: 'Operación equivocada',

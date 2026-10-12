@@ -1,4 +1,4 @@
-/* Dibuja una división "como en la carpeta": cuadrícula, galera, casita del cociente, restas escritas,
+/* Dibuja una división "como en la carpeta": cuadrícula, galera, casillero del cociente, restas escritas,
    flechas de bajada y tabla del divisor. Se usa en la Actividad 1 (interactiva) y en la 4 (solo lectura).
    Solo dibuja; no sabe nada de pasos ni de errores. window.REF4_CUADERNO.dibujar(contenedor, vista, opts) */
 (function (root) {
@@ -66,15 +66,15 @@
       html += cel('=', xR + c * 1.05, Y(0), 'ok');
       for (var q = 0; q < vista.igual.length; q++) html += cel(vista.igual[q], xR + c * (2.05 + q), Y(0), 'ok');
     }
-    // --- casita (fila 1, a la derecha de la galera) ---
+    // --- casillero (fila 1, a la derecha de la galera) ---
     for (var k = 0; k < vista.cociente.length; k++) html += cel(vista.cociente[k], xR + k * c, Y(1), vista.errCasita === k ? 'error' : '');
     if (act.zona === 'casita') html += cel(act.buf ? act.buf.slice(-1) : '', xR + act.vuelta * c, Y(1), 'slot') +
       (act.buf && act.buf.length > 1 ? cel(act.buf.slice(0, -1), xR + (act.vuelta - 1) * c, Y(1), 'slot') : '');
 
     // --- vueltas ---
     svg += raya(xLinea, Y(0), xLinea, alto);                       // galera
-    svg += raya(xLinea, Y(1), xCasitaFin, Y(1));                   // raya del divisor / techo de la casita
-    svg += raya(xCasitaFin, Y(1), xCasitaFin, Y(2));               // pared derecha de la casita
+    svg += raya(xLinea, Y(1), xCasitaFin, Y(1));                   // raya del divisor / techo del casillero
+    svg += raya(xCasitaFin, Y(1), xCasitaFin, Y(2));               // pared derecha del casillero
     vista.vueltas.forEach(function (v, vi) {
       var rP = 2 * vi + 1, rR = 2 * vi + 2, vcls = v.vieja ? 'vieja' : '';
       if (v.producto !== null && v.producto !== undefined) {

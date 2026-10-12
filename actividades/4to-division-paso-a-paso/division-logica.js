@@ -12,14 +12,14 @@
     FACTOR_GRANDE: '{d} × {q} = {p}, y eso es más que {n}. Se pasa: probá con uno menos.',
     RESTO_MAYOR: 'Te quedaron {r}, y {r} es más que {d}. ¡Entra una vez más! Volvé a elegir.',
     BIEN_VISTO: '¡Bien visto! {r} es más que {d}: entra una vez más. Volvé a elegir.',
-    REGISTRO_COCIENTE: 'En la casita va por cuánto multiplicaste, no el resultado. ¿{d} por cuánto da {p}?',
-    OTRO_CASITA: 'En la casita va cuántas veces entra {d}: el número que elegiste.',
+    REGISTRO_COCIENTE: 'En el casillero va por cuánto multiplicaste, no el resultado. ¿{d} por cuánto da {p}?',
+    OTRO_CASITA: 'En el casillero va cuántas veces entra {d}: el número que elegiste.',
     TABLA_PRODUCTO: 'Mirá la tabla: {d} × {q}.',
     TABLA: 'Armalo desde el anterior: {d} × {q1} = {prev}, y le sumás {d}.',
     RESTA: 'Revisá la resta: {n} − {p}.',
     BAJAR: 'Bajá la cifra que sigue, la que está justo después: el {x}.',
     PASO_EXTRA: 'Antes de volver a restar, bajá la cifra que sigue.',
-    CERO_OMITIDO: '{n} es menor que {d}: entra 0 veces. Anotá 0 en la casita y restá 0.',
+    CERO_OMITIDO: '{n} es menor que {d}: entra 0 veces. Anotá 0 en el casillero y restá 0.',
     ESTIMACION: '{d} × 100 = {a}. ¿{dividendo} es más o menos que {a}? ¿Y que {d} × 10?',
     VERIFICACION: 'Fijate: {q} × {d} + {r} tiene que darte {dividendo}.',
     CONTROL: 'Compará {r} con {d}: {r} es menor, así que ya no entra otra vez.',
@@ -244,7 +244,7 @@
                                        : 'Mirá la primera cifra: ¿alcanza para ' + d + '? Si no, tomá dos cifras.';
       case 'factor': return explicita ? (d + ' × ' + T.factor + ' = ' + d * T.factor + ' es el más grande que no pasa de ' + V.parcial + ': entra ' + T.factor + (T.factor === 1 ? ' vez.' : ' veces.'))
                                      : '¿Cuántas veces entra ' + d + ' en ' + V.parcial + '? Buscá en la tabla el producto más grande que no pase.';
-      case 'casita': return explicita ? 'Anotá ' + c.q + ' en la casita.' : 'En la casita va cuántas veces entra, no el resultado.';
+      case 'casita': return explicita ? 'Anotá ' + c.q + ' en el casillero.' : 'En el casillero va cuántas veces entra, no el resultado.';
       case 'producto': return explicita ? d + ' × ' + c.q + ' = ' + c.p + '.' : 'Multiplicá ' + d + ' × ' + c.q + '.';
       case 'resta': return explicita ? c.n + ' − ' + (M.dif ? d * T.factor : V.producto) + ' = ' + esperadoDe(M, out, a) + '.' : 'Restá ' + c.n + ' − ' + (M.dif ? d * T.factor : V.producto) + '.';
       case 'control': return explicita ? (V.resta + (V.resta < d ? ' es menor que ' : ' no es menor que ') + d + '.') : 'Compará el resto con ' + d + '.';
@@ -268,7 +268,7 @@
       case 'estimacion': return '¿Cuántas cifras va a tener el cociente?';
       case 'parcial': return 'Tocá las cifras del dividendo que tomás para empezar.';
       case 'factor': return '¿Cuántas veces entra ' + d + ' en ' + V.parcial + '?';
-      case 'casita': return 'Anotá en la casita cuántas veces entra.';
+      case 'casita': return 'Anotá en el casillero cuántas veces entra.';
       case 'producto': return '¿Cuánto da ' + d + ' × ' + (M.dif ? M.sim.vueltas[a.vuelta].factor : V.factor) + '? Escribilo debajo.';
       case 'resta': return '¿Cuánto da ' + V.parcial + ' − ' + V.producto + '?';
       case 'control': return '¿' + V.resta + ' es menor que ' + d + '?';

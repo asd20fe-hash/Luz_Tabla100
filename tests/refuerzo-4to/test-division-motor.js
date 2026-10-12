@@ -41,12 +41,12 @@ prueba('motor: tabla del divisor según el nivel', function () {
   assert.ok(m2.blancos.some(function (q) { return [1, 3, 9].indexOf(q) >= 0; }), 'incluye un factor que va a usar');
   assert.strictEqual(MO.crear({ dividendo: 976, divisor: 7, nivel: 3 }).blancos.length, 8);
 });
-prueba('motor: anotar 7 en la casita cuando el factor es 1 en 976 : 7 → REGISTRO_COCIENTE', function () {
+prueba('motor: anotar 7 en el casillero cuando el factor es 1 en 976 : 7 → REGISTRO_COCIENTE', function () {
   var M = MO.crear({ dividendo: 976, divisor: 7, nivel: 2, az: AZ.crear(1) });
   hasta(M, 'casita', 0);
   var r = MO.responder(M, 7);
-  assert.strictEqual(r.ok, false); assert.strictEqual(r.codigo, 'REGISTRO_COCIENTE'); assert.ok(/casita/.test(r.pista));
-  assert.strictEqual(MO.derivar(M).actual.tipo, 'casita', 'sigue en la casita');
+  assert.strictEqual(r.ok, false); assert.strictEqual(r.codigo, 'REGISTRO_COCIENTE'); assert.ok(/casillero/.test(r.pista));
+  assert.strictEqual(MO.derivar(M).actual.tipo, 'casita', 'sigue en el casillero');
   assert.strictEqual(MO.responder(M, 1).ok, true);
 });
 prueba('motor: elegir 4 en 60 : 8 y confirmar el control → RESTO_MAYOR', function () {
@@ -133,7 +133,7 @@ prueba('motor: nivel 4 acepta todo, revisa al final y deja corregir desde el pri
   var fin = resolver(M);
   assert.ok(MO.derivar(M).terminada);
 });
-prueba('motor: la vista dibuja la casita y el cociente completo al terminar', function () {
+prueba('motor: la vista dibuja el casillero y el cociente completo al terminar', function () {
   var M = MO.crear({ dividendo: 976, divisor: 7, nivel: 1 });
   resolver(M); var v = MO.vista(M, '');
   assert.strictEqual(v.cociente, '139'); assert.strictEqual(v.igual, '139'); assert.strictEqual(v.vueltas.length, 3);

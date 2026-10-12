@@ -1,16 +1,18 @@
 /* División paso a paso — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.1  (2026-10-12) Textos
+     + "Casillero" en vez de "casita" para el lugar del cociente.
    v1.0.0  (2026-10-11) Primera versión
-     + Cuaderno cuadriculado con galera, casita, restas escritas y flechas de bajada.
+     + Cuaderno cuadriculado con galera, casillero, restas escritas y flechas de bajada.
      + 4 niveles (con todo a la vista → como en la carpeta), rondas de 2 cuentas (1 en el nivel 4).
-     + Pasos de control: factor, casita, resto menor que el divisor, bajar una sola cifra, cero.
+     + Pasos de control: factor, casillero, resto menor que el divisor, bajar una sola cifra, cero.
      + Estimación de cifras del cociente y verificación (niveles 3 y 4).
      + Registro de eventos, progresión automática de nivel, ?debug=1 y ?seed=N.
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.0', ACT = '4to-division-paso-a-paso', TITULO = 'División paso a paso';
+  var VERSION = '1.0.1', ACT = '4to-division-paso-a-paso', TITULO = 'División paso a paso';
   var CONTROLES = ['RESTO_MAYOR', 'CONTROL', 'ESTIMACION', 'VERIFICACION'];
   var MO = REF4_DIVMOTOR, DIV = REF4_DIV, UI = REF4_UI, $ = UI.$;
 
@@ -20,7 +22,7 @@
 
   var R = null;            // estado de la ronda
   var sesionDiv = { usados: {}, cuadernoUsado: false };
-  var NOMBRE_PASO = { tabla: 'completar la tabla', estimacion: 'estimar las cifras', parcial: 'elegir las cifras', factor: '¿cuántas veces entra?', casita: 'anotar en la casita',
+  var NOMBRE_PASO = { tabla: 'completar la tabla', estimacion: 'estimar las cifras', parcial: 'elegir las cifras', factor: '¿cuántas veces entra?', casita: 'anotar en el casillero',
                       producto: 'multiplicar', resta: 'restar', control: 'comparar el resto', bajar: 'bajar una cifra', fin: 'terminar la cuenta', verificacion: 'verificar', revision: 'revisar' };
 
   /* ---------- ronda ---------- */

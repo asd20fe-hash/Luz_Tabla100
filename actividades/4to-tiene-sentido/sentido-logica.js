@@ -106,8 +106,8 @@
       case 'PASO_EXTRA': return 'Contá cuántas cifras bajaste. Cada vuelta da una cifra del cociente.';
       case 'RESTO_MAYOR': return 'Si sobran ' + v.resto + ' y ' + v.resto + ' es más que ' + d + ', todavía entra.';
       case 'TABLA': return 'Mirá la tabla: ¿' + d + ' × ' + e.vuelta + ' da ' + v.tabla[e.vuelta - 1].p + '?';
-      case 'REGISTRO_COCIENTE': return 'En la casita va por cuánto multiplicaste, no el resultado.';
-      default: return 'Fijate si cada vuelta tiene su cifra en la casita, aunque sea 0.';
+      case 'REGISTRO_COCIENTE': return 'En el casillero va por cuánto multiplicaste, no el resultado.';
+      default: return 'Fijate si cada vuelta tiene su cifra en el casillero, aunque sea 0.';
     }
   }
   function validarMotivo(it, op) { return op.ok ? OK : { ok: false, codigo: 'MOTIVO', pista: pistaMotivo(it) }; }

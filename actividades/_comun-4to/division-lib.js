@@ -140,7 +140,7 @@
   /* ---------- inyector de errores (Actividad 4) ----------
      inyectarError(sim, tipo, az) → {vista, error:{tipo, campo, vuelta, motivo}} o null si no se puede. */
   var MOTIVOS = {
-    REGISTRO_COCIENTE: 'En la casita anotó el resultado de la multiplicación, no cuántas veces entra.',
+    REGISTRO_COCIENTE: 'En el casillero anotó el resultado de la multiplicación, no cuántas veces entra.',
     RESTO_MAYOR: 'Quedó un resto más grande que el divisor: todavía entraba otra vez.',
     PASO_EXTRA: 'El cociente tiene una cifra de más: no hay tantas vueltas.',
     CERO_OMITIDO: 'Se olvidó de anotar un 0 en el cociente cuando no entraba.',

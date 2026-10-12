@@ -1,6 +1,8 @@
 /* ¿Tiene sentido? — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.1  (2026-10-12) Textos
+     + "Casillero" en vez de "casita" para el lugar del cociente.
    v1.0.0  (2026-10-11) Primera versión
      + Control del resultado: estimar las cifras del cociente, detectar cuentas imposibles,
        verificar con cociente × divisor + resto y descubrir respuestas absurdas.
@@ -10,7 +12,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.0', ACT = '4to-tiene-sentido', TITULO = '¿Tiene sentido?';
+  var VERSION = '1.0.1', ACT = '4to-tiene-sentido', TITULO = '¿Tiene sentido?';
   var UI = REF4_UI, SE = REF4_SENTIDO, $ = UI.$, esc = UI.esc, miles = UI.miles;
   var ctx = UI.base({ act: ACT, titulo: TITULO, version: VERSION, nivelMax: SE.MAX_NIVEL });
   if (!ctx) return;
