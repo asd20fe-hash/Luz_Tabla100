@@ -40,3 +40,45 @@ El prompt usa nombres ilustrativos. La API real, leída en `core/core.js`, `acti
 **"Errores de control" para subir de nivel.** A1: `RESTO_MAYOR`, `CONTROL`, `ESTIMACION`, `VERIFICACION`. A4: todos. A2, A3 y A5: ninguno (solo cuenta el 80 %), salvo `ESTIMACION` en A5.
 
 **Estrellas.** 3 con 85 % o más al primer intento, 2 con 60 % o más, 1 en otro caso.
+
+## 3. Decisiones tomadas durante la implementación
+
+**Almacén que avisa si está lleno.** `MATE.store().set` se traga los errores de `localStorage`, así que no se podría compactar cuando se llena. `ui-comun.js` usa un almacén propio con el mismo esquema de claves (`mate.<perfil>.<act>.<clave>`) que lanza la excepción; `eventos.js` la atrapa, compacta la mitad de los eventos en agregados y reintenta. Alternativa descartada: usar `MATE.store` directamente (nunca se enteraría del error).
+
+**Guardado diferido.** Los eventos se escriben cada 1 s (agrupados), al cerrar la ronda y al ocultar la página, no en cada pulsación (3000 eventos serializados en cada tecla es lento en una tablet).
+
+**Fijar el nivel desde la URL.** `?nivel=N` solo funciona junto con `?debug=1` (sirve para probar). El nivel real lo fija la progresión o el panel de padres.
+
+**A1, nivel 4 (carpeta).** Se agregó el paso "Revisar mi cuenta" al final (después de la verificación). Marca en rojo el primer paso erróneo y el botón "Corregir desde acá" corta las respuestas desde ahí. Las respuestas del chico se registran como eventos en el momento (con su acierto real), aunque no se le muestre la corrección.
+
+**A1, factor en los niveles 2 y 3.** El factor equivocado se acepta; se descubre en el producto ("se pasa") o en el control del resto. Se registra un evento `factor` con `FACTOR_CHICO`/`FACTOR_GRANDE`/`CERO_OMITIDO` recién cuando se descubre, y el control (nivel 2) queda como acierto si el chico dijo "no".
+
+**A1, `PASO_EXTRA`.** En el paso de bajar, escribir un número con el teclado en vez de tocar la cifra se registra como `PASO_EXTRA`.
+
+**A1, ejercicios del cuaderno.** 976 : 7 y 300 : 8 pueden aparecer desde el nivel 2; los otros tres (de 4 cifras) desde el nivel 3 o 4 según el rango de divisor. Máximo uno por sesión de pantalla.
+
+**A2, ítem B y hechos.** Los productos "vecinos" siempre incluyen uno que se pasa de n. El récord del nivel 4 solo cuenta rondas con 80 % o más al primer intento, para que no premie apurarse sin cuidado; se guarda en la clave `record`.
+
+**A2, ayudas.** En el nivel 1 la escalera está siempre; "Ver tabla" (nivel 2) cuenta como ayuda `tabla`; "Me perdí" (niveles 3 y 4) abre la escalera y cuenta como `me_perdi`.
+
+**A3, selección del plan.** El plan se arma con listas desplegables nativas (operando, operación, operando), accesibles y cómodas en pantallas táctiles. Se compara por forma canónica: no importa el orden de los pasos independientes ni el orden de los operandos de + y ×. Alternativa descartada: fichas arrastrables (frágiles en táctil).
+
+**A3, cálculo.** En los niveles 3 y 4 el chico escribe solo el resultado del último paso (hay calculadora); si es una división con resto, la app avisa "Da X y sobran Y". En C8 se pide la diferencia en valor absoluto y se aceptan las dos restas.
+
+**A3, errores en el nivel 4.** Sin pistas automáticas: después de un error aparece "Todavía no" y la pista queda disponible con el botón 💡.
+
+**A3, lectura.** El tiempo de lectura se mide hasta tocar "Ya lo leí"; si es menor a 4 s en un texto de más de 25 palabras se registra `lectura_rapida`. El audio se registra con `intento: 0` para que no cuente en el porcentaje.
+
+**A4, cuentas sanas.** El 30 % de las cuentas de T2 no tiene error en todos los niveles (el prompt lo pide en el 3), para que el nivel 1 y 2 tampoco enseñen "todo está mal". En el nivel 3 de T2 se usan cuentas de 3 o 4 cifras (con ceros posibles) para poder plantar `CERO_OMITIDO`.
+
+**A4, T2.** Elegir mal la zona se registra como `DETECCION_OMITIDA` (no encontró el error real).
+
+**A5, ítems M1 sin ceros en el multiplicando.** Para que haya una fila por cifra. Los ceros aparecen en los productos parciales (9 × 30 = 270), que es donde falla.
+
+**A5, M4.** Cada columna tiene tres pasos: suma (con lo que se llevó), cifra que se anota y cuánto se lleva. La última columna no lleva reserva.
+
+**Pasos y paneles.** El campo `nivelMax` se agregó a las entradas de `registro.js` de las cinco actividades para que el panel de padres sepa los niveles disponibles.
+
+**Colores.** Se agregaron los tokens `--sobre-acento` y `--velo` (texto sobre el color de acento y fondo de los diálogos) con versión clara y oscura, en lugar de `#fff` y `rgba()` sueltos.
+
+**Shell v2.1.** Se subió la versión del shell (`index.html`) porque cambió Ajustes de padres. El `.ver` de la pantalla de perfiles ahora muestra v2.1; el core sigue en v2.0.

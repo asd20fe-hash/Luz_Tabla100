@@ -4,7 +4,7 @@
   --resalte:rgba(139,92,246,.22); --resalte-borde:#8b5cf6; --flecha:#e0457b;
   --globo-bg:#fff6d6; --globo-borde:#e0b73a; --globo-texto:#3b2f00;
   --ok-bg:rgba(21,146,74,.16); --bad-bg:rgba(212,32,74,.16);
-  --tecla:#ffffff; --tecla-borde:#c9c2e8;
+  --tecla:#ffffff; --tecla-borde:#c9c2e8; --sobre-acento:#ffffff; --velo:rgba(10,8,30,.55);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
@@ -12,7 +12,7 @@
     --resalte:rgba(167,139,250,.28); --resalte-borde:#a78bfa; --flecha:#fb7ab0;
     --globo-bg:#3a3213; --globo-borde:#c9a227; --globo-texto:#fff1b8;
     --ok-bg:rgba(74,222,128,.18); --bad-bg:rgba(251,113,133,.2);
-    --tecla:#2a2658; --tecla-borde:#4a4488;
+    --tecla:#2a2658; --tecla-borde:#4a4488; --sobre-acento:#1c1a3c; --velo:rgba(0,0,0,.65);
   }
 }
 :root[data-theme="dark"]{
@@ -20,7 +20,7 @@
   --resalte:rgba(167,139,250,.28); --resalte-borde:#a78bfa; --flecha:#fb7ab0;
   --globo-bg:#3a3213; --globo-borde:#c9a227; --globo-texto:#fff1b8;
   --ok-bg:rgba(74,222,128,.18); --bad-bg:rgba(251,113,133,.2);
-  --tecla:#2a2658; --tecla-borde:#4a4488;
+  --tecla:#2a2658; --tecla-borde:#4a4488; --sobre-acento:#1c1a3c; --velo:rgba(0,0,0,.65);
 }
 html,body{margin:0;min-height:100%}
 body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:18px;line-height:1.35;-webkit-tap-highlight-color:transparent}
@@ -32,7 +32,7 @@ button{font:inherit;color:inherit}
 .ref-ver{font-size:12px;color:var(--muted)}
 .ref-btn{min-height:48px;min-width:48px;padding:6px 14px;font-weight:600;cursor:pointer;
   background:var(--glass-strong);border:1px solid var(--glass-border);border-radius:14px;box-shadow:var(--shadow)}
-.ref-btn.main{background:var(--accent);color:#fff;border-color:transparent}
+.ref-btn.main{background:var(--accent);color:var(--sobre-acento);border-color:transparent}
 .ref-btn[disabled]{opacity:.45;cursor:default}
 .ref-btn.chico{min-height:48px;font-size:18px}
 #app{max-width:980px;margin:0 auto;padding:6px 12px 90px}
@@ -56,7 +56,7 @@ button{font:inherit;color:inherit}
 .ref-teclado{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:320px;margin:10px auto 0}
 .ref-teclado button{min-height:54px;font-size:24px;font-weight:600;cursor:pointer;background:var(--tecla);border:2px solid var(--tecla-borde);border-radius:14px}
 .ref-teclado button:active{background:var(--resalte)}
-.ref-teclado button.ok{background:var(--accent);color:#fff;border-color:transparent}
+.ref-teclado button.ok{background:var(--accent);color:var(--sobre-acento);border-color:transparent}
 .ref-teclado button[disabled]{opacity:.4}
 .ref-entrada{min-width:90px;min-height:52px;padding:6px 14px;font-size:26px;font-weight:700;text-align:center;
   border:3px solid var(--resalte-borde);background:var(--resalte);border-radius:12px;display:inline-block;letter-spacing:.08em}
@@ -68,7 +68,7 @@ button{font:inherit;color:inherit}
 #globo.ver{display:block}
 #globo.ok{border-color:var(--ok)} #globo.mal{border-color:var(--bad)}
 
-.ref-modal{position:fixed;inset:0;background:rgba(10,8,30,.55);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.ref-modal{position:fixed;inset:0;background:var(--velo);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
 .ref-modal .ref-panel{max-width:420px;width:100%;text-align:center;background:var(--box-bg)}
 .ref-estrellas{font-size:44px;letter-spacing:6px;margin:6px 0}
 .ref-estrellas .off{opacity:.25;filter:grayscale(1)}
@@ -113,5 +113,5 @@ button{font:inherit;color:inherit}
 .tabla-div .hueco{display:inline-block;min-width:34px;border-bottom:2px dashed var(--tinta-suave);text-align:center}
 .pasos-barra{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:6px 0}
 .pasos-barra span{padding:4px 10px;border-radius:999px;font-size:15px;background:var(--chip);color:var(--muted)}
-.pasos-barra span.on{background:var(--accent);color:#fff;font-weight:700}
+.pasos-barra span.on{background:var(--accent);color:var(--sobre-acento);font-weight:700}
 @media (max-width:640px){#app{padding-left:8px;padding-right:8px} .tabla-div{display:grid;grid-template-columns:1fr 1fr;column-gap:10px;width:100%}}

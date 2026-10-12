@@ -4,7 +4,7 @@
 .det-texto u{text-decoration-thickness:3px;text-decoration-color:var(--accent);text-underline-offset:4px}
 .tok{border-radius:8px;padding:1px 4px;border-bottom:2px dotted var(--tinta-suave)}
 .tok.tocable{cursor:pointer;border-bottom-style:solid;border-bottom-color:var(--resalte-borde);background:var(--resalte);padding:3px 6px;margin:0 1px}
-.tok.sel{background:var(--accent);color:#fff;border-bottom-color:transparent}
+.tok.sel{background:var(--accent);color:var(--sobre-acento);border-bottom-color:transparent}
 .tok.usado{background:var(--ok-bg);border-bottom-color:var(--ok)}
 .tok.suelto{opacity:.55}
 .det-paso{margin-top:8px}
