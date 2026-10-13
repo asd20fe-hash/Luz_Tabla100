@@ -1,6 +1,9 @@
 /* ¿Cuál es más? (fracciones de 4to) — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.1  (2026-10-13) Teclado y correcciones
+     + Teclado: Tab y Enter pasan a la casilla siguiente de la fracción (Enter en la última es OK).
+     + Teclado: S y N eligen Sí o No, las flechas ← → recorren las opciones y Enter elige.
    v1.0.0  (2026-10-13) Primera versión
      + Comparar con criterios: mismo denominador, mismo numerador (partes más grandes) o pasando a equivalentes.
      + C1 "Poné >, < o =", C2 "¿Más o menos que un entero?" (canastas), C3 problemas de comparar con "¿Cómo te diste cuenta?",
@@ -10,7 +13,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.0', ACT = '4to-fracciones-comparar';
+  var VERSION = '1.0.1', ACT = '4to-fracciones-comparar';
   var FRUI = REF4_FRUI, FR = REF4_FR, G = REF4_FRGEN, A = G.comparar, cf = FRUI.conFracciones, esc = FRUI.esc;
   var fr = FR.fr, txt = function (f) { return FR.formatear(f); };
   var CANASTAS = { menos: 'Menos de 1', justo: 'Justo 1', mas: 'Más de 1' };

@@ -88,12 +88,20 @@
       tk.classList.add('fr-teclado'); // REF4_UI.teclado pisa la clase
     }
     function refrescar() { cont.querySelectorAll('.fr-casilla').forEach(function (b) { var k = b.dataset.c; b.textContent = campos[k]; b.classList.toggle('on', k === activo); }); }
-    // Teclado físico: "/" o flechas cambian de casilla.
-    var kd = function (e) { if (!cont.isConnected) { document.removeEventListener('keydown', kd); return; }
-      var i = orden.indexOf(activo);
-      if ((e.key === '/' || e.key === 'ArrowRight' || e.key === ' ') && i < orden.length - 1) { e.preventDefault(); activo = orden[i + 1]; refrescar(); }
-      else if (e.key === 'ArrowLeft' && i > 0) { e.preventDefault(); activo = orden[i - 1]; refrescar(); } };
-    document.addEventListener('keydown', kd);
+    // Teclado físico: Tab, Enter, "/" y las flechas pasan a la casilla siguiente (Shift+Tab y ← a la anterior);
+    // en la última casilla, Enter es OK. Va en captura para ganarle al Enter del teclado común.
+    function ir(k) { activo = k; refrescar(); var b = cont.querySelector('[data-c="' + k + '"]'); if (b) b.focus(); }
+    var kd = function (e) { if (!cont.isConnected) { document.removeEventListener('keydown', kd, true); return; }
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      var i = orden.indexOf(activo), ultima = i === orden.length - 1;
+      var adelante = (e.key === 'Tab' && !e.shiftKey) || e.key === 'Enter' || e.key === '/' || e.key === 'ArrowRight';
+      var atras = (e.key === 'Tab' && e.shiftKey) || e.key === 'ArrowLeft';
+      if (adelante && !ultima) { e.preventDefault(); e.stopImmediatePropagation(); ir(orden[i + 1]); }
+      else if (atras && i > 0) { e.preventDefault(); e.stopImmediatePropagation(); ir(orden[i - 1]); }
+      else if (e.key === 'Enter' && ultima) { e.preventDefault(); e.stopImmediatePropagation(); var ok = cont.querySelector('.fr-teclado [data-k="ok"]'); if (ok && !ok.disabled) ok.click(); } };
+    document.addEventListener('keydown', kd, true);
+    // Si el foco llega a una casilla (con el mouse o con Tab), esa es la que recibe los números.
+    cont.addEventListener('focusin', function (e) { var b = e.target.closest && e.target.closest('[data-c]'); if (b && b.dataset.c !== activo) { activo = b.dataset.c; refrescar(); } });
     pintar();
     return { limpiar: function () { campos = { entero: '', num: '', den: '' }; activo = orden[0]; refrescar(); }, campos: function () { return campos; } };
   };
@@ -246,6 +254,7 @@
       for (var i = 0; i < n; i++) {
         if (forzado) { out.push(forzado); continue; }
         var cand = tipos.filter(function (t) { return !(out.length >= 2 && out[out.length - 1] === t && out[out.length - 2] === t); });
+        if (!cand.length) cand = tipos; // con un solo tipo en el nivel no hay otro para alternar
         out.push(AZ.pesado(cand, cand.map(function (t) { return pw.tipos[t] || 1; })));
       }
       var fin = !forzado && cfg.tipoFinal ? cfg.tipoFinal(nivel) : null;

@@ -1,6 +1,9 @@
 /* ¿Cuánto falta? (fracciones de 4to) — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.1  (2026-10-13) Teclado y correcciones
+     + Teclado: Tab y Enter pasan a la casilla siguiente de la fracción (Enter en la última es OK).
+     + Teclado: S y N eligen Sí o No, las flechas ← → recorren las opciones y Enter elige.
    v1.0.0  (2026-10-13) Primera versión
      + Cuánto falta para 1 o para 2, completar sumas, sumar y restar con medios, cuartos y octavos.
      + S1 "¿Cuánto falta para el entero?", S2 "Completá", S3 "Sumá o restá" por pasos (¿mismo tamaño? → pasar → resultado),
@@ -10,7 +13,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.0', ACT = '4to-fracciones-cuanto-falta';
+  var VERSION = '1.0.1', ACT = '4to-fracciones-cuanto-falta';
   var FRUI = REF4_FRUI, FR = REF4_FR, G = REF4_FRGEN, A = G.falta, cf = FRUI.conFracciones, esc = FRUI.esc;
   var fr = FR.fr, txt = function (f) { return FR.formatear(f); }, mix = function (f) { return FR.formatear(f, { mixto: true }); }, UNO = fr(1, 1);
   var PASOS_P = ['leer', 'pregunta', 'entero', 'plan', 'calcular', 'sentido', 'respuesta'];

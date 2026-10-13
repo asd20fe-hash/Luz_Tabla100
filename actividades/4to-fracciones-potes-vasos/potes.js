@@ -1,6 +1,9 @@
 /* Potes y vasos (fracciones de 4to) — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.1  (2026-10-13) Teclado y correcciones
+     + Teclado: Tab y Enter pasan a la casilla siguiente de la fracción (Enter en la última es OK).
+     + Teclado: S y N eligen Sí o No, las flechas ← → recorren las opciones y Enter elige.
    v1.0.0  (2026-10-13) Primera versión
      + Fracciones en medidas: potes de 1, 1/2 y 1/4 kg; vasos de 1/4 l (mediano) y 1/8 l (chico); jarra de 1 1/2 l.
      + K1 "Llená la balanza" (con condiciones y la variante "¿Se puede?"), K2 "¿Alcanza?", K3 "¿Es justo?",
@@ -10,7 +13,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.0', ACT = '4to-fracciones-potes-vasos';
+  var VERSION = '1.0.1', ACT = '4to-fracciones-potes-vasos';
   var FRUI = REF4_FRUI, FR = REF4_FR, G = REF4_FRGEN, A = G.potes, cf = FRUI.conFracciones;
   var fr = FR.fr, txt = function (f) { return FR.formatear(f); }, mix = function (f) { return FR.formatear(f, { mixto: true }); };
   var TEXTO_PASO = { sepuede: 'decidir si se puede', K1: 'poner potes y tocar Listo', alcanza: 'decidir si alcanza', cuanto: 'escribir cuánto', fila: 'revisar la fila', K4: 'completar la suma',

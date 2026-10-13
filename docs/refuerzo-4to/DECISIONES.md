@@ -53,7 +53,9 @@ El prompt usa nombres ilustrativos. La API real, leída en `core/core.js`, `acti
 
 **A1, factor en los niveles 2 y 3.** El factor equivocado se acepta; se descubre en el producto ("se pasa") o en el control del resto. Se registra un evento `factor` con `FACTOR_CHICO`/`FACTOR_GRANDE`/`CERO_OMITIDO` recién cuando se descubre, y el control (nivel 2) queda como acierto si el chico dijo "no".
 
-**A1, `PASO_EXTRA`.** En el paso de bajar, escribir un número con el teclado en vez de tocar la cifra se registra como `PASO_EXTRA`.
+**A1, bajar con el teclado** (v1.0.4). Escribir la cifra que toca bajar vale como tocarla; escribir otra cifra del dividendo cuenta como tocar esa (`BAJAR`). `PASO_EXTRA` queda para un número de más de una cifra (antes, cualquier número escrito era `PASO_EXTRA`).
+
+**Atajos de teclado** (`REF4_UI.atajos`, desde las versiones del 2026-10-13). S y N tocan el botón "Sí…" o "No…" que se ve; ← y → recorren los botones de opción y Enter elige el que tiene el foco.
 
 **A1, ejercicios del cuaderno.** 976 : 7 y 300 : 8 pueden aparecer desde el nivel 2; los otros tres (de 4 cifras) desde el nivel 3 o 4 según el rango de divisor. Máximo uno por sesión de pantalla.
 

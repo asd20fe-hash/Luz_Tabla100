@@ -1,6 +1,10 @@
 /* Partes iguales (fracciones de 4to) — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.1  (2026-10-13) Teclado y correcciones
+     + "Marcá las que tienen exactamente…": al acertar, Listo no pasaba al ejercicio siguiente.
+     + Teclado: Tab y Enter pasan a la casilla siguiente de la fracción (Enter en la última es OK).
+     + Teclado: S y N eligen Sí o No, las flechas ← → recorren las opciones y Enter elige.
    v1.0.0  (2026-10-13) Primera versión
      + La fracción como parte de un entero partido en partes iguales: cuenta el tamaño, no los pedazos.
      + P1 "¿Qué parte está pintada?", P2 "Pintá…", P3 "Marcá las que tienen exactamente 1/4" y P4 "Armá el entero".
@@ -9,7 +13,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.0', ACT = '4to-fracciones-partes';
+  var VERSION = '1.0.1', ACT = '4to-fracciones-partes';
   var FRUI = REF4_FRUI, FR = REF4_FR, FIG = REF4_FIG, G = REF4_FRGEN, A = G.partes, cf = FRUI.conFracciones;
   var txt = function (f) { return FR.formatear(f); };
   var TEXTO_PASO = { P1: 'escribir qué parte está pintada', P2: 'pintar y tocar Listo', P3: 'marcar las figuras y tocar Listo', P4: 'armar el entero' };
@@ -89,7 +93,7 @@
       $('#listo').onclick = function () {
         var v = A.validarP3(it, est.sel), bien = it.figs.map(function (x, i) { return x.correcta ? i + 1 : 0; }).filter(Boolean);
         api.responder({ paso: 'P3', ok: v.ok, error: v.codigo, esperado: bien.join(','), respuesta: est.sel.map(function (i) { return i + 1; }).sort().join(','), forma: 'opcion', pista: v.ok ? null : A.pista(v.codigo, it) });
-        if (v.ok) { document.querySelectorAll('.fr-carta').forEach(function (b, i) { b.classList.add(it.figs[i].correcta ? 'ok' : ''); }); api.fin(900); }
+        if (v.ok) { document.querySelectorAll('.fr-carta').forEach(function (b, i) { if (it.figs[i].correcta) b.classList.add('ok'); }); api.fin(900); }
       };
       return;
     }

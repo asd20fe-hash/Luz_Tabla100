@@ -55,7 +55,8 @@ La rama `refuerzo-4to` ya no existe: se mergeó en `main` (commit `9067a30`) y s
 **Comunes**
 - **Barra inclinada.** `fraccionHTML` dibuja la fracción tal como está escrita (12/4 se ve como 12 sobre 4 y se lee "doce cuartos"); solo los números con denominador 1, o los mixtos calculados, se ven como enteros. Las etiquetas dentro de los SVG (muro, jarra) también van apiladas (`REF4_FRUI.svgFrac`).
 - **Globo de pistas.** En pantallas de 640 px o menos va arriba, para no tapar el teclado numérico, y se cierra tocándolo. Es un estilo agregado en `fracciones.css`; las actividades de refuerzo no cambian.
-- **Teclado.** `REF4_UI.teclado` reemplaza la clase del contenedor; el ingreso de fracciones la vuelve a agregar. Con el teclado físico, "/" y las flechas cambian de casilla.
+- **Teclado.** `REF4_UI.teclado` reemplaza la clase del contenedor; el ingreso de fracciones la vuelve a agregar. Con el teclado físico, Tab, Enter, "/" y → pasan a la casilla siguiente (Shift+Tab y ← a la anterior) y Enter en la última es OK; si el foco llega a una casilla, esa es la que recibe los números (v1.0.1). S/N y las flechas en los botones de opción vienen de `REF4_UI.atajos`.
+- **Rondas con un solo tipo.** Si el nivel tiene un solo tipo de ítem (Repartos, nivel 1), se repite aunque sean más de 2 seguidos (v1.0.1; antes el tercero salía sin tipo).
 - **Respuestas equivalentes.** Si la respuesta está bien pero no simplificada, se acepta y el globo muestra "¡Bien! 4/8 es lo mismo que 1/2". Donde la consigna pide una forma (E2 "□/8", "¿Y escrito como una sola fracción?", "Pasá a octavos") se exige esa forma.
 - **"Me perdí".** Muestra la ayuda del nivel anterior (dibujo, tiras, cuadrícula, la cuenta o "Partir") y una pista; se registra como `me_perdi`. No aparece en el nivel 1 (ya está todo a la vista) ni en el Repaso.
 

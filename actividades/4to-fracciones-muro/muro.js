@@ -1,6 +1,9 @@
 /* Muro de fracciones (fracciones de 4to) — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.1  (2026-10-13) Teclado y correcciones
+     + Teclado: Tab y Enter pasan a la casilla siguiente de la fracción (Enter en la última es OK).
+     + Teclado: S y N eligen Sí o No, las flechas ← → recorren las opciones y Enter elige.
    v1.0.0  (2026-10-13) Primera versión
      + Fracciones equivalentes: partir cada parte en 2 (o en 4) es multiplicar arriba y abajo por el mismo número.
      + E1 "Cubrí con piezas", E2 "Completá", E3 "Rodeá las equivalentes", E4 "¿Quién tiene razón?",
@@ -10,7 +13,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.0', ACT = '4to-fracciones-muro';
+  var VERSION = '1.0.1', ACT = '4to-fracciones-muro';
   var FRUI = REF4_FRUI, FR = REF4_FR, G = REF4_FRGEN, A = G.muro, cf = FRUI.conFracciones, esc = FRUI.esc;
   var fr = FR.fr, txt = function (f) { return FR.formatear(f); };
   var TEXTO_PASO = { E1: 'cubrir el tramo con piezas', cuantos: 'contar las piezas', E2: 'completar la fracción', E3: 'tocar las equivalentes y Listo', quien: 'elegir quién tiene razón',

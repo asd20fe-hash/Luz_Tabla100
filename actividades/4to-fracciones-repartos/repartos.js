@@ -1,6 +1,10 @@
 /* Repartos (fracciones de 4to) — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.1  (2026-10-13) Teclado y correcciones
+     + Nivel 1: el tercer reparto de la ronda salía sin preguntas (la ronda tiene un solo tipo de ítem).
+     + Teclado: Tab y Enter pasan a la casilla siguiente de la fracción (Enter en la última es OK).
+     + Teclado: S y N eligen Sí o No, las flechas ← → recorren las opciones y Enter elige.
    v1.0.0  (2026-10-13) Primera versión
      + Repartir en partes iguales cuando sobra: primero los enteros, después se parte lo que sobra.
      + R1 guiado (Enteros → Sobra → Corto → Respuesta), R2 con la cuenta, R3 "¿Qué reparto es?" y R4 "Elegí".
@@ -10,7 +14,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.0', ACT = '4to-fracciones-repartos';
+  var VERSION = '1.0.1', ACT = '4to-fracciones-repartos';
   var FRUI = REF4_FRUI, FR = REF4_FR, FIG = REF4_FIG, G = REF4_FRGEN, A = G.repartos, esc = FRUI.esc, cf = FRUI.conFracciones;
   var fr = FR.fr, mix = function (f) { return FR.formatear(f, { mixto: true }); };
 

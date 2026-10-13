@@ -1,6 +1,8 @@
 /* Repaso de fracciones (fracciones de 4to) — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.1  (2026-10-13) Teclado y correcciones
+     + Teclado: S y N eligen Sí o No, las flechas ← → recorren las opciones y Enter elige.
    v1.0.0  (2026-10-13) Primera versión
      + Repaso tipo prueba, como el test del módulo: 8 preguntas de opción múltiple (4 opciones) con temas mezclados:
        reparto, parte pintada, equivalencia, comparación, cuánto falta, suma o resta, medidas y un verdadero o falso.
@@ -11,7 +13,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.0', ACT = '4to-fracciones-repaso';
+  var VERSION = '1.0.1', ACT = '4to-fracciones-repaso';
   var FRUI = REF4_FRUI, FR = REF4_FR, G = REF4_FRGEN, cf = FRUI.conFracciones, esc = FRUI.esc;
   var ACTS = ['4to-fracciones-repartos', '4to-fracciones-partes', '4to-fracciones-muro', '4to-fracciones-comparar', '4to-fracciones-cuanto-falta', '4to-fracciones-potes-vasos'];
   var resultados = [];
