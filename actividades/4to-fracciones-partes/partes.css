@@ -10,3 +10,4 @@
 .par-largo{font-size:18px;color:var(--muted);text-align:center}
 .par-opcion{width:100%;text-align:left;padding:8px}
 .fr-figs .fr-carta{display:flex;align-items:center;justify-content:center}
+#ops.fr-opciones.texto{justify-content:stretch}

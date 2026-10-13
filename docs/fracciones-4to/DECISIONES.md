@@ -52,4 +52,48 @@ La rama `refuerzo-4to` ya no existe: se mergeó en `main` (commit `9067a30`) y s
 
 ## 3. Decisiones tomadas durante la implementación
 
-(Se completa en cada actividad.)
+**Comunes**
+- **Barra inclinada.** `fraccionHTML` dibuja la fracción tal como está escrita (12/4 se ve como 12 sobre 4 y se lee "doce cuartos"); solo los números con denominador 1, o los mixtos calculados, se ven como enteros. Las etiquetas dentro de los SVG (muro, jarra) también van apiladas (`REF4_FRUI.svgFrac`).
+- **Globo de pistas.** En pantallas de 640 px o menos va arriba, para no tapar el teclado numérico, y se cierra tocándolo. Es un estilo agregado en `fracciones.css`; las actividades de refuerzo no cambian.
+- **Teclado.** `REF4_UI.teclado` reemplaza la clase del contenedor; el ingreso de fracciones la vuelve a agregar. Con el teclado físico, "/" y las flechas cambian de casilla.
+- **Respuestas equivalentes.** Si la respuesta está bien pero no simplificada, se acepta y el globo muestra "¡Bien! 4/8 es lo mismo que 1/2". Donde la consigna pide una forma (E2 "□/8", "¿Y escrito como una sola fracción?", "Pasá a octavos") se exige esa forma.
+- **"Me perdí".** Muestra la ayuda del nivel anterior (dibujo, tiras, cuadrícula, la cuenta o "Partir") y una pista; se registra como `me_perdi`. No aparece en el nivel 1 (ya está todo a la vista) ni en el Repaso.
+
+**A1 Repartos**
+- "Dar una vuelta" no registra evento cuando la vuelta es válida (es parte de la animación); sí registra `VUELTA_DE_MAS` y `RESTO_MAYOR`, y el acierto final del paso.
+- El corte se elige con botones del 2 al 8 (tocar es más rápido que escribir); un corte inválido queda deshabilitado.
+- "Ver la cuenta" reusa `REF4_CUADERNO` en modo solo lectura (sin tabla del divisor). En R2 se escriben el cociente y el resto como enteros y después la respuesta.
+- En las cosas que no se parten, la respuesta es el entero; responder N/M registra `PARTIR_INDIVISIBLE`.
+
+**A2 Partes iguales**
+- P4 "estirar" va de a una unidad, hasta 16 (así se puede probar el error de repetir la cinta b veces). "Partir" cuenta como ayuda `dibujo`. En el nivel 3, la variante con figuras usa rectángulos del mismo alto.
+- La unidad de dibujo de las cintas se calcula con la cinta más larga que se va a mostrar, y todas se alinean a la izquierda para comparar largos.
+
+**A3 Muro**
+- E1 usa una paleta de un solo tamaño (más fino que el tramo) y tramos de hasta 1 entero, para que el muro (que llega a 1) sirva de referencia. Que la pieza rebote no se registra como error: es la forma de explorar.
+- E4: elegir al que usa la fracción mal escalada registra `EQUIV_MAL_ESCALADA`; no ver que los dos (o ninguno) tienen razón, `IGUALDAD_NO_DETECTADA`; el porqué equivocado, `JUSTIFICACION`.
+- E5: decir "falso" cuando es verdadero registra `IGUALDAD_NO_DETECTADA`; decir "verdadero" cuando es falso, `EQUIV_MAL_ESCALADA`. E6: una pareja equivocada registra `IGUALDAD_NO_DETECTADA`.
+- En el nivel 1 las parejas incluyen el entero (1 = 4/4 = 8/8), porque sin él no alcanzan cuatro valores distintos.
+
+**A4 ¿Cuál es más?**
+- En los problemas (C3) las dos fracciones son menores que 1 (nadie lee más que el libro entero).
+- C3: con denominadores distintos, elegir la que "parece mayor por tener más partes" registra `DENOM_MAYOR_ES_MAYOR`; elegir al revés en una pregunta de "menos" o "falta", `PREGUNTA`.
+- C2 y C4 validan cada toque (una ficha por vez), así la pista llega en el momento.
+
+**A5 ¿Cuánto falta?**
+- "¿Tiene sentido?" se pregunta sobre la respuesta de otro chico ("Otro chico respondió…"), que la mitad de las veces es absurda (más que lo que había). Como el chico ya corrigió su propia cuenta, preguntar sobre ella siempre daría "sí". Alternativa descartada: preguntar antes de calcular (todavía no hay respuesta).
+- En el nivel 3 la respuesta con unidad se elige entre unidades (la cantidad ya la escribió al calcular).
+- P4 (juntar) no tiene el paso "¿Cuál es el entero?" porque no hay entero.
+
+**A6 Potes y vasos**
+- La variante "¿Se puede?" aparece desde el nivel 2 cuando el objetivo tiene una cantidad impar de cuartos, y sigue con "la mayor cantidad posible de potes de 1/2".
+- K6 en el nivel 3 ajusta la altura de a 1/4 de la del mediano.
+
+**A7 Repaso**
+- Sin niveles (`nivelMax: 1`): cada pregunta usa el nivel 2 de su generador o el 3 si esa actividad ya está en el nivel 3.
+- Una sola oportunidad por pregunta (es una prueba): se marca y sigue. El puntaje por tema se guarda en `mate.<perfil>.4to-fracciones-repaso.ultimo` y se registra un evento `repaso_fin`.
+- El verdadero o falso tiene 2 opciones; las demás preguntas, 4 con valores distintos.
+
+**Estadísticas**
+- El panel existente ya muestra por actividad el nivel, rondas y minutos, el porcentaje, los errores frecuentes con ejemplo, las desconexiones, la exportación, el reinicio y el nivel a mano. `panel-fracciones.js` solo agrega el Mapa de fracciones, el interruptor y los nombres de los errores nuevos. El Mapa se calcula con los eventos guardados (los compactados en agregados no tienen tema), así que mira como máximo los últimos 3000 eventos de cada actividad.
+- Shell v2.3: cambió Ajustes de padres (`index.html`); carga `fracciones-lib.js` y `panel-fracciones.js`.
