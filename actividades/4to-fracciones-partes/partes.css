@@ -1,0 +1,12 @@
+/* Partes iguales — estilos propios (lo común está en _comun-4to/comun.css y fracciones.css). */
+.par-fig{display:flex;justify-content:center;margin:6px 0}
+.par-cinta{display:block;margin:6px 0;max-width:100%;height:auto}
+.par-cinta rect{stroke:var(--fr-borde);stroke-width:2;vector-effect:non-scaling-stroke}
+.par-cinta .dada{fill:var(--fr-pintado)}
+.par-cinta .nueva{fill:var(--fr-pintado2)}
+.par-cinta .corte{stroke:var(--fr-guia);stroke-width:2;stroke-dasharray:4 3;vector-effect:non-scaling-stroke}
+.par-estirar{display:flex;gap:12px;justify-content:center;align-items:center;margin:8px 0}
+.par-estirar .ref-btn{font-size:28px;min-width:64px}
+.par-largo{font-size:18px;color:var(--muted);text-align:center}
+.par-opcion{width:100%;text-align:left;padding:8px}
+.fr-figs .fr-carta{display:flex;align-items:center;justify-content:center}

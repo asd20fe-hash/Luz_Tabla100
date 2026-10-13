@@ -10,6 +10,7 @@ MATE.actividades=[
   {id:'4to-tiene-sentido',nivelMax:3,titulo:'¿Tiene sentido?',descripcion:'Estimá, verificá y descubrí resultados imposibles.',icono:'🤔',perfiles:['ian'],ruta:'actividades/4to-tiene-sentido/index.html',version:'1.0.3'},
   {id:'4to-calculo-con-ceros',nivelMax:4,titulo:'Cálculo con ceros',descripcion:'Multiplicá, dividí y sumá sin perder ni un cero.',icono:'🧮',perfiles:['ian'],ruta:'actividades/4to-calculo-con-ceros/index.html',version:'1.0.2'},
   // Fracciones de 4to (las siete juntas)
-  {id:'4to-fracciones-repartos',nivelMax:3,titulo:'Repartos',descripcion:'Repartí en partes iguales: primero los enteros, después lo que sobra.',icono:'🍕',perfiles:['ian'],ruta:'actividades/4to-fracciones-repartos/index.html',version:'1.0.0'}
+  {id:'4to-fracciones-repartos',nivelMax:3,titulo:'Repartos',descripcion:'Repartí en partes iguales: primero los enteros, después lo que sobra.',icono:'🍕',perfiles:['ian'],ruta:'actividades/4to-fracciones-repartos/index.html',version:'1.0.0'},
+  {id:'4to-fracciones-partes',nivelMax:3,titulo:'Partes iguales',descripcion:'Leé, pintá y armá fracciones: cuenta el tamaño, no los pedazos.',icono:'🍫',perfiles:['ian'],ruta:'actividades/4to-fracciones-partes/index.html',version:'1.0.0'}
 ];
 })();

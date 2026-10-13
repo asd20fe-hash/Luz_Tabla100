@@ -33,6 +33,7 @@
     var g = $('#globo'); if (!g) return;
     if (!texto) { g.className = ''; g.innerHTML = ''; return; }
     g.className = 'ver' + (tipo ? ' ' + tipo : ''); g.innerHTML = FRUI.conFracciones(texto);
+    g.onclick = function () { FRUI.globo(null); };
   };
 
   /* ==================== voz (🔊) ==================== */
