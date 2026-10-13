@@ -164,9 +164,9 @@
 
   /* ==================== A5. ¿Cuánto falta? ==================== */
   var CTX_P = {
-    pared: { verbo: 'pintó', de: 'de la pared', falta: 'pintar', unidad: 'de la pared' }, libro: { verbo: 'leyó', de: 'del libro', falta: 'leer', unidad: 'del libro' },
-    tarea: { verbo: 'hizo', de: 'de la tarea', falta: 'hacer', unidad: 'de la tarea' }, caminata: { verbo: 'caminó', de: 'del recorrido', falta: 'caminar', unidad: 'del recorrido' },
-    datos: { verbo: 'usó', de: 'de los datos del celular', falta: 'usar', unidad: 'de los datos' }
+    pared: { verbo: 'pintó', de: 'de la pared', falta: 'pintar', unidad: 'de la pared', todo: 'Toda la pared' }, libro: { verbo: 'leyó', de: 'del libro', falta: 'leer', unidad: 'del libro', todo: 'Todo el libro' },
+    tarea: { verbo: 'hizo', de: 'de la tarea', falta: 'hacer', unidad: 'de la tarea', todo: 'Toda la tarea' }, caminata: { verbo: 'caminó', de: 'del recorrido', falta: 'caminar', unidad: 'del recorrido', todo: 'Todo el recorrido' },
+    datos: { verbo: 'usó', de: 'de los datos del celular', falta: 'usar', unidad: 'de los datos', todo: 'Todo el paquete de datos' }
   };
   function armarProblema(p, nivel, az) {
     var cat = p.cat, nom = GEN.nombres(az, 1)[0], a = p.a.n === undefined ? T(p.a) : p.a, b = p.b ? (p.b.n === undefined ? T(p.b) : p.b) : null, it = { tipo: 'S4', tema: 'problemas', cat: cat, nombre: nom };
@@ -176,7 +176,7 @@
       else { it.texto = nom + ' ' + cx.verbo + ' ' + txt(a) + ' ' + cx.de + '. ¿Cuánto le falta ' + cx.falta + '?'; it.preguntas = ['Cuánto le falta ' + cx.falta + '.', 'Cuánto ' + cx.verbo + '.', 'Cuánto le falta para hacerlo 2 veces.']; }
       it.T = UNO; it.unidad = cx.unidad; it.datos = [a]; it.esperado = FR.restar(UNO, a); it.opuesta = FR.sumar(UNO, a);
       it.planes = ['A todo (1 entero) le resto lo que ' + (p.ctx === 'datos' ? 'usó' : cx.verbo) + '.', 'Sumo 1 más lo que ' + (p.ctx === 'datos' ? 'usó' : cx.verbo) + '.', 'Ya está en el problema: es ' + txt(a) + '.'];
-      it.enteros = ['Todo ' + (p.ctx === 'datos' ? 'el paquete de datos' : cx.de.replace(/^de la /, 'la ').replace(/^del /, 'el ')) + ' (1 entero)', '2 enteros', txt(a)];
+      it.enteros = [cx.todo + ' (1 entero)', '2 enteros', txt(a)]; it.todo = cx.todo;
     } else if (cat === 'P2') {
       var u2 = p.ctx === 'jugo' ? 'l' : 'kg';
       it.texto = 'Compraron ' + mix(p.T ? T(p.T) : DOS) + ' ' + u2 + ' de ' + (u2 === 'kg' ? 'pan' : 'jugo') + ' y ya ' + (u2 === 'kg' ? 'comieron' : 'tomaron') + ' ' + mix(a) + ' ' + u2 + '. ¿Cuánto queda?';
@@ -201,13 +201,13 @@
       it.T = UNO; it.unidad = 'del libro'; it.datos = [a, b]; it.incompleto = FR.sumar(a, b); it.esperado = FR.restar(UNO, it.incompleto); it.opuesta = FR.sumar(UNO, it.incompleto); it.trampa = 'ultimo_paso';
       it.preguntas = ['Cuánto le falta leer.', 'Cuánto leyó entre los dos días.', 'Cuánto leyó el martes.'];
       it.planes = ['Sumo lo que leyó los dos días y se lo resto al libro entero.', 'Sumo lo que leyó los dos días y listo.', 'Ya está en el problema: es ' + txt(b) + '.'];
-      it.enteros = ['Todo el libro (1 entero)', '2 libros', txt(a)];
+      it.enteros = ['Todo el libro (1 entero)', '2 libros', txt(a)]; it.todo = 'Todo el libro';
     } else { // P6: palabra clave engañosa ("le quedan… ¿cuánto usó?")
       it.texto = 'A ' + nom + ' le quedan ' + txt(a) + ' de los datos del celular. ¿Cuánto usó?';
       it.T = UNO; it.unidad = 'de los datos'; it.datos = [a]; it.esperado = FR.restar(UNO, a); it.opuesta = FR.sumar(UNO, a); it.trampa = 'palabra';
       it.preguntas = ['Cuánto usó de los datos.', 'Cuánto le queda de los datos.', 'Cuánto le falta para usar 2 paquetes.'];
       it.planes = ['A todo el paquete (1 entero) le resto lo que le queda.', 'Sumo 1 más lo que le queda.', 'Ya está en el problema: es ' + txt(a) + '.'];
-      it.enteros = ['Todo el paquete de datos (1 entero)', '2 paquetes', txt(a)];
+      it.enteros = ['Todo el paquete de datos (1 entero)', '2 paquetes', txt(a)]; it.todo = 'Todo el paquete de datos';
     }
     it.info = { cat: cat, a: txt(a), b: b ? txt(b) : null, T: it.T ? txt(it.T) : null, trampa: it.trampa || null };
     it.sentido = nivel >= 2 && it.T && az.prob(0.5);
@@ -300,7 +300,7 @@
         OPERA_DENOMINADORES: 'Ojo: los de abajo no se suman. ' + (extra.resp ? extra.resp + ' es menos que ' + (a ? txt(a) : '') + ', así que no puede ser. ' : '') + 'Pasá todo a ' + partes + '.',
         DENOMINADOR_DISTINTO: 'Para sumar, las partes tienen que ser del mismo tamaño. Pasá ' + (it.conv === 'a' && a ? txt(a) : (b ? txt(b) : '')) + ' a ' + partes + '.',
         RESPONDE_EL_DATO: 'Ese número ya está en el problema. Te preguntan cuánto ' + verbo + '.',
-        ENTERO_EQUIVOCADO: 'Acá el entero no es 1: ' + (it.T ? 'tenía ' + mix(it.T) + (it.unidad === 'kg' || it.unidad === 'l' ? ' ' + it.unidad : '') : 'mirá cuánto hay en total') + '.',
+        ENTERO_EQUIVOCADO: it.T && FR.comparar(it.T, UNO) === 0 ? 'El entero es 1: ' + (it.todo || 'todo').toLowerCase() + '.' : 'Acá el entero no es 1: ' + (it.T ? 'tenía ' + mix(it.T) + (it.unidad === 'kg' || it.unidad === 'l' ? ' ' + it.unidad : '') : 'mirá cuánto hay en total') + '.',
         PLAN_OPERACION: it.cat === 'P4' ? 'Preguntan cuánto tomó en total: ¿juntás o sacás?' : 'Preguntan cuánto ' + verbo + ': a lo que tenía, ¿le sumás o le sacás?',
         PLAN_INCOMPLETO: 'Eso es lo que ya leyó. ¿La pregunta pide eso o lo que le falta?', ABSURDO: '¿Puede quedarle más de lo que tenía?',
         UNIDAD: '¿' + (extra.x || 'Eso') + ' qué? ¿Kilos, litros, partes del libro?', MIXTO: '1 entero son ' + (a ? a.d + '/' + a.d : 'todas las partes') + '. Contá cuántas partes son en total.',
