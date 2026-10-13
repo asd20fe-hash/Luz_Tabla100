@@ -1,6 +1,9 @@
 /* ¿Tiene sentido? — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.3  (2026-10-13) Fondos
+     + Botón 🎨 para elegir el fondo (Aurora, Océano, Bosque, Atardecer, Espacio), el mismo de la Tabla del 100.
+       Es global: se guarda en mate.global.fondo y lo comparten todas las actividades.
    v1.0.2  (2026-10-12) Teclado
      + Enter con una tecla del teclado en pantalla enfocada aprieta OK, no repite el número.
    v1.0.1  (2026-10-12) Textos
@@ -14,7 +17,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.2', ACT = '4to-tiene-sentido', TITULO = '¿Tiene sentido?';
+  var VERSION = '1.0.3', ACT = '4to-tiene-sentido', TITULO = '¿Tiene sentido?';
   var UI = REF4_UI, SE = REF4_SENTIDO, $ = UI.$, esc = UI.esc, miles = UI.miles;
   var ctx = UI.base({ act: ACT, titulo: TITULO, version: VERSION, nivelMax: SE.MAX_NIVEL });
   if (!ctx) return;

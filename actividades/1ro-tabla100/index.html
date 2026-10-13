@@ -2,9 +2,13 @@
 <!--
   ============================================================
   Saltos en la Tabla del 100 (práctica de matemática, 1er grado)
-  Versión: v1.4 (2026-10-11)
+  Versión: v1.5 (2026-10-13)
   ------------------------------------------------------------
   Historial de cambios
+  v1.5  Fondo global
+    + Los fondos (Aurora, Océano, Bosque, Atardecer, Espacio) pasan a core.css y MATE.fondo:
+      se guardan en mate.global.fondo y se ven igual en todas las actividades y en el menú.
+    + El fondo que Luz tenía elegido acá se adopta como global la primera vez (si no había uno).
   v1.4  Pasa a ser una actividad del menú de Matemática
     + Vive en actividades/1ro-tabla100 y usa core.css y core.js (MATE).
     + El guardado va por MATE.store('tabla100') (mate.<perfil>.tabla100.*); el modo
@@ -55,7 +59,6 @@
   --shadow:0 12px 40px rgba(110,80,180,.18);
   --accent:#8b5cf6; --accent2:#ec4899; --accent3:#0e9fbf;
   --ok:#15924a; --bad:#d4204a; --warn:#d97706;
-  --blob1:#ffc2e2; --blob2:#c9b8ff; --blob3:#9ef0dc; --blob4:#ffd2a8; --blob5:#a6dcff; --blob-op:.85;
   --chip:rgba(139,92,246,.12); --box-bg:rgba(255,255,255,.95);
   --font:"Fredoka","Nunito","Trebuchet MS",system-ui,sans-serif;
   color-scheme:light;
@@ -67,7 +70,6 @@
     --shadow:0 12px 44px rgba(0,0,0,.5);
     --accent:#a78bfa; --accent2:#f472b6; --accent3:#22d3ee;
     --ok:#4ade80; --bad:#fb7185; --warn:#fbbf24;
-    --blob1:#7c3aed; --blob2:#e0409b; --blob3:#14b8c6; --blob4:#ffb547; --blob5:#3b4fd8; --blob-op:.42;
     --chip:rgba(167,139,250,.16); --box-bg:rgba(20,15,48,.88);
     color-scheme:dark;
   }
@@ -78,7 +80,6 @@
   --shadow:0 12px 44px rgba(0,0,0,.5);
   --accent:#a78bfa; --accent2:#f472b6; --accent3:#22d3ee;
   --ok:#4ade80; --bad:#fb7185; --warn:#fbbf24;
-  --blob1:#7c3aed; --blob2:#e0409b; --blob3:#14b8c6; --blob4:#ffb547; --blob5:#3b4fd8; --blob-op:.42;
   --chip:rgba(167,139,250,.16); --box-bg:rgba(20,15,48,.88);
   color-scheme:dark;
 }
@@ -92,37 +93,7 @@ button{font-family:var(--font)}
 body,button,input{text-transform:uppercase;letter-spacing:.02em}
 button:focus-visible{outline:3px solid var(--accent3);outline-offset:2px}
 
-/* ---------- fondo aurora ---------- */
-#bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-#bg .blob{position:absolute;width:52vmax;height:52vmax;border-radius:50%;filter:blur(80px);opacity:var(--blob-op);animation:drift 24s ease-in-out infinite alternate}
-#bg .b1{background:var(--blob1);left:-14vmax;top:-18vmax}
-#bg .b2{background:var(--blob2);right:-18vmax;top:-12vmax;animation-duration:28s}
-#bg .b3{background:var(--blob3);left:6vmax;bottom:-26vmax;animation-duration:32s}
-#bg .b4{background:var(--blob4);right:-8vmax;bottom:-28vmax;animation-duration:26s;width:40vmax;height:40vmax}
-#bg .b5{background:var(--blob5);left:34vmax;top:18vmax;width:30vmax;height:30vmax;animation-duration:36s}
-@keyframes drift{0%{transform:translate(0,0) scale(1)}50%{transform:translate(5vmax,4vmax) scale(1.12)}100%{transform:translate(-4vmax,6vmax) scale(.94)}}
-@media (prefers-reduced-motion: reduce){#bg .blob{animation:none}}
-
-/* ---------- fondos a elegir (data-bg en <html>; "aurora" es el de arriba) ---------- */
-:root[data-bg="oceano"]{--bg:#eefaff;--blob1:#a6e4ff;--blob2:#8fd3fe;--blob3:#9ef0dc;--blob4:#c7f9ff;--blob5:#b8c6ff;--blob-op:.85}
-:root[data-bg="bosque"]{--bg:#f3fbef;--blob1:#bff0b4;--blob2:#e6f7a6;--blob3:#9ee6c2;--blob4:#ffe3a8;--blob5:#c4ecd4;--blob-op:.85}
-:root[data-bg="atardecer"]{--bg:#fff5ec;--blob1:#ffc4a3;--blob2:#ffb3c7;--blob3:#ffe08a;--blob4:#ff9e8a;--blob5:#e4c1ff;--blob-op:.85}
-:root[data-bg="espacio"]{--bg:#eef0ff;--blob1:#c9c4ff;--blob2:#b9d4ff;--blob3:#e2c7ff;--blob4:#c0f0ff;--blob5:#d6d0ff;--blob-op:.8;--star:rgba(110,90,200,.55)}
-@media (prefers-color-scheme: dark){
-  :root[data-bg="oceano"]:not([data-theme="light"]){--bg:#061a2e;--blob1:#0e7fb8;--blob2:#1450c8;--blob3:#0fa9a0;--blob4:#2563eb;--blob5:#0b3b78;--blob-op:.45}
-  :root[data-bg="bosque"]:not([data-theme="light"]){--bg:#0b1d14;--blob1:#15803d;--blob2:#4d7c0f;--blob3:#0f766e;--blob4:#a16207;--blob5:#166534;--blob-op:.42}
-  :root[data-bg="atardecer"]:not([data-theme="light"]){--bg:#1f0d1c;--blob1:#c2410c;--blob2:#be185d;--blob3:#b45309;--blob4:#e11d48;--blob5:#6d28d9;--blob-op:.42}
-  :root[data-bg="espacio"]:not([data-theme="light"]){--bg:#05061a;--blob1:#3b1d8f;--blob2:#1e3a8a;--blob3:#581c87;--blob4:#0e7490;--blob5:#312e81;--blob-op:.38;--star:rgba(255,255,255,.85)}
-}
-:root[data-bg="oceano"][data-theme="dark"]{--bg:#061a2e;--blob1:#0e7fb8;--blob2:#1450c8;--blob3:#0fa9a0;--blob4:#2563eb;--blob5:#0b3b78;--blob-op:.45}
-:root[data-bg="bosque"][data-theme="dark"]{--bg:#0b1d14;--blob1:#15803d;--blob2:#4d7c0f;--blob3:#0f766e;--blob4:#a16207;--blob5:#166534;--blob-op:.42}
-:root[data-bg="atardecer"][data-theme="dark"]{--bg:#1f0d1c;--blob1:#c2410c;--blob2:#be185d;--blob3:#b45309;--blob4:#e11d48;--blob5:#6d28d9;--blob-op:.42}
-:root[data-bg="espacio"][data-theme="dark"]{--bg:#05061a;--blob1:#3b1d8f;--blob2:#1e3a8a;--blob3:#581c87;--blob4:#0e7490;--blob5:#312e81;--blob-op:.38;--star:rgba(255,255,255,.85)}
-#bg .stars{position:absolute;inset:-50px;display:none;background-image:radial-gradient(1.6px 1.6px at 20px 30px,var(--star),transparent),radial-gradient(1.2px 1.2px at 90px 120px,var(--star),transparent),radial-gradient(2px 2px at 160px 60px,var(--star),transparent),radial-gradient(1.2px 1.2px at 230px 170px,var(--star),transparent),radial-gradient(1.6px 1.6px at 60px 200px,var(--star),transparent),radial-gradient(1px 1px at 200px 240px,var(--star),transparent);background-size:260px 260px;animation:twinkle 4s ease-in-out infinite alternate}
-#bg .stars.s2{background-size:370px 370px;background-position:80px 140px;animation-duration:6s;animation-delay:-2s}
-:root[data-bg="espacio"] #bg .stars{display:block}
-@keyframes twinkle{from{opacity:.35}to{opacity:1}}
-@media (prefers-reduced-motion: reduce){#bg .stars{animation:none}}
+/* el fondo (aurora y los demás) vive en core.css y se elige con MATE.fondo */
 
 #scene{position:fixed;inset:0;z-index:2;display:block;touch-action:none;outline:none}
 
@@ -276,7 +247,6 @@ body.portrait .eqline{font-size:26px}
 </style>
 </head>
 <body>
-<div id="bg" aria-hidden="true"><div class="stars"></div><div class="stars s2"></div><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div><div class="blob b5"></div></div>
 <div id="cubeBack" class="glass" aria-hidden="true"></div>
 <canvas id="scene" tabindex="0" aria-label="Tablero 3D de números"></canvas>
 
@@ -320,13 +290,7 @@ body.portrait .eqline{font-size:26px}
   <div class="field"><span>Tabla</span><div class="seg" data-set="layout"><button data-v="1">1 al 100</button><button data-v="0">0 al 99</button></div></div>
   <div class="field"><span>Saltos</span><div class="seg" data-set="jumpStyle"><button data-v="diez">de 10 y de 1</button><button data-v="uno">de a 1</button></div></div>
   <div class="field col"><span>Ficha</span><div class="seg wrap" data-set="skin"><button data-v="clasica">♟️ Clásica</button><button data-v="unicornio">🦄 Unicornio</button><button data-v="capibara">🦫 Capibara</button></div></div>
-  <div class="field col"><span>Fondo</span><div class="seg wrap" data-set="bg">
-    <button data-v="aurora"><i class="swatch" style="background:linear-gradient(135deg,#ff8cc6,#a78bfa,#5ee0c4)"></i>Aurora</button>
-    <button data-v="oceano"><i class="swatch" style="background:linear-gradient(135deg,#38bdf8,#2563eb,#2dd4bf)"></i>Océano</button>
-    <button data-v="bosque"><i class="swatch" style="background:linear-gradient(135deg,#86efac,#16a34a,#facc15)"></i>Bosque</button>
-    <button data-v="atardecer"><i class="swatch" style="background:linear-gradient(135deg,#fdba74,#fb7185,#c084fc)"></i>Atardecer</button>
-    <button data-v="espacio"><i class="swatch" style="background:radial-gradient(circle at 30% 30%,#fff 0 8%,transparent 10%),linear-gradient(135deg,#1e1b4b,#4c1d95)"></i>Espacio</button>
-  </div></div>
+  <div class="field col"><span>Fondo</span><div class="seg wrap" data-set="bg"></div></div>
   <div class="field"><span>Sonido</span><div class="seg" data-set="sound"><button data-v="1">Sí</button><button data-v="0">No</button></div></div>
   <div class="pop-foot">Versión <span class="ver"></span>, three.js r128</div>
 </div>
@@ -356,7 +320,7 @@ body.portrait .eqline{font-size:26px}
 /* ============================================================
    Saltos en la Tabla del 100
    ============================================================ */
-const APP_VERSION='1.4';
+const APP_VERSION='1.5';
 const TAG='[Tabla100 v'+APP_VERSION+']';
 const LOG=(...a)=>console.log(TAG,...a);
 LOG('Iniciando');
@@ -381,6 +345,8 @@ const store=MATE.store('tabla100');
     MATE.global.set('migrado.tabla100',true); LOG('migrado',n.join(',')||'(nada para migrar)');
   }catch(e){ console.warn(TAG,'migración falló',e); }
 })();
+// el fondo pasó a ser global (MATE.fondo): si todavía no hay uno global, adopta el que Luz tenía elegido acá
+if(MATE.global.get('fondo',null)===null){ const b=store.get('bg',null); if(b&&b!=='aurora'){ MATE.fondo.set(b); LOG('fondo global desde tabla100',b); } }
 
 /* ---------- estado ---------- */
 const S={
@@ -389,7 +355,7 @@ const S={
   jumpStyle:store.get('jumpStyle','diez')==='uno'?'uno':'diez',
   sound:store.get('sound',true)!==false,
   stars:Number(store.get('stars',0))||0,
-  skin:store.get('skin','clasica'), bg:store.get('bg','aurora'),
+  skin:store.get('skin','clasica'),
   ficha:null, target:null,
   moveMode:false, fichaLocked:false, hintCol:null
 };
@@ -398,9 +364,8 @@ let FB={text:'',type:''};
 /* ---------- tema ---------- */
 const root=document.documentElement;
 const mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):{matches:false,addEventListener(){}};
-const BGS=['aurora','oceano','bosque','atardecer','espacio'];
-function applyBg(){ if(!BGS.includes(S.bg)) S.bg='aurora'; if(S.bg==='aurora') delete root.dataset.bg; else root.dataset.bg=S.bg; }
-applyBg();
+// fondos: los botones de Ajustes salen de la lista global
+$('#settings [data-set="bg"]').innerHTML=MATE.fondo.lista.map(f=>'<button data-v="'+f.id+'"><i class="swatch" style="background:'+f.muestra+'"></i>'+f.nombre+'</button>').join('');
 const isDark=()=>root.dataset.theme?root.dataset.theme==='dark':mq.matches;
 
 /* ---------- three.js ---------- */
@@ -1292,7 +1257,7 @@ function setMode(m){
   });
 }
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{ ensureAudio(); sfx.click(); setMode(t.dataset.mode); }));
-function currentSetting(k){ return k==='layout'?String(S.layout):k==='jumpStyle'?S.jumpStyle:k==='skin'?S.skin:k==='bg'?S.bg:(S.sound?'1':'0'); }
+function currentSetting(k){ return k==='layout'?String(S.layout):k==='jumpStyle'?S.jumpStyle:k==='skin'?S.skin:k==='bg'?MATE.fondo.get():(S.sound?'1':'0'); }
 function syncSegs(){ document.querySelectorAll('.seg').forEach(seg=>{ const cur=currentSetting(seg.dataset.set); seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===cur)); }); }
 function applySetting(k,v){
   if(k==='layout'){
@@ -1304,7 +1269,7 @@ function applySetting(k,v){
   }else if(k==='jumpStyle'){ S.jumpStyle=v; store.set('jumpStyle',v); refreshEquation(); rebuildArcs(0); }
   else if(k==='sound'){ S.sound=v==='1'; store.set('sound',S.sound); }
   else if(k==='skin'){ setSkin(v); store.set('skin',S.skin); if(fichaRoot.visible) puff(fichaRoot.position.clone(),14); }
-  else if(k==='bg'){ S.bg=v; applyBg(); store.set('bg',S.bg); }
+  else if(k==='bg'){ MATE.fondo.set(v); }
   syncSegs(); LOG('ajuste',k,v);
 }
 document.addEventListener('click',e=>{

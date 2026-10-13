@@ -1,6 +1,9 @@
 /* Detective de problemas — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.2  (2026-10-13) Fondos
+     + Botón 🎨 para elegir el fondo (Aurora, Océano, Bosque, Atardecer, Espacio), el mismo de la Tabla del 100.
+       Es global: se guarda en mate.global.fondo y lo comparten todas las actividades.
    v1.0.1  (2026-10-12) Teclado
      + Enter con una tecla del teclado en pantalla enfocada aprieta OK, no repite el número.
    v1.0.0  (2026-10-11) Primera versión
@@ -11,7 +14,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.1', ACT = '4to-detective-problemas', TITULO = 'Detective de problemas';
+  var VERSION = '1.0.2', ACT = '4to-detective-problemas', TITULO = 'Detective de problemas';
   var UI = REF4_UI, DE = REF4_DETECTIVE, PR = REF4_PROBLEMAS, $ = UI.$, esc = UI.esc, miles = PR.miles;
   var ctx = UI.base({ act: ACT, titulo: TITULO, version: VERSION, nivelMax: 4 });
   if (!ctx) return;
