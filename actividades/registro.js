@@ -8,6 +8,8 @@ MATE.actividades=[
   {id:'4to-cuantas-veces-entra',nivelMax:4,titulo:'¿Cuántas veces entra?',descripcion:'Las tablas al revés: ¿cuántas veces entra y cuánto sobra?',icono:'🪜',perfiles:['ian'],ruta:'actividades/4to-cuantas-veces-entra/index.html',version:'1.0.2'},
   {id:'4to-detective-problemas',nivelMax:4,titulo:'Detective de problemas',descripcion:'Leé, marcá los datos, armá el plan y respondé.',icono:'🔎',perfiles:['ian'],ruta:'actividades/4to-detective-problemas/index.html',version:'1.0.2'},
   {id:'4to-tiene-sentido',nivelMax:3,titulo:'¿Tiene sentido?',descripcion:'Estimá, verificá y descubrí resultados imposibles.',icono:'🤔',perfiles:['ian'],ruta:'actividades/4to-tiene-sentido/index.html',version:'1.0.3'},
-  {id:'4to-calculo-con-ceros',nivelMax:4,titulo:'Cálculo con ceros',descripcion:'Multiplicá, dividí y sumá sin perder ni un cero.',icono:'🧮',perfiles:['ian'],ruta:'actividades/4to-calculo-con-ceros/index.html',version:'1.0.2'}
+  {id:'4to-calculo-con-ceros',nivelMax:4,titulo:'Cálculo con ceros',descripcion:'Multiplicá, dividí y sumá sin perder ni un cero.',icono:'🧮',perfiles:['ian'],ruta:'actividades/4to-calculo-con-ceros/index.html',version:'1.0.2'},
+  // Fracciones de 4to (las siete juntas)
+  {id:'4to-fracciones-repartos',nivelMax:3,titulo:'Repartos',descripcion:'Repartí en partes iguales: primero los enteros, después lo que sobra.',icono:'🍕',perfiles:['ian'],ruta:'actividades/4to-fracciones-repartos/index.html',version:'1.0.0'}
 ];
 })();

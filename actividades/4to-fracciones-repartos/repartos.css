@@ -1,0 +1,9 @@
+/* Repartos — estilos propios (lo común está en _comun-4to/comun.css y fracciones.css). */
+.rep-botones{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:10px 0}
+.rep-botones .ref-btn{font-size:20px;min-height:56px}
+.rep-cortes{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.rep-cortes .ref-opcion{min-width:60px}
+.rep-cuenta-txt{font-size:34px;font-weight:700;text-align:center;margin:8px 0;letter-spacing:.04em}
+.rep-quedan{text-align:center;color:var(--muted);font-size:18px}
+.rep-pieza{display:inline-flex;align-items:center;gap:2px;font-size:15px;font-weight:600}
+.rep-figura{display:flex;justify-content:center}

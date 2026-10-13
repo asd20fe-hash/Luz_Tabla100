@@ -74,7 +74,8 @@
       h += (op.sufijo ? '<span class="fr-sufijo">' + esc(op.sufijo) + '</span>' : '') + '</div><div class="ref-teclado fr-teclado"></div>';
       cont.innerHTML = h;
       cont.querySelector('.fr-ingreso').onclick = function (e) { var b = e.target.closest('[data-c]'); if (b) { activo = b.dataset.c; refrescar(); } };
-      UI.teclado(cont.querySelector('.fr-teclado'), {
+      var tk = cont.querySelector('.fr-teclado');
+      UI.teclado(tk, {
         digito: function (d) { if (campos[activo].length < 2) campos[activo] += d; refrescar(); },
         borrar: function () { if (campos[activo]) campos[activo] = campos[activo].slice(0, -1); else { var i = orden.indexOf(activo); if (i > 0) { activo = orden[i - 1]; campos[activo] = campos[activo].slice(0, -1); } } refrescar(); },
         ok: function () {
@@ -83,6 +84,7 @@
           op.onOk(f, FR.forma(campos), { entero: campos.entero, num: campos.num, den: campos.den });
         }
       });
+      tk.classList.add('fr-teclado'); // REF4_UI.teclado pisa la clase
     }
     function refrescar() { cont.querySelectorAll('.fr-casilla').forEach(function (b) { var k = b.dataset.c; b.textContent = campos[k]; b.classList.toggle('on', k === activo); }); }
     // Teclado físico: "/" o flechas cambian de casilla.
