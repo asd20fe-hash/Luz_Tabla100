@@ -36,7 +36,7 @@
       h += FRUI.muroSVG(filas, { hasta: sobre ? it.f : null });
       var w = 100 / it.pieza, tot = est.piezas;
       h += '<div class="fr-trabajo" aria-label="tu fila: ' + tot + ' piezas"><div class="meta" style="left:0;width:' + (100 * it.f.n / it.f.d) + '%"></div>';
-      for (var i = 0; i < tot; i++) h += '<div class="fr-pieza" style="width:' + w + '%">' + (it.pieza <= 8 ? '1/' + it.pieza : '') + '</div>';
+      for (var i = 0; i < tot; i++) h += '<div class="fr-pieza" style="width:' + w + '%">' + (it.pieza <= 8 ? FRUI.fraccionHTML(fr(1, it.pieza)) : '') + '</div>';
       if (est.rebota) h += '<div class="fr-pieza rebota" style="width:' + w + '%"></div>';
       h += '</div>';
       if (it.guiado || est.guia) h += '<div class="mur-cuenta">Llevás ' + tot + ' ' + (tot === 1 ? 'pieza' : 'piezas') + ' de ' + FRUI.fraccionHTML(fr(1, it.pieza)) + '.</div>';

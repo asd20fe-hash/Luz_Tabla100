@@ -123,6 +123,14 @@
     }
     return h + '</svg>';
   };
+  // Fracción apilada dentro de un SVG (centrada en x; y es la raya). e: entero delante (número mixto).
+  FRUI.svgFrac = function (x, y, n, d, tam, e) {
+    tam = tam || 12; var w = String(Math.max(n, d)).length * tam * 0.62 + 4, dx = e ? String(e).length * tam * 0.34 + 2 : 0;
+    var h = e ? '<text x="' + (x - dx) + '" y="' + (y + tam * 0.4) + '" text-anchor="middle" class="fr-ltxt" style="font-size:' + (tam * 1.15) + 'px">' + e + '</text>' : '';
+    return h + '<text x="' + (x + dx) + '" y="' + (y - 2) + '" text-anchor="middle" class="fr-ltxt" style="font-size:' + tam + 'px">' + n + '</text>' +
+      '<path d="M' + (x + dx - w / 2) + ' ' + y + ' L' + (x + dx + w / 2) + ' ' + y + '" class="fr-marca" style="stroke-width:1.4"/>' +
+      '<text x="' + (x + dx) + '" y="' + (y + tam - 1) + '" text-anchor="middle" class="fr-ltxt" style="font-size:' + tam + 'px">' + d + '</text>';
+  };
   // Muro de fracciones: filas de 1, 1/2, 1/4, 1/8 (y 1/16). op: {hasta: fracción resaltada, filas: [1,2,4,8]}
   FRUI.muroSVG = function (filas, op) {
     op = op || {};
@@ -131,7 +139,7 @@
       for (var i = 0; i < d; i++) {
         var x = L * i / d, y = f * (A + gap);
         h += '<rect x="' + x + '" y="' + y + '" width="' + (L / d) + '" height="' + A + '" class="fr-ladrillo f' + f + '"/>';
-        if (d <= 8) h += '<text x="' + (x + L / d / 2) + '" y="' + (y + A / 2 + 6) + '" class="fr-ltxt" text-anchor="middle">' + (d === 1 ? '1' : '1/' + d) + '</text>';
+        if (d <= 8) h += d === 1 ? '<text x="' + (x + L / 2) + '" y="' + (y + A / 2 + 6) + '" class="fr-ltxt" text-anchor="middle">1</text>' : FRUI.svgFrac(x + L / d / 2, y + A / 2, 1, d, 11);
       }
     });
     if (op.hasta) { var xh = L * op.hasta.n / op.hasta.d; h += '<rect x="0" y="-2" width="' + xh + '" height="' + (filas.length * (A + gap)) + '" class="fr-resalte"/>'; }
@@ -145,10 +153,10 @@
   };
   // Barra de la balanza de 0 a max kg, marcas cada 1/4, banderita en el objetivo.
   FRUI.barraKilosSVG = function (op) {
-    var max = op.max || 3, L = 320, x0 = 10, A = 26, esc4 = (L - 20) / (max * 4), tot = op.total, obj = op.objetivo;
+    var max = op.max || 3, L = 320, x0 = 22, A = 26, esc4 = (L - 2 * x0) / (max * 4), tot = op.total, obj = op.objetivo;
     var h = '<svg class="fr-barra" viewBox="0 0 ' + L + ' 70" role="img" aria-label="balanza">';
-    h += '<rect x="' + x0 + '" y="20" width="' + (L - 20) + '" height="' + A + '" rx="6" class="fr-reg"/>';
-    if (tot) { var w = Math.min(L - 20, esc4 * 4 * tot.n / tot.d); h += '<rect x="' + x0 + '" y="20" width="' + w + '" height="' + A + '" rx="6" class="fr-reg pint' + (FR.comparar(tot, obj || tot) > 0 ? ' pasa' : '') + '"/>'; }
+    h += '<rect x="' + x0 + '" y="20" width="' + (L - 2 * x0) + '" height="' + A + '" rx="6" class="fr-reg"/>';
+    if (tot) { var w = Math.min(L - 2 * x0, esc4 * 4 * tot.n / tot.d); h += '<rect x="' + x0 + '" y="20" width="' + w + '" height="' + A + '" rx="6" class="fr-reg pint' + (FR.comparar(tot, obj || tot) > 0 ? ' pasa' : '') + '"/>'; }
     for (var i = 0; i <= max * 4; i++) { var x = x0 + i * esc4; h += '<path d="M' + x + ' ' + (i % 4 ? 38 : 30) + ' L' + x + ' 46" class="fr-marca"/>'; if (i % 4 === 0) h += '<text x="' + x + '" y="62" text-anchor="middle" class="fr-ltxt">' + (i / 4) + ' kg</text>'; }
     if (obj) { var xo = x0 + esc4 * 4 * obj.n / obj.d; h += '<path d="M' + xo + ' 48 L' + xo + ' 4" class="fr-asta"/><path d="M' + xo + ' 4 L' + (xo + 16) + ' 9 L' + xo + ' 14 Z" class="fr-bandera"/>'; }
     return h + '</svg>';
@@ -160,7 +168,7 @@
     var h = '<svg class="fr-jarra" viewBox="0 0 120 ' + H + '" width="120" height="' + H + '" role="img" aria-label="jarra con ' + esc(FR.leer(nivel, { unidad: 'l', mixto: true })) + '">';
     h += '<rect x="20" y="' + (top + alto - hn) + '" width="70" height="' + hn + '" class="fr-agua"/>';
     h += '<path d="M20 ' + top + ' L20 ' + (top + alto) + ' L90 ' + (top + alto) + ' L90 ' + top + '" class="fr-vidrio"/><path d="M90 30 Q112 40 90 80" class="fr-vidrio"/>';
-    for (var i = 1; i <= oct; i++) { var y = top + alto - alto * i / oct; h += '<path d="M20 ' + y + ' L' + (i % 4 === 0 ? 40 : 30) + ' ' + y + '" class="fr-marca"/>'; if (i % 4 === 0) h += '<text x="44" y="' + (y + 4) + '" class="fr-ltxt">' + (i / 8 === 1 ? '1' : (i % 8 === 0 ? i / 8 : (Math.floor(i / 8) ? Math.floor(i / 8) + ' ' : '') + '1/2')) + ' l</text>'; }
+    for (var i = 1; i <= oct; i++) { var y = top + alto - alto * i / oct; h += '<path d="M20 ' + y + ' L' + (i % 4 === 0 ? 40 : 30) + ' ' + y + '" class="fr-marca"/>'; if (i % 4 === 0) { var ent = Math.floor(i / 8), medio = i % 8 !== 0; h += medio ? FRUI.svgFrac(ent ? 60 : 54, y, 1, 2, 10, ent || null) + '<text x="' + (ent ? 74 : 66) + '" y="' + (y + 4) + '" class="fr-ltxt">l</text>' : '<text x="44" y="' + (y + 4) + '" class="fr-ltxt">' + ent + ' l</text>'; } }
     return h + '</svg>';
   };
   // Vaso: misma base; alto relativo (1 = mediano).
