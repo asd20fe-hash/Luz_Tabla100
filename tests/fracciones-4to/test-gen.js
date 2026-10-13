@@ -85,7 +85,7 @@ prueba('comparar: 1000 ítems por nivel y tipo cumplen sus restricciones', funct
   cadaItem('comparar', function (it, nivel, tipo) {
     if (tipo === 'C1') { assert.ok(GEN.comparar.validarC1(it, it.rel).ok); if (nivel === 1) assert.ok(it.a.d === it.b.d || it.a.n === it.b.n); }
     if (tipo === 'C2') { assert.ok(it.fichas.length >= 6 && it.fichas.length <= 7); if (nivel === 1) assert.ok(it.fichas.every(function (x) { return x.canasta !== 'justo'; })); }
-    if (tipo === 'C3') { assert.ok(GEN.comparar.validarC3(it, it.correcta).ok); if (nivel === 1) assert.strictEqual(it.pregunta, 'mas'); assert.strictEqual(it.razones.filter(function (r) { return r.ok; }).length, 1); }
+    if (tipo === 'C3') { assert.ok(GEN.comparar.validarC3(it, it.correcta).ok); assert.ok(FR.comparar(it.a, UNO) < 0 && FR.comparar(it.b, UNO) < 0, 'en los problemas nadie pasa el entero'); if (nivel === 1) assert.strictEqual(it.pregunta, 'mas'); assert.strictEqual(it.razones.filter(function (r) { return r.ok; }).length, 1); }
     if (tipo === 'C4') { for (var i = 1; i < it.orden.length; i++) assert.strictEqual(FR.comparar(it.orden[i - 1], it.orden[i]), -1); }
     if (tipo === 'C5') opcionMultiple(it.opciones, 'C5');
   });

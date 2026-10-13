@@ -98,7 +98,12 @@
         if (!fichas.some(function (x) { return x.canasta === 'menos'; })) fichas[1] = { f: fr(3, 8), canasta: 'menos' };
         return { tipo: 'C2', tema: 'mayor_que_uno', fichas: az.mezclar(fichas), conJusto: conJusto, info: { fichas: fichas.map(function (x) { return txt(x.f); }) } };
       }
-      if (tipo === 'C3') { var pp = par(nivel === 3 ? 2 : nivel, az); return armarC3({ a: pp.a, b: pp.b, modo: pp.modo, pregunta: nivel === 1 ? 'mas' : az.elegir(['mas', 'menos', 'falta']) }, nivel, az); }
+      if (tipo === 'C3') {
+        // En los problemas (leer un libro, comer una pizza) nadie hace más que el entero: las dos fracciones, menores que 1.
+        var pp = par(nivel === 3 ? 2 : nivel, az);
+        for (var q3 = 0; q3 < 100 && (FR.comparar(pp.a, UNO) >= 0 || FR.comparar(pp.b, UNO) >= 0); q3++) pp = par(nivel === 3 ? 2 : nivel, az);
+        if (FR.comparar(pp.a, UNO) >= 0 || FR.comparar(pp.b, UNO) >= 0) pp = { a: fr(3, 4), b: fr(5, 8), modo: 'distinto' };
+        return armarC3({ a: pp.a, b: pp.b, modo: pp.modo, pregunta: nivel === 1 ? 'mas' : az.elegir(['mas', 'menos', 'falta']) }, nivel, az); }
       if (tipo === 'C4') {
         for (var j = 0; j < 100; j++) {
           var k = az.entero(3, 4), vals = [];

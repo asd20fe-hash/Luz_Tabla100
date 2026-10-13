@@ -12,6 +12,7 @@ MATE.actividades=[
   // Fracciones de 4to (las siete juntas)
   {id:'4to-fracciones-repartos',nivelMax:3,titulo:'Repartos',descripcion:'Repartí en partes iguales: primero los enteros, después lo que sobra.',icono:'🍕',perfiles:['ian'],ruta:'actividades/4to-fracciones-repartos/index.html',version:'1.0.0'},
   {id:'4to-fracciones-partes',nivelMax:3,titulo:'Partes iguales',descripcion:'Leé, pintá y armá fracciones: cuenta el tamaño, no los pedazos.',icono:'🍫',perfiles:['ian'],ruta:'actividades/4to-fracciones-partes/index.html',version:'1.0.0'},
-  {id:'4to-fracciones-muro',nivelMax:3,titulo:'Muro de fracciones',descripcion:'Fracciones equivalentes: la misma cantidad escrita de otra forma.',icono:'🧱',perfiles:['ian'],ruta:'actividades/4to-fracciones-muro/index.html',version:'1.0.0'}
+  {id:'4to-fracciones-muro',nivelMax:3,titulo:'Muro de fracciones',descripcion:'Fracciones equivalentes: la misma cantidad escrita de otra forma.',icono:'🧱',perfiles:['ian'],ruta:'actividades/4to-fracciones-muro/index.html',version:'1.0.0'},
+  {id:'4to-fracciones-comparar',nivelMax:3,titulo:'¿Cuál es más?',descripcion:'Compará fracciones con criterios, sin adivinar.',icono:'⚖️',perfiles:['ian'],ruta:'actividades/4to-fracciones-comparar/index.html',version:'1.0.0'}
 ];
 })();
