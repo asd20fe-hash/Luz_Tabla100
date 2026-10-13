@@ -1,0 +1,11 @@
+/* Repaso de fracciones — estilos propios (lo común está en _comun-4to/comun.css y fracciones.css). */
+.rps-fig{display:flex;justify-content:center;margin:6px 0}
+.ref-modal .ref-panel.rps-final{max-width:640px;max-height:92vh;overflow:auto;text-align:left}
+.rps-final h2,.rps-final .ref-estrellas,.rps-final .rps-pct{text-align:center}
+.rps-temas{display:grid;gap:6px;margin:8px 0}
+.rps-temas .fila{display:flex;justify-content:space-between;gap:8px;padding:6px 10px;border-radius:10px;background:var(--chip);font-size:18px}
+.rps-temas .fila b.ok{color:var(--ok)} .rps-temas .fila b.mal{color:var(--bad)}
+.rps-caso{border:2px solid var(--glass-border);border-radius:14px;padding:10px 12px;margin:8px 0;background:var(--box-bg)}
+.rps-caso p{margin:4px 0}
+.rps-caso .fr-tira{max-width:320px;margin:4px 0}
+.rps-caso .fr-fig{margin:4px 0}

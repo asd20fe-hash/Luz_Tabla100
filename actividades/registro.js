@@ -15,6 +15,7 @@ MATE.actividades=[
   {id:'4to-fracciones-muro',nivelMax:3,titulo:'Muro de fracciones',descripcion:'Fracciones equivalentes: la misma cantidad escrita de otra forma.',icono:'🧱',perfiles:['ian'],ruta:'actividades/4to-fracciones-muro/index.html',version:'1.0.0'},
   {id:'4to-fracciones-comparar',nivelMax:3,titulo:'¿Cuál es más?',descripcion:'Compará fracciones con criterios, sin adivinar.',icono:'⚖️',perfiles:['ian'],ruta:'actividades/4to-fracciones-comparar/index.html',version:'1.0.0'},
   {id:'4to-fracciones-cuanto-falta',nivelMax:3,titulo:'¿Cuánto falta?',descripcion:'Cuánto falta, sumas y restas, y problemas para leer con lupa.',icono:'🧩',perfiles:['ian'],ruta:'actividades/4to-fracciones-cuanto-falta/index.html',version:'1.0.0'},
-  {id:'4to-fracciones-potes-vasos',nivelMax:3,titulo:'Potes y vasos',descripcion:'Kilos y litros con fracciones: ¿alcanza, falta o sobra?',icono:'🍯',perfiles:['ian'],ruta:'actividades/4to-fracciones-potes-vasos/index.html',version:'1.0.0'}
+  {id:'4to-fracciones-potes-vasos',nivelMax:3,titulo:'Potes y vasos',descripcion:'Kilos y litros con fracciones: ¿alcanza, falta o sobra?',icono:'🍯',perfiles:['ian'],ruta:'actividades/4to-fracciones-potes-vasos/index.html',version:'1.0.0'},
+  {id:'4to-fracciones-repaso',nivelMax:1,titulo:'Repaso de fracciones',descripcion:'Un repaso tipo prueba con todo mezclado.',icono:'📝',perfiles:['ian'],ruta:'actividades/4to-fracciones-repaso/index.html',version:'1.0.0'}
 ];
 })();
