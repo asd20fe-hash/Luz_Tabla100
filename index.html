@@ -3,9 +3,13 @@
 <!--
   ============================================================
   Matemática — shell: perfiles, menú de actividades y ajustes de padres
-  Versión: v2.1 (2026-10-11)
+  Versión: v2.2 (2026-10-13)
   ------------------------------------------------------------
   Historial de cambios
+  v2.2  Fondo global
+    + Los fondos de la Tabla del 100 (Aurora, Océano, Bosque, Atardecer, Espacio) pasan al core
+      (MATE.fondo, mate.global.fondo): se ven en el menú y en todas las actividades, también las de Ian.
+    + Botón 🎨 arriba para elegirlo; el fondo viaja por la URL (?f=) como el tema.
   v2.1  Estadísticas del refuerzo de 4to
     + Ajustes de padres muestra el panel de estadísticas de las actividades de refuerzo de Ian
       (rondas, minutos, errores más frecuentes, hechos errados y lentos), permite fijar el nivel,
@@ -58,6 +62,7 @@ input{font:inherit;color:var(--text);background:var(--box-bg);border:2px solid v
 <body>
 <div class="top">
   <button class="icon-btn" id="lockBtn" title="Ajustes de padres">🔒</button>
+  <button class="icon-btn" id="fondoBtn" title="Elegir el fondo" aria-haspopup="menu">🎨</button>
   <button class="icon-btn" id="themeBtn" title="Cambiar modo claro u oscuro">🌙</button>
 </div>
 <h1>Matemática</h1>
@@ -73,13 +78,14 @@ input{font:inherit;color:var(--text);background:var(--box-bg);border:2px solid v
 'use strict';
 const $=s=>document.querySelector(s), view=$('#view');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-document.querySelectorAll('.ver').forEach(el=>el.textContent='v2.1');
+document.querySelectorAll('.ver').forEach(el=>el.textContent='v2.2');
 
 /* ==== TEMA ==== */
 function pintaTema(){ $('#themeBtn').textContent=MATE.tema.oscuro()?'☀️':'🌙'; }
 $('#themeBtn').onclick=()=>{ MATE.tema.alternar(); pintaTema(); };
 if(window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change',pintaTema);
 pintaTema();
+$('#fondoBtn').onclick=()=>MATE.fondo.menu($('#fondoBtn'));
 
 /* ==== PERFILES ==== */
 function verPerfiles(){

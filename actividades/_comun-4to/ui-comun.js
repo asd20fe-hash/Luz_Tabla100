@@ -41,6 +41,7 @@
     var vb = $('#volver'); if (vb) vb.onclick = function () { reg.flush(); MATE.irMenu(); };
     var tb = $('#tema');
     if (tb) { var pt = function () { tb.textContent = MATE.tema.oscuro() ? '☀️' : '🌙'; }; tb.onclick = function () { MATE.tema.alternar(); pt(); }; pt(); }
+    var fb = $('#fondo'); if (fb) fb.onclick = function () { MATE.fondo.menu(fb); };
     var sb = $('#sonido');
     if (sb) { var ps = function () { sb.textContent = UI.sonidoOn() ? '🔊' : '🔇'; sb.setAttribute('aria-pressed', UI.sonidoOn()); }; sb.onclick = function () { MATE.global.set('sonido', !UI.sonidoOn()); ps(); }; ps(); }
     root.addEventListener('pagehide', function () { reg.flush(); });
