@@ -1,6 +1,8 @@
 /* Detective de problemas — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.4  (2026-10-13) Voz argentina
+     + El 🔊 prefiere voz de Argentina, después Uruguay/Chile/resto de Latinoamérica; la de España queda última.
    v1.0.3  (2026-10-13) Teclado y correcciones
      + Teclado: S y N eligen Sí o No, las flechas ← → recorren las opciones y Enter elige.
    v1.0.2  (2026-10-13) Fondos
@@ -16,7 +18,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.3', ACT = '4to-detective-problemas', TITULO = 'Detective de problemas';
+  var VERSION = '1.0.4', ACT = '4to-detective-problemas', TITULO = 'Detective de problemas';
   var UI = REF4_UI, DE = REF4_DETECTIVE, PR = REF4_PROBLEMAS, $ = UI.$, esc = UI.esc, miles = PR.miles;
   var ctx = UI.base({ act: ACT, titulo: TITULO, version: VERSION, nivelMax: 4 });
   if (!ctx) return;
@@ -28,11 +30,7 @@
     respuesta: 'La respuesta lleva el número y lo que cuenta (pesos, chicos, bolsitas…).' };
 
   /* ---------- voz ---------- */
-  function elegirVoz() {
-    if (!window.speechSynthesis) return null;
-    var vs = speechSynthesis.getVoices();
-    return vs.filter(function (v) { return /^es[-_]AR/i.test(v.lang); })[0] || vs.filter(function (v) { return /^es/i.test(v.lang); })[0] || null;
-  }
+  function elegirVoz() { return UI.elegirVoz(); } // Argentina primero, España al final
   if (window.speechSynthesis) { voz = elegirVoz(); speechSynthesis.onvoiceschanged = function () { voz = elegirVoz(); var b = $('#b-voz'); if (b) b.hidden = !voz; }; }
   function leerEnVoz() {
     if (!voz) return;

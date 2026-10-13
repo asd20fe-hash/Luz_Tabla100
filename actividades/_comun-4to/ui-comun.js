@@ -8,6 +8,26 @@
   UI.esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   UI.miles = function (n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }; // 1500 → 1.500 (solo en textos)
 
+  /* ---------- voz para el 🔊 ----------
+     Prioridad: Argentina → Uruguay, Paraguay, Chile → resto de Latinoamérica y EE. UU. (es-419, es-MX, es-US…) → otro español → España.
+     A igual país, mejor las voces "Natural"/"Online" (Edge) o de Google. Devuelve null si no hay ninguna en español. */
+  UI.elegirVoz = function () {
+    if (!root.speechSynthesis) return null;
+    var mejor = null, pm = -1;
+    speechSynthesis.getVoices().forEach(function (v) {
+      var l = String(v.lang).replace('_', '-').toLowerCase(), p;
+      if (!/^es(-|$)/.test(l)) return;
+      if (/^es-ar/.test(l) || /argentin/i.test(v.name)) p = 50;
+      else if (/^es-(uy|py|cl)/.test(l)) p = 40;
+      else if (/^es-es/.test(l) || /españa|spain|castilian/i.test(v.name)) p = 10;
+      else if (/^es-/.test(l)) p = 30;
+      else p = 20;
+      if (/natural|online|google/i.test(v.name)) p += 5;
+      if (p > pm) { pm = p; mejor = v; }
+    });
+    return mejor;
+  };
+
   /* ---------- arranque común ----------
      cfg: {act, titulo, version, nivelMax, tag}. Devuelve el contexto de la actividad. */
   UI.base = function (cfg) {

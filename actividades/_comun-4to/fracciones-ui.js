@@ -1,12 +1,13 @@
 /* Fracciones de 4to — widgets de interfaz y marco común de las actividades (con DOM).
-   Depende de: MATE, REF4_UI, REF4_EV, REF4_AZAR, REF4_FR. Sin módulos: window.REF4_FRUI. Versión 1.0.0 (2026-10-13).
+   Depende de: MATE, REF4_UI, REF4_EV, REF4_AZAR, REF4_FR. Sin módulos: window.REF4_FRUI. Versión 1.0.1 (2026-10-13).
    - Mostrar fracciones apiladas (fraccionHTML, conFracciones) con aria-label en palabras.
    - Ingreso de fracciones: casillas [entero] [numerador / denominador] + teclado numérico común.
    - Dibujos SVG: figuras tocables, tiras, muro, potes, barra de kilos, jarra y vasos, objetos de los repartos.
-   - actividad(cfg): rondas, mezcla de tipos, módulo de la escuela, "Me perdí", 🔊, "¿Qué aprendiste?", debug y eventos. */
+   - actividad(cfg): rondas, mezcla de tipos, módulo de la escuela, "Me perdí", 🔊, "¿Qué aprendiste?", debug y eventos.
+   v1.0.1  + La voz del 🔊 prefiere español de Argentina (o de Latinoamérica) y deja la de España como último recurso. */
 (function (root) {
   'use strict';
-  var VERSION = '1.0.0';
+  var VERSION = '1.0.1';
   var UI = root.REF4_UI, FR = root.REF4_FR, EV = root.REF4_EV;
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
@@ -38,11 +39,7 @@
 
   /* ==================== voz (🔊) ==================== */
   var voz = null;
-  function elegirVoz() {
-    if (!root.speechSynthesis) return null;
-    var vs = speechSynthesis.getVoices();
-    return vs.filter(function (v) { return /^es[-_]AR/i.test(v.lang); })[0] || vs.filter(function (v) { return /^es/i.test(v.lang); })[0] || null;
-  }
+  function elegirVoz() { return UI.elegirVoz(); } // Argentina primero, España al final
   if (root.speechSynthesis) { voz = elegirVoz(); speechSynthesis.onvoiceschanged = function () { voz = elegirVoz(); document.querySelectorAll('.fr-voz').forEach(function (b) { b.hidden = !voz; }); }; }
   FRUI.hayVoz = function () { return !!voz; };
   FRUI.hablar = function (texto) {
