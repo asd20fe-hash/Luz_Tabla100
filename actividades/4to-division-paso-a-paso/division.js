@@ -1,6 +1,9 @@
 /* División paso a paso — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.4  (2026-10-13) Teclado y correcciones
+     + Bajar: además de tocar la cifra del dividendo, se puede escribir con el teclado.
+     + Teclado: S y N eligen Sí o No, las flechas ← → recorren las opciones y Enter elige.
    v1.0.3  (2026-10-13) Fondos
      + Botón 🎨 para elegir el fondo (Aurora, Océano, Bosque, Atardecer, Espacio), el mismo de la Tabla del 100.
        Es global: se guarda en mate.global.fondo y lo comparten todas las actividades.
@@ -17,7 +20,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.3', ACT = '4to-division-paso-a-paso', TITULO = 'División paso a paso';
+  var VERSION = '1.0.4', ACT = '4to-division-paso-a-paso', TITULO = 'División paso a paso';
   var CONTROLES = ['RESTO_MAYOR', 'CONTROL', 'ESTIMACION', 'VERIFICACION'];
   var MO = REF4_DIVMOTOR, DIV = REF4_DIV, UI = REF4_UI, $ = UI.$;
 
@@ -124,12 +127,21 @@
   function tecla(d) {
     var a = MO.derivar(R.M).actual; if (!a || R.hecha) return;
     R.buf.push(d); pintar();
-    if (a.tipo === 'factor') confirmar();    // el factor es un solo dígito: se envía enseguida
+    if (a.tipo === 'factor' || a.tipo === 'bajar') confirmar();    // un solo dígito: se envía enseguida
   }
   function confirmar() {
     var a = MO.derivar(R.M).actual; if (!a || R.hecha) return;
     var n = R.buf.num(); if (n === null) return;
-    if (a.tipo === 'bajar') enviar({ num: n }); else enviar(n);
+    if (a.tipo === 'bajar') enviar(bajadaTecleada(a, n)); else enviar(n);
+  }
+  /* Bajar con el teclado: la cifra que toca bajar vale como tocarla en el dividendo; otra cifra del dividendo,
+     como tocar esa (BAJAR); un número de más de una cifra sigue siendo PASO_EXTRA. */
+  function bajadaTecleada(a, n) {
+    var cifras = String(R.M.dividendo), col = R.M.sim.vueltas[a.vuelta].colFin + 1;
+    if (n > 9) return { num: n };
+    if (+cifras[col] === n) return { col: col };
+    var otra = cifras.indexOf(String(n), col + 1); if (otra < 0) otra = cifras.indexOf(String(n));
+    return otra >= 0 ? { col: otra } : { num: n };
   }
   function tocarCifra(col) {
     var a = MO.derivar(R.M).actual; if (!a) return;

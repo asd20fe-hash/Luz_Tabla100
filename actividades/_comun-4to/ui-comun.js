@@ -47,6 +47,7 @@
     root.addEventListener('pagehide', function () { reg.flush(); });
     document.addEventListener('visibilitychange', function () { if (document.hidden) reg.flush(); });
     if (debug) { var d = document.createElement('pre'); d.id = 'debug'; document.body.appendChild(d); }
+    UI.atajos();
     UI._ctx = ctx;
     log('listo', 'semilla', seed, 'nivel', reg.estado().nivel);
     return ctx;
@@ -127,6 +128,37 @@
     if (UI._kd) document.removeEventListener('keydown', UI._kd);
     UI._kd = kd; document.addEventListener('keydown', kd);
     return { habilitar: function (b) { activo = b; cont.querySelectorAll('button').forEach(function (x) { x.disabled = !b; }); } };
+  };
+
+  /* ---------- atajos de teclado para las opciones ----------
+     S / N tocan el botón "Sí…" / "No…" que se ve; ← y → mueven el foco entre los botones de opción
+     (Enter toca el que tiene el foco). No actúa si hay un diálogo abierto que no los contiene. */
+  UI.atajos = function () {
+    if (UI._atajos) return; UI._atajos = true;
+    function visibles(sel) {
+      var raiz = document.querySelector('.ref-modal') || document;
+      return [].slice.call(raiz.querySelectorAll(sel)).filter(function (b) { return !b.disabled && b.offsetParent !== null; });
+    }
+    function sinTilde(s) { return s.normalize ? s.normalize('NFD').replace(/[̀-ͯ]/g, '') : s; }
+    document.addEventListener('keydown', function (e) {
+      if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
+      var t = e.target; if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) return;
+      var k = e.key.toLowerCase();
+      if (k === 's' || k === 'n') {
+        var quiere = k === 's' ? 'si' : 'no';
+        var b = visibles('button').filter(function (x) { var txt = sinTilde(x.textContent.trim().toLowerCase()); return txt === quiere || txt.indexOf(quiere + ',') === 0 || txt.indexOf(quiere + ' ') === 0; })[0];
+        if (b) { e.preventDefault(); b.focus(); b.click(); }
+        return;
+      }
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        var ops = visibles('.ref-opcion'); if (!ops.length) return;
+        var i = ops.indexOf(document.activeElement);
+        if (i < 0 && document.querySelector('.fr-ingreso')) return;   // las flechas son de las casillas de fracción
+        e.preventDefault();
+        var j = i < 0 ? 0 : (i + (e.key === 'ArrowRight' ? 1 : -1) + ops.length) % ops.length;
+        ops[j].focus();
+      }
+    });
   };
 
   /* ---------- inactividad: 15 s → pista suave; 45 s → pausa ----------
