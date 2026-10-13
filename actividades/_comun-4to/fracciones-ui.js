@@ -16,8 +16,8 @@
   // fraccionHTML(f, {mixto, unidad}) → fracción apilada (nunca barra inclinada), con su lectura en aria-label.
   FRUI.fraccionHTML = function (f, op) {
     op = op || {};
-    var lect = esc(FR.leer(f, { mixto: op.mixto, unidad: op.unidad })), u = op.unidad ? '<span class="fr-u">' + esc(op.unidad) + '</span>' : '';
-    if (FR.esEntero(f)) return '<span class="fr-num" role="img" aria-label="' + lect + '">' + (f.n / f.d) + u + '</span>';
+    var lect = esc(FR.leer(f, { mixto: op.mixto, unidad: op.unidad, entero: true, literal: true })), u = op.unidad ? '<span class="fr-u">' + esc(op.unidad) + '</span>' : '';
+    if (f.d === 1 || (op.mixto && FR.esEntero(f))) return '<span class="fr-num" role="img" aria-label="' + lect + '">' + (f.n / f.d) + u + '</span>';
     var m = op.mixto ? FR.aMixto(f) : { entero: 0, n: f.n, d: f.d };
     return '<span class="fr-num" role="img" aria-label="' + lect + '">' + (m.entero ? '<span class="fr-e">' + m.entero + '</span>' : '') +
       '<span class="fr-ap"><span class="fr-n">' + m.n + '</span><span class="fr-d">' + m.d + '</span></span>' + u + '</span>';

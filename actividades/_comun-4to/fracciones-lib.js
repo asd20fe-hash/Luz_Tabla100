@@ -64,6 +64,7 @@
     op = op || {};
     var u = op.unidad && UNIDADES[op.unidad];
     if (f.n === 0) return u ? 'cero ' + u[1] : 'cero';
+    if (op.literal && !op.mixto && !u && f.d !== 1) return leerSimple(f.n, f.d);   // tal como está escrita: 12/4 → "doce cuartos"
     if (esEntero(f)) { var e = f.n / f.d; return u ? numero(e) + ' ' + u[e === 1 ? 0 : 1] : (op.mixto || op.entero ? numero(e) + (e === 1 ? ' entero' : ' enteros') : numero(e)); }
     var m = aMixto(f);
     if (u) {
