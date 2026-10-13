@@ -2,9 +2,13 @@
 <!--
   ============================================================
   Saltos en la Tabla del 100 (práctica de matemática, 1er grado)
-  Versión: v1.5 (2026-10-13)
+  Versión: v1.6 (2026-10-13)
   ------------------------------------------------------------
   Historial de cambios
+  v1.6  Cuenta maximizada en Suma y Resta
+    + La cuenta en 3 pasos arranca maximizada y tapa el tablero, para que no distraiga.
+    + Botón "Ver la tabla" para achicarla y ver el tablero; "Agrandar" la vuelve a maximizar.
+    + Cada cuenta nueva arranca otra vez maximizada.
   v1.5  Fondo global
     + Los fondos (Aurora, Océano, Bosque, Atardecer, Espacio) pasan a core.css y MATE.fondo:
       se guardan en mate.global.fondo y se ven igual en todas las actividades y en el menú.
@@ -244,6 +248,17 @@ body.portrait #helpPop{bottom:auto;top:calc(var(--top-h,64px) + 8px)}
 body.portrait .key{height:42px;font-size:20px}
 body.portrait #panel.steps{width:auto}
 body.portrait .eqline{font-size:26px}
+
+/* ---------- cuenta maximizada (Suma y Resta): tapa el tablero para que no distraiga ---------- */
+body #panel.practice.max{left:14px;right:14px;top:calc(var(--top-h,64px) + 10px);bottom:calc(env(safe-area-inset-bottom,0px) + 14px);width:auto;height:auto;max-height:none}
+#panel.max .pbody{max-width:820px;margin:0 auto}
+#panel.max .op-big{font-size:48px}
+#panel.max .eqline{font-size:44px;justify-content:safe center}
+#panel.max .step-title,#panel.max .feedback{font-size:18px}
+#panel.max .done b{font-size:24px}
+#panel.max .key{height:64px;font-size:28px}
+.collapse.wide{width:auto;padding:0 12px;font-weight:600;font-size:14px}
+body.cuenta-max #scene,body.cuenta-max #eqCard,body.cuenta-max #tools,body.cuenta-max #cubeSlot,body.cuenta-max #cubeBack,body.cuenta-max #homeBtn{visibility:hidden}
 </style>
 </head>
 <body>
@@ -320,7 +335,7 @@ body.portrait .eqline{font-size:26px}
 /* ============================================================
    Saltos en la Tabla del 100
    ============================================================ */
-const APP_VERSION='1.5';
+const APP_VERSION='1.6';
 const TAG='[Tabla100 v'+APP_VERSION+']';
 const LOG=(...a)=>console.log(TAG,...a);
 LOG('Iniciando');
@@ -1105,7 +1120,7 @@ function makeResta(){
   ]};
 }
 function startSteps(kind){
-  ST.kind=kind; ST.q=kind==='suma'?makeSuma():makeResta(); ST.step=0; ST.doneLines=[]; ST.finished=false; ST.busy=false;
+  ST.kind=kind; ST.q=kind==='suma'?makeSuma():makeResta(); ST.step=0; ST.doneLines=[]; ST.finished=false; ST.busy=false; panelMax=true; // cada cuenta nueva arranca maximizada
   S.fichaLocked=false; clearTarget(); beginStep();
   LOG('cuenta nueva',ST.q.a,ST.q.sym,ST.q.b);
 }
@@ -1152,9 +1167,11 @@ function moveFocus(d){ if(!ST.q||ST.finished) return; ST.focus=(ST.focus+d+ST.va
 /* ============================================================
    PANEL
    ============================================================ */
-const panel=$('#panel'); let panelCollapsed=false;
+const panel=$('#panel'); let panelCollapsed=false, panelMax=true, maxOn=false; // panelMax: la cuenta de Suma/Resta tapa el tablero
+const isSteps=()=>S.mode==='suma'||S.mode==='resta';
 function head(icon,title,extra){
-  return '<div class="ph"><div class="ptitle"><span>'+icon+'</span><span>'+title+'</span></div>'+(extra||'')+
+  const mx=isSteps()&&!panelCollapsed?'<button class="collapse wide" data-action="max" title="'+(panelMax?'Achicar la cuenta y ver la tabla':'Agrandar la cuenta')+'">'+(panelMax?'🔽 Ver la tabla':'🔼 Agrandar')+'</button>':'';
+  return '<div class="ph"><div class="ptitle"><span>'+icon+'</span><span>'+title+'</span></div>'+(extra||'')+mx+
     '<button class="collapse" data-action="collapse" title="'+(panelCollapsed?'Abrir':'Achicar')+'">'+(panelCollapsed?'▴':'▾')+'</button></div>';
 }
 function segJump(){ return '<div class="seg" data-set="jumpStyle"><button data-v="diez">de 10 y de 1</button><button data-v="uno">de a 1</button></div>'; }
@@ -1188,7 +1205,7 @@ function panelSteps(){
   h+='<div class="op-big"><span class="n-ficha">'+q.a+'</span> '+q.sym+' <span class="n-salto">'+q.b+'</span></div>';
   ST.doneLines.forEach((d,i)=>{ h+='<div class="done"><span class="chk">✓</span><span><small>Paso '+(i+1)+': '+d.title+'</small><b>'+d.text+'</b></span></div>'; });
   if(ST.finished){
-    h+='<div class="final">🎉 '+q.a+' '+q.sym+' '+q.b+' = <b>'+q.result+'</b></div><p class="lead center">Mirá los saltos en la tabla.</p>'+
+    h+='<div class="final">🎉 '+q.a+' '+q.sym+' '+q.b+' = <b>'+q.result+'</b></div><p class="lead center">'+(panelMax?'Tocá "Ver la tabla" para mirar los saltos.':'Mirá los saltos en la tabla.')+'</p>'+
       '<div class="row center"><button class="btn primary" data-action="new">Otra cuenta ▶</button></div>';
   }else{
     const st=q.steps[ST.step], segs=st.tpl.split('[]');
@@ -1211,8 +1228,18 @@ function renderPanel(){
   panel.innerHTML=S.mode==='libre'?panelLibre():(S.mode==='saltos'?panelSaltos():panelSteps());
   panel.classList.toggle('collapsed',panelCollapsed);
   panel.classList.toggle('practice',S.mode!=='libre');
-  panel.classList.toggle('steps',S.mode==='suma'||S.mode==='resta');
+  panel.classList.toggle('steps',isSteps());
+  const mx=isSteps()&&panelMax&&!panelCollapsed;
+  panel.classList.toggle('max',mx); document.body.classList.toggle('cuenta-max',mx);
   syncSegs(); fitEq();
+  if(mx!==maxOn){ maxOn=mx; LOG('cuenta',mx?'maximizada':'chica'); relayout(); }
+}
+/* Reencuadra el tablero si el panel cambió de tamaño (con la cuenta maximizada el tablero no se ve: no hace falta). */
+function relayout(){
+  requestAnimationFrame(()=>{
+    const r0=view.right, b0=view.bot; updateLayout();
+    if(!maxOn&&(Math.abs(view.right-r0)>20||Math.abs(view.bot-b0)>20)){ const h=homeView(); animateCam(h.theta,h.phi,h.radius,h.target,.8); }
+  });
 }
 /* La cuenta con casilleros va siempre en una línea: si no entra, se achica la letra (y con ella los casilleros). */
 function fitEq(){
@@ -1225,7 +1252,8 @@ panel.addEventListener('click',e=>{
   if(e.target.closest('.seg')) return;
   const b=e.target.closest('[data-action]'); if(!b) return; ensureAudio();
   switch(b.dataset.action){
-    case 'collapse': panelCollapsed=!panelCollapsed; renderPanel(); updateLayout(); break;
+    case 'collapse': panelCollapsed=!panelCollapsed; if(panelCollapsed) panelMax=false; renderPanel(); updateLayout(); break;
+    case 'max': panelMax=!panelMax; sfx.click(); renderPanel(); break;
     case 'next-salto': SAL.idx++; if(SAL.idx>=10){ S.hintCol=null; renderPanel(); celebrate(true); sfx.win(); toast('¡Ronda terminada! 🎉'); } else nextSalto(); break;
     case 'new-round': newSaltosRound(); break;
     case 'help':
@@ -1251,10 +1279,7 @@ function setMode(m){
   if(m==='libre'){ S.fichaLocked=false; clearTarget(); renderPanel(); }
   else if(m==='saltos') newSaltosRound();
   else startSteps(m);
-  requestAnimationFrame(()=>{
-    const r0=view.right, b0=view.bot; updateLayout();
-    if(Math.abs(view.right-r0)>20||Math.abs(view.bot-b0)>20){ const h=homeView(); animateCam(h.theta,h.phi,h.radius,h.target,.8); }
-  });
+  relayout();
 }
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{ ensureAudio(); sfx.click(); setMode(t.dataset.mode); }));
 function currentSetting(k){ return k==='layout'?String(S.layout):k==='jumpStyle'?S.jumpStyle:k==='skin'?S.skin:k==='bg'?MATE.fondo.get():(S.sound?'1':'0'); }
