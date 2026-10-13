@@ -3,9 +3,13 @@
 <!--
   ============================================================
   Matemática — shell: perfiles, menú de actividades y ajustes de padres
-  Versión: v2.2 (2026-10-13)
+  Versión: v2.3 (2026-10-13)
   ------------------------------------------------------------
   Historial de cambios
+  v2.3  Fracciones de 4to
+    + Ajustes de padres suma el mapa de fracciones de Ian (por tema: % al primer intento en 14 días, ítems,
+      tendencia y último repaso) y el interruptor "Incluir ejercicios del módulo de la escuela".
+    + El panel de estadísticas muestra también las siete actividades de fracciones y los nombres de sus errores.
   v2.2  Fondo global
     + Los fondos de la Tabla del 100 (Aurora, Océano, Bosque, Atardecer, Espacio) pasan al core
       (MATE.fondo, mate.global.fondo): se ven en el menú y en todas las actividades, también las de Ian.
@@ -56,6 +60,11 @@ input{font:inherit;color:var(--text);background:var(--box-bg);border:2px solid v
 .ref4-dos{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
 .ref4-acc{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
 .ref4-acc select{font:inherit;color:var(--text);background:var(--box-bg);border:2px solid var(--glass-border);border-radius:10px;padding:6px}
+.fr4-mapa{width:100%;border-collapse:collapse;font-size:15px;margin:6px 0}
+.fr4-mapa th,.fr4-mapa td{padding:5px 6px;border-bottom:1px solid var(--glass-border);text-align:center}
+.fr4-mapa th:first-child,.fr4-mapa td:first-child{text-align:left}
+.fr4-switch{display:flex;gap:10px;align-items:center;font-weight:600;margin:10px 0 2px;min-height:44px;cursor:pointer}
+.fr4-switch input{width:24px;height:24px;margin:0}
 .foot{margin-top:auto;padding-top:24px;color:var(--muted);font-size:13px}
 </style>
 </head>
@@ -73,12 +82,14 @@ input{font:inherit;color:var(--text);background:var(--box-bg);border:2px solid v
 <script src="actividades/registro.js"></script>
 <script src="actividades/_comun-4to/eventos.js"></script>
 <script src="actividades/_comun-4to/panel-estadisticas.js"></script>
+<script src="actividades/_comun-4to/fracciones-lib.js"></script>
+<script src="actividades/_comun-4to/panel-fracciones.js"></script>
 <script>
 (function(){
 'use strict';
 const $=s=>document.querySelector(s), view=$('#view');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-document.querySelectorAll('.ver').forEach(el=>el.textContent='v2.2');
+document.querySelectorAll('.ver').forEach(el=>el.textContent='v2.3');
 
 /* ==== TEMA ==== */
 function pintaTema(){ $('#themeBtn').textContent=MATE.tema.oscuro()?'☀️':'🌙'; }
@@ -123,9 +134,11 @@ function verAjustes(){
     '<b>Cambiar PIN</b><input id="np" type="password" inputmode="numeric" maxlength="8" placeholder="PIN nuevo" autocomplete="off"><div class="msg" id="m"></div>'+
     '<div class="row"><button class="btn main" id="gp">Guardar PIN</button></div></div>'+
     (stats.length||!window.REF4_PANEL?'<div class="panel"><h2>Estadísticas</h2>':'<div hidden>')+(stats.length?stats.map(a=>{ let r=''; try{ r=a.stats(); }catch(e){ r='(sin datos)'; } return '<p><b>'+esc(a.titulo)+'</b><br>'+esc(r)+'</p>'; }).join(''):'<p class="sub" style="margin:0">Todavía no hay estadísticas.</p>')+'</div>'+
-    '<div class="panel ancho" id="ref4"></div><div class="row"><button class="btn" id="sal">Salir</button></div>';
+    '<div class="panel ancho" id="ref4"></div><div class="panel ancho" id="fr4"></div><div class="row"><button class="btn" id="sal">Salir</button></div>';
   if(window.REF4_PANEL) REF4_PANEL.render($('#ref4'),{perfiles:MATE.perfiles,actividades:MATE.actividades.filter(a=>/^4to-/.test(a.id))});
   else $('#ref4').remove();
+  if(window.REF4_PANEL_FR) REF4_PANEL_FR.render($('#fr4'),{perfiles:MATE.perfiles,actividades:MATE.actividades});
+  else $('#fr4').remove();
   $('#gp').onclick=()=>{ const v=$('#np').value, m=$('#m'); if(!/^\d{4,8}$/.test(v)){ m.className='msg bad'; m.textContent='Usá de 4 a 8 números.'; return; } MATE.pin.set(v); $('#np').value=''; m.className='msg ok'; m.textContent='PIN guardado'; };
   $('#sal').onclick=volver;
 }
