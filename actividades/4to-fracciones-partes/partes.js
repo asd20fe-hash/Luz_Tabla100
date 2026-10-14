@@ -1,6 +1,8 @@
 /* Partes iguales (fracciones de 4to) — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.2  (2026-10-14) Fuegos artificiales
+     + Al terminar la ronda hay fuegos artificiales en el resumen, que siguen hasta tocar "Otra ronda" o "Salir".
    v1.0.1  (2026-10-13) Teclado y correcciones
      + "Marcá las que tienen exactamente…": al acertar, Listo no pasaba al ejercicio siguiente.
      + Teclado: Tab y Enter pasan a la casilla siguiente de la fracción (Enter en la última es OK).
@@ -13,7 +15,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.1', ACT = '4to-fracciones-partes';
+  var VERSION = '1.0.2', ACT = '4to-fracciones-partes';
   var FRUI = REF4_FRUI, FR = REF4_FR, FIG = REF4_FIG, G = REF4_FRGEN, A = G.partes, cf = FRUI.conFracciones;
   var txt = function (f) { return FR.formatear(f); };
   var TEXTO_PASO = { P1: 'escribir qué parte está pintada', P2: 'pintar y tocar Listo', P3: 'marcar las figuras y tocar Listo', P4: 'armar el entero' };

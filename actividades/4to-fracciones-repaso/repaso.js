@@ -1,6 +1,8 @@
 /* Repaso de fracciones (fracciones de 4to) — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.2  (2026-10-14) Fuegos artificiales
+     + Al terminar la ronda hay fuegos artificiales en el resumen, que siguen hasta tocar "Otro repaso" o "Salir".
    v1.0.1  (2026-10-13) Teclado y correcciones
      + Teclado: S y N eligen Sí o No, las flechas ← → recorren las opciones y Enter elige.
    v1.0.0  (2026-10-13) Primera versión
@@ -13,7 +15,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.1', ACT = '4to-fracciones-repaso';
+  var VERSION = '1.0.2', ACT = '4to-fracciones-repaso';
   var FRUI = REF4_FRUI, FR = REF4_FR, G = REF4_FRGEN, cf = FRUI.conFracciones, esc = FRUI.esc;
   var ACTS = ['4to-fracciones-repartos', '4to-fracciones-partes', '4to-fracciones-muro', '4to-fracciones-comparar', '4to-fracciones-cuanto-falta', '4to-fracciones-potes-vasos'];
   var resultados = [];
@@ -67,9 +69,9 @@
         return '<div class="rps-caso"><p><b>' + cf(x.q.pregunta) + '</b></p><p>Elegiste ' + cf(textoOpcion(x.elegida)) + '; era ' + cf(textoOpcion(x.correcta)) + '.</p><p>' + cf(x.q.explicacion) + '</p>' + dibujo(x.q.dibujo) +
           '<div class="ref-fila"><button class="ref-btn" data-practicar="' + esc(x.q.act) + '" data-i="' + i + '">Practicar esto</button></div></div>'; }).join('') : '<p class="fr-msg">¡No hay nada para revisar!</p>') +
       '<div class="ref-fila"><button class="ref-btn" id="r-salir">Salir</button><button class="ref-btn main" id="r-otra">Otro repaso</button></div></div>';
-    document.body.appendChild(m);
+    document.body.appendChild(m); REF4_UI.fuegos.iniciar();
     m.onclick = function (e) {
-      var b = e.target.closest('button'); if (!b) return;
+      var b = e.target.closest('button'); if (!b) return; REF4_UI.fuegos.parar();
       if (b.id === 'r-otra') { m.remove(); resultados = []; otra(); }
       else if (b.id === 'r-salir') { m.remove(); MATE.irMenu(); }
       else if (b.dataset.practicar) { REF4_FRUI._ctx.reg.flush(); MATE.abrir(b.dataset.practicar); }

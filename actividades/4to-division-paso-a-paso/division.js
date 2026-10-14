@@ -1,6 +1,10 @@
 /* División paso a paso — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.6  (2026-10-14) Fuegos al terminar cada cuenta
+     + Al terminar una división hay fuegos artificiales que siguen hasta tocar "Siguiente cuenta" o "Terminar ronda".
+   v1.0.5  (2026-10-14) Fuegos artificiales
+     + Al terminar la ronda hay fuegos artificiales en el resumen, que siguen hasta tocar "Otra ronda" o "Salir".
    v1.0.4  (2026-10-13) Teclado y correcciones
      + Bajar: además de tocar la cifra del dividendo, se puede escribir con el teclado.
      + Teclado: S y N eligen Sí o No, las flechas ← → recorren las opciones y Enter elige.
@@ -20,7 +24,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.4', ACT = '4to-division-paso-a-paso', TITULO = 'División paso a paso';
+  var VERSION = '1.0.6', ACT = '4to-division-paso-a-paso', TITULO = 'División paso a paso';
   var CONTROLES = ['RESTO_MAYOR', 'CONTROL', 'ESTIMACION', 'VERIFICACION'];
   var MO = REF4_DIVMOTOR, DIV = REF4_DIV, UI = REF4_UI, $ = UI.$;
 
@@ -50,7 +54,7 @@
     var g = DIV.generar(R.nivel, ctx.az, sesionDiv);
     if (g.relajado.length) ctx.log('restricción relajada', g.relajado.join(', '));
     R.M = MO.crear({ dividendo: g.dividendo, divisor: g.divisor, nivel: R.nivel, az: ctx.az });
-    R.hecha = false; R.marca = null; R.resaltar = null; R.buf.limpiar(); R.ayuda = 'ninguna'; R.tPaso = Date.now(); R.corregir = null;
+    UI.fuegos.parar(); R.hecha = false; R.marca = null; R.resaltar = null; R.buf.limpiar(); R.ayuda = 'ninguna'; R.tPaso = Date.now(); R.corregir = null;
     UI.globo(null); render();
   }
 
@@ -191,7 +195,7 @@
   /* ---------- fin de cuenta y de ronda ---------- */
   function terminarCuenta() {
     R.hecha = true; R.marca = null; R.resaltar = null;
-    UI.sonar('ok'); UI.celebrar(R.cont.pct() === 100 ? '¡Impecable, sin errores!' : null);
+    UI.sonar('ok'); UI.celebrar(R.cont.pct() === 100 ? '¡Impecable, sin errores!' : null); UI.fuegos.iniciar();
     render();
   }
   function siguiente() {

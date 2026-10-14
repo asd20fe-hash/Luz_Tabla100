@@ -1,6 +1,8 @@
 /* ¿Tiene sentido? — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.5  (2026-10-14) Fuegos artificiales
+     + Al terminar la ronda hay fuegos artificiales en el resumen, que siguen hasta tocar "Otra ronda" o "Salir".
    v1.0.4  (2026-10-13) Teclado y correcciones
      + Teclado: S y N eligen Sí o No, las flechas ← → recorren las opciones y Enter elige.
    v1.0.3  (2026-10-13) Fondos
@@ -19,7 +21,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.4', ACT = '4to-tiene-sentido', TITULO = '¿Tiene sentido?';
+  var VERSION = '1.0.5', ACT = '4to-tiene-sentido', TITULO = '¿Tiene sentido?';
   var UI = REF4_UI, SE = REF4_SENTIDO, $ = UI.$, esc = UI.esc, miles = UI.miles;
   var ctx = UI.base({ act: ACT, titulo: TITULO, version: VERSION, nivelMax: SE.MAX_NIVEL });
   if (!ctx) return;

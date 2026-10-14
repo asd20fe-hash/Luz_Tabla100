@@ -2,9 +2,13 @@
 <!--
   ============================================================
   Saltos en la Tabla del 100 (práctica de matemática, 1er grado)
-  Versión: v1.6 (2026-10-13)
+  Versión: v1.7 (2026-10-14)
   ------------------------------------------------------------
   Historial de cambios
+  v1.7  Fuegos artificiales sin parar
+    + Al acertar, los fuegos artificiales siguen en bucle hasta que empieza otro ejercicio
+      (Siguiente, Otra cuenta, Otra ronda o cambio de modo). Solo la primera tanda suena.
+    + Al terminar una cuenta de Suma o Resta, la cuenta se achica para que se vean los saltos y los fuegos.
   v1.6  Cuenta maximizada en Suma y Resta
     + La cuenta en 3 pasos arranca maximizada y tapa el tablero, para que no distraiga.
     + Botón "Ver la tabla" para achicarla y ver el tablero; "Agrandar" la vuelve a maximizar.
@@ -335,7 +339,7 @@ body.cuenta-max #scene,body.cuenta-max #eqCard,body.cuenta-max #tools,body.cuent
 /* ============================================================
    Saltos en la Tabla del 100
    ============================================================ */
-const APP_VERSION='1.6';
+const APP_VERSION='1.7';
 const TAG='[Tabla100 v'+APP_VERSION+']';
 const LOG=(...a)=>console.log(TAG,...a);
 LOG('Iniciando');
@@ -697,21 +701,29 @@ function trail(pos,hue){
   const s=new THREE.Sprite(m); s.position.copy(pos); s.scale.set(.2,.2,1); scene.add(s); let t=0;
   fx.push({update(dt){ t+=dt; const p=t/.45; if(p>=1){ scene.remove(s); m.dispose(); return false; } m.opacity=.8*(1-p); s.position.y-=dt*.3; return true; }});
 }
-function rocket(to,hue,delay){
+function rocket(to,hue,delay,g,snd){
   setTimeout(()=>{
+    if(g!==fiesta) return; // la fiesta terminó (empezó otro ejercicio)
     const from=new THREE.Vector3(to.x*.7,CELL_H,to.z*.7);
     const m=new THREE.SpriteMaterial({map:dotTex,color:new THREE.Color().setHSL(hue,1,.72),transparent:true,depthWrite:false,blending:blendMode()});
     const s=new THREE.Sprite(m); s.scale.set(.38,.38,1); s.position.copy(from); scene.add(s); let t=0; const dur=.55;
-    sfx.whoosh();
+    if(snd) sfx.whoosh();
     fx.push({update(dt){ t+=dt; const p=Math.min(1,t/dur); s.position.lerpVectors(from,to,1-Math.pow(1-p,2)); if(Math.random()<.7) trail(s.position,hue);
-      if(p>=1){ scene.remove(s); m.dispose(); firework(to,hue); sfx.boom(); return false; } return true; }});
+      if(p>=1){ scene.remove(s); m.dispose(); firework(to,hue); if(snd) sfx.boom(); return false; } return true; }});
   },delay);
 }
-function celebrate(big){
+/* La fiesta sigue en bucle (sin sonido después de la primera tanda) hasta que empieza otro ejercicio: stopFiesta(). */
+let fiesta=0, fiestaT=null;
+function volley(big,g,snd){
   const n=big?7:4;
-  for(let i=0;i<n;i++){ const to=new THREE.Vector3((Math.random()*2-1)*4.5,4.2+Math.random()*3,(Math.random()*2-1)*3.2-.5); rocket(to,Math.random(),i*(big?230:260)); }
-  if(S.target!==null) puff(topPos(S.target,.1),18);
+  for(let i=0;i<n;i++){ const to=new THREE.Vector3((Math.random()*2-1)*4.5,4.2+Math.random()*3,(Math.random()*2-1)*3.2-.5); rocket(to,Math.random(),i*(big?230:260),g,snd); }
 }
+function celebrate(big){
+  stopFiesta(); const g=fiesta; volley(big,g,true);
+  if(S.target!==null) puff(topPos(S.target,.1),18);
+  fiestaT=setInterval(()=>{ if(!document.hidden) volley(big,g,false); },big?2600:2200);
+}
+function stopFiesta(){ fiesta++; if(fiestaT){ clearInterval(fiestaT); fiestaT=null; } }
 
 /* ============================================================
    SONIDO (sintetizado, sin archivos)
@@ -1024,7 +1036,7 @@ function makeSalto(){
 }
 function newSaltosRound(){ SAL.round=new Array(10).fill(null); SAL.idx=0; SAL.q=null; nextSalto(); }
 function nextSalto(){
-  SAL.q=makeSalto(); SAL.tries=0; SAL.solved=false; S.hintCol=null; S.fichaLocked=true;
+  stopFiesta(); SAL.q=makeSalto(); SAL.tries=0; SAL.solved=false; S.hintCol=null; S.fichaLocked=true;
   FB={text:'',type:''}; clearTarget(); setFicha(SAL.q.start); renderPanel();
   LOG('salto nuevo',SAL.q.start,SAL.q.delta);
 }
@@ -1120,7 +1132,7 @@ function makeResta(){
   ]};
 }
 function startSteps(kind){
-  ST.kind=kind; ST.q=kind==='suma'?makeSuma():makeResta(); ST.step=0; ST.doneLines=[]; ST.finished=false; ST.busy=false; panelMax=true; // cada cuenta nueva arranca maximizada
+  stopFiesta(); ST.kind=kind; ST.q=kind==='suma'?makeSuma():makeResta(); ST.step=0; ST.doneLines=[]; ST.finished=false; ST.busy=false; panelMax=true; // cada cuenta nueva arranca maximizada
   S.fichaLocked=false; clearTarget(); beginStep();
   LOG('cuenta nueva',ST.q.a,ST.q.sym,ST.q.b);
 }
@@ -1150,7 +1162,7 @@ function checkStep(){
   }
 }
 function finishSteps(){
-  const q=ST.q; ST.finished=true; S.hintCol=null; addStar(); sfx.win(); FB={text:'',type:''};
+  const q=ST.q; ST.finished=true; S.hintCol=null; panelMax=false; addStar(); sfx.win(); FB={text:'',type:''}; // achica la cuenta para que se vean los saltos y los fuegos
   renderPanel(); clearTarget(); setFicha(q.a);
   setTimeout(()=>{ if(ST.q!==q) return; setTarget(q.result,.1); afterArcs=()=>celebrate(true); },650);
   LOG('cuenta terminada',q.a,q.sym,q.b,'=',q.result);
@@ -1272,7 +1284,7 @@ panel.addEventListener('click',e=>{
    MODOS, AJUSTES Y BARRA
    ============================================================ */
 function setMode(m){
-  S.mode=m; LOG('modo',m);
+  stopFiesta(); S.mode=m; LOG('modo',m);
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.mode===m));
   S.hintCol=null; setMoveMode(false); FB={text:'',type:''};
   $('#btnMove').hidden=m==='saltos';

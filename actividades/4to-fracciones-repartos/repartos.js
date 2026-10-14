@@ -1,6 +1,8 @@
 /* Repartos (fracciones de 4to) — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.2  (2026-10-14) Fuegos artificiales
+     + Al terminar la ronda hay fuegos artificiales en el resumen, que siguen hasta tocar "Otra ronda" o "Salir".
    v1.0.1  (2026-10-13) Teclado y correcciones
      + Nivel 1: el tercer reparto de la ronda salía sin preguntas (la ronda tiene un solo tipo de ítem).
      + Teclado: Tab y Enter pasan a la casilla siguiente de la fracción (Enter en la última es OK).
@@ -14,7 +16,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.1', ACT = '4to-fracciones-repartos';
+  var VERSION = '1.0.2', ACT = '4to-fracciones-repartos';
   var FRUI = REF4_FRUI, FR = REF4_FR, FIG = REF4_FIG, G = REF4_FRGEN, A = G.repartos, esc = FRUI.esc, cf = FRUI.conFracciones;
   var fr = FR.fr, mix = function (f) { return FR.formatear(f, { mixto: true }); };
 

@@ -1,6 +1,8 @@
 /* Detective de problemas — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.5  (2026-10-14) Fuegos artificiales
+     + Al terminar la ronda hay fuegos artificiales en el resumen, que siguen hasta tocar "Otra ronda" o "Salir".
    v1.0.4  (2026-10-13) Voz argentina
      + El 🔊 prefiere voz de Argentina, después Uruguay/Chile/resto de Latinoamérica; la de España queda última.
    v1.0.3  (2026-10-13) Teclado y correcciones
@@ -18,7 +20,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.4', ACT = '4to-detective-problemas', TITULO = 'Detective de problemas';
+  var VERSION = '1.0.5', ACT = '4to-detective-problemas', TITULO = 'Detective de problemas';
   var UI = REF4_UI, DE = REF4_DETECTIVE, PR = REF4_PROBLEMAS, $ = UI.$, esc = UI.esc, miles = PR.miles;
   var ctx = UI.base({ act: ACT, titulo: TITULO, version: VERSION, nivelMax: 4 });
   if (!ctx) return;

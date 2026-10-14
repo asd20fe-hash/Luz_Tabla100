@@ -114,6 +114,52 @@
     document.body.appendChild(d); setTimeout(function () { d.remove(); }, 1300);
   };
 
+  /* ---------- fuegos artificiales (canvas encima de todo, sin tocar los clics) ----------
+     iniciar() los lanza en bucle hasta parar(); se usan en el resumen de ronda y paran al empezar otra. */
+  UI.fuegos = (function () {
+    var cv = null, cx = null, parts = [], cohetes = [], raf = 0, prox = 0, activo = false, ult = 0;
+    function lanzar(w, h) {
+      cohetes.push({ x: w * (0.15 + Math.random() * 0.7), y: h, vy: -(h * 0.9 + Math.random() * h * 0.35), ty: h * (0.12 + Math.random() * 0.35), hue: Math.random() * 360 });
+    }
+    function explotar(c) {
+      for (var i = 0, n = 90; i < n; i++) {
+        var a = Math.random() * Math.PI * 2, v = 90 + Math.random() * 170, h2 = Math.random() < 0.7 ? c.hue : (c.hue + 40) % 360;
+        parts.push({ x: c.x, y: c.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, t: 0, vida: 1.1 + Math.random() * 0.6, hue: h2 });
+      }
+    }
+    function cuadro(ts) {
+      var dt = Math.min(0.05, (ts - (ult || ts)) / 1000); ult = ts;
+      var w = cv.width = innerWidth, h = cv.height = innerHeight;
+      if (activo && ts >= prox) { lanzar(w, h); if (Math.random() < 0.4) lanzar(w, h); prox = ts + 550 + Math.random() * 500; }
+      cx.clearRect(0, 0, w, h); var os = !root.MATE || MATE.tema.oscuro(); // en claro, chispas más oscuras para que se vean
+      cohetes = cohetes.filter(function (c) {
+        c.y += c.vy * dt; c.vy *= 1 - 0.6 * dt;
+        cx.fillStyle = 'hsl(' + c.hue + ',100%,' + (os ? 75 : 50) + '%)'; cx.beginPath(); cx.arc(c.x, c.y, 3, 0, 7); cx.fill();
+        if (c.y <= c.ty || c.vy > -40) { explotar(c); return false; } return true;
+      });
+      parts = parts.filter(function (p) {
+        p.t += dt; if (p.t >= p.vida) return false;
+        p.vy += 140 * dt; p.vx *= 1 - 1.4 * dt; p.vy *= 1 - 1.4 * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+        var k = p.t / p.vida; cx.globalAlpha = k < 0.6 ? 1 : 1 - (k - 0.6) / 0.4;
+        cx.fillStyle = 'hsl(' + p.hue + ',100%,' + ((os ? 60 : 42) + 15 * (1 - k)) + '%)'; cx.beginPath(); cx.arc(p.x, p.y, 3.4 * (1 - k * 0.5), 0, 7); cx.fill();
+        return true;
+      });
+      cx.globalAlpha = 1;
+      if (activo || cohetes.length || parts.length) raf = requestAnimationFrame(cuadro); else quitar();
+    }
+    function quitar() { cancelAnimationFrame(raf); raf = 0; if (cv) cv.remove(); cv = null; parts = []; cohetes = []; }
+    return {
+      iniciar: function () {
+        if (activo || (root.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+        activo = true; prox = 0; ult = 0;
+        if (!cv) { cv = document.createElement('canvas'); cv.className = 'ref-fuegos'; cv.setAttribute('aria-hidden', 'true'); document.body.appendChild(cv); cx = cv.getContext('2d'); }
+        if (!raf) raf = requestAnimationFrame(cuadro);
+      },
+      parar: function () { activo = false; quitar(); },
+      activo: function () { return activo; }
+    };
+  })();
+
   /* ---------- entrada numérica (buffer) + teclado en pantalla ---------- */
   UI.entrada = function (max) {
     var buf = '';
@@ -226,9 +272,9 @@
     m.innerHTML = '<div class="ref-panel"><h2>' + msg + '</h2><div class="ref-estrellas" aria-label="' + cfg.estrellas + ' estrellas">' + e + '</div>' +
       '<p>' + cfg.pct + '% bien al primer intento</p>' + (cfg.extra ? '<p>' + cfg.extra + '</p>' : '') +
       '<div class="ref-fila"><button class="ref-btn" id="r-salir">Salir</button><button class="ref-btn main" id="r-otra">Otra ronda</button></div></div>';
-    document.body.appendChild(m);
-    $('#r-otra', m).onclick = function () { m.remove(); onOtra(); };
-    $('#r-salir', m).onclick = function () { m.remove(); onSalir(); };
+    document.body.appendChild(m); UI.fuegos.iniciar();
+    $('#r-otra', m).onclick = function () { UI.fuegos.parar(); m.remove(); onOtra(); };
+    $('#r-salir', m).onclick = function () { UI.fuegos.parar(); m.remove(); onSalir(); };
     $('#r-otra', m).focus();
   };
 

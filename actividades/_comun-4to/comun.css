@@ -78,6 +78,7 @@ button{font:inherit;color:inherit}
 .ref-inactivo{animation:ref-late 1.1s ease-in-out infinite}
 @keyframes ref-late{50%{box-shadow:0 0 0 6px var(--resalte);transform:scale(1.04)}}
 @media (prefers-reduced-motion: reduce){.ref-inactivo,.ref-celebra{animation:none}}
+.ref-fuegos{position:fixed;inset:0;width:100%;height:100%;z-index:55;pointer-events:none}
 
 #debug{position:fixed;right:6px;top:6px;max-width:300px;max-height:60vh;overflow:auto;z-index:60;font:12px/1.3 monospace;
   background:var(--box-bg);color:var(--text);border:1px solid var(--glass-border);border-radius:8px;padding:6px;white-space:pre-wrap}
