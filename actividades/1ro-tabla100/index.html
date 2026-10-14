@@ -2,9 +2,13 @@
 <!--
   ============================================================
   Saltos en la Tabla del 100 (práctica de matemática, 1er grado)
-  Versión: v1.8 (2026-10-14)
+  Versión: v1.9 (2026-10-14)
   ------------------------------------------------------------
   Historial de cambios
+  v1.9  Botón Menú visible
+    + "🏠 Menú" arriba a la izquierda, grande y con texto, como en las otras actividades (antes era un ícono chico
+      entre las estrellas y el sol, y se confundía con el 🏠 de la vista del tablero).
+    + El botón que endereza el tablero ahora es 🧭, para que no parezca el de volver al menú.
   v1.8  Registro de cada paso
     + Cada intento queda registrado con MATE.ejercicio (va a la planilla de Google con perfil y dispositivo):
       saltos de 10 (desde, salto, adónde fue) y cada paso de Suma y Resta (lo esperado, lo que puso, el error).
@@ -117,6 +121,9 @@ button:focus-visible{outline:3px solid var(--accent3);outline-offset:2px}
 #topbar>*{pointer-events:auto}
 .brand{display:flex;align-items:center;gap:8px;padding:0 16px;height:50px;border-radius:18px;font-weight:700;font-size:19px;white-space:nowrap;letter-spacing:.2px}
 .brand .logo{font-size:23px}
+button.brand{border:0;color:var(--text);font-family:inherit;cursor:pointer;min-height:48px}
+button.brand:hover{background:var(--chip)}
+.brand .menu-txt{font-size:18px}
 #tabs{display:flex;gap:4px;padding:5px;border-radius:18px;overflow-x:auto;scrollbar-width:none;min-width:0}
 #tabs::-webkit-scrollbar{display:none}
 .tab{border:0;background:transparent;color:var(--text);font-weight:600;font-size:15px;padding:0 15px;height:40px;border-radius:13px;cursor:pointer;white-space:nowrap;transition:background .2s,color .2s}
@@ -275,7 +282,7 @@ body.cuenta-max #scene,body.cuenta-max #eqCard,body.cuenta-max #tools,body.cuent
 <canvas id="scene" tabindex="0" aria-label="Tablero 3D de números"></canvas>
 
 <header id="topbar">
-  <div class="brand glass"><span class="logo">🔢</span><span class="name">Saltos en la Tabla</span></div>
+  <button class="brand glass" id="menuBtn" title="Volver al menú"><span class="logo">🏠</span><span class="menu-txt">Menú</span></button>
   <nav id="tabs" class="glass" aria-label="Modos">
     <button class="tab active" data-mode="libre">🎲 Libre</button>
     <button class="tab" data-mode="saltos">🔟 Saltos de 10</button>
@@ -285,7 +292,6 @@ body.cuenta-max #scene,body.cuenta-max #eqCard,body.cuenta-max #tools,body.cuent
   <div class="spacer"></div>
   <div class="right glass">
     <div class="stars" id="stars" title="Estrellas ganadas">⭐ <span id="starsN">0</span></div>
-    <button class="icon-btn" id="menuBtn" title="Volver al menú">🏠</button>
     <button class="icon-btn" id="themeBtn" title="Cambiar modo claro u oscuro">🌙</button>
     <button class="icon-btn" data-pop="#settings" title="Ajustes">⚙️</button>
   </div>
@@ -298,7 +304,7 @@ body.cuenta-max #scene,body.cuenta-max #eqCard,body.cuenta-max #tools,body.cuent
 </div>
 
 <div id="cubeSlot" title="Arrastrá para girar. Tocá una cara para ver desde ahí."></div>
-<button id="homeBtn" class="glass" title="Volver a la vista inicial">🏠</button>
+<button id="homeBtn" class="glass" title="Volver a la vista inicial" aria-label="Volver a la vista inicial">🧭</button>
 
 <div id="tools" class="glass">
   <button class="tool" id="btnMove" title="Mover la ficha"><span class="ico">📍</span><span class="lbl">Mover ficha</span></button>
@@ -344,7 +350,7 @@ body.cuenta-max #scene,body.cuenta-max #eqCard,body.cuenta-max #tools,body.cuent
 /* ============================================================
    Saltos en la Tabla del 100
    ============================================================ */
-const APP_VERSION='1.8';
+const APP_VERSION='1.9';
 const TAG='[Tabla100 v'+APP_VERSION+']';
 // Registro de ejercicios (MATE.ejercicio → planilla). Campos comunes: v, sesion; el resto lo pone cada modo.
 const SES='s'+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36);

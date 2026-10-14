@@ -7,7 +7,7 @@
 (function(){
 'use strict';
 MATE.actividades=[
-  {id:'tabla100',titulo:'Saltos en la Tabla del 100',descripcion:'Sumá y restá saltando en la tabla.',icono:'🔢',grados:['1ro'],ruta:'actividades/1ro-tabla100/index.html',version:'1.8',
+  {id:'tabla100',titulo:'Saltos en la Tabla del 100',descripcion:'Sumá y restá saltando en la tabla.',icono:'🔢',grados:['1ro'],ruta:'actividades/1ro-tabla100/index.html',version:'1.9',
    errores:{SALTO_DIRECCION:'Saltó para el lado contrario (sumó en vez de restar o al revés)',SALTO_FILAS:'Saltó una cantidad de filas equivocada',SALTO_COLUMNA:'Se salió de la columna (mezcló saltos de 10 con saltos de 1)',
      DIEZ_COMO_UNO:'Escribió los dieces sin el cero (3 en vez de 30)',DESARME_DIECES:'Desarmó mal los dieces',DESARME_UNOS:'Desarmó mal los unos',AGRUPA_MAL:'No juntó dieces con dieces y unos con unos',
      DIECES_SIN_CERO:'Sumó los dieces pero sin el cero (5 en vez de 50)',SUMA_DIECES:'Error al sumar los dieces',SUMA_UNOS:'Error al sumar los unos',JUNTA_MAL:'Error al juntar dieces y unos en el resultado',
