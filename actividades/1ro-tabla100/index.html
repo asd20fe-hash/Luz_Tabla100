@@ -2,9 +2,14 @@
 <!--
   ============================================================
   Saltos en la Tabla del 100 (práctica de matemática, 1er grado)
-  Versión: v1.7 (2026-10-14)
+  Versión: v1.8 (2026-10-14)
   ------------------------------------------------------------
   Historial de cambios
+  v1.8  Registro de cada paso
+    + Cada intento queda registrado con MATE.ejercicio (va a la planilla de Google con perfil y dispositivo):
+      saltos de 10 (desde, salto, adónde fue) y cada paso de Suma y Resta (lo esperado, lo que puso, el error).
+    + Códigos de error en MAYÚSCULAS (SALTO_FILAS, DIEZ_COMO_UNO, RESTA_UNOS_EN_VEZ_DE_DIECES…); sus nombres
+      para padres están en la entrada de registro.js. También se registra si pidió ayuda y cuánto tardó.
   v1.7  Fuegos artificiales sin parar
     + Al acertar, los fuegos artificiales siguen en bucle hasta que empieza otro ejercicio
       (Siguiente, Otra cuenta, Otra ronda o cambio de modo). Solo la primera tanda suena.
@@ -339,8 +344,11 @@ body.cuenta-max #scene,body.cuenta-max #eqCard,body.cuenta-max #tools,body.cuent
 /* ============================================================
    Saltos en la Tabla del 100
    ============================================================ */
-const APP_VERSION='1.7';
+const APP_VERSION='1.8';
 const TAG='[Tabla100 v'+APP_VERSION+']';
+// Registro de ejercicios (MATE.ejercicio → planilla). Campos comunes: v, sesion; el resto lo pone cada modo.
+const SES='s'+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36);
+const REG=ev=>{ try{ MATE.ejercicio('tabla100',Object.assign({v:APP_VERSION,sesion:SES},ev)); }catch(e){ console.warn(TAG,'registro',e); } };
 const LOG=(...a)=>console.log(TAG,...a);
 LOG('Iniciando');
 
@@ -1034,9 +1042,9 @@ function makeSalto(){
   }
   return {start:34,delta:20,end:54};
 }
-function newSaltosRound(){ SAL.round=new Array(10).fill(null); SAL.idx=0; SAL.q=null; nextSalto(); }
+function newSaltosRound(){ SAL.round=new Array(10).fill(null); SAL.idx=0; SAL.q=null; REG({tipo:'ronda_inicio',tema:'saltos10'}); nextSalto(); }
 function nextSalto(){
-  stopFiesta(); SAL.q=makeSalto(); SAL.tries=0; SAL.solved=false; S.hintCol=null; S.fichaLocked=true;
+  stopFiesta(); SAL.q=makeSalto(); SAL.tries=0; SAL.solved=false; SAL.t0=Date.now(); SAL.ayuda='ninguna'; S.hintCol=null; S.fichaLocked=true;
   FB={text:'',type:''}; clearTarget(); setFicha(SAL.q.start); renderPanel();
   LOG('salto nuevo',SAL.q.start,SAL.q.delta);
 }
@@ -1046,9 +1054,13 @@ function saltoHint(n){
   if(d%10===0){ const got=Math.abs(d)/10; return 'Saltaste '+got+' '+plural(got,'fila','filas')+'. Necesitás '+k+' '+plural(k,'salto','saltos')+' de 10, o sea '+plural(k,'una fila',k+' filas')+'.'; }
   return 'Mirá la cuenta de arriba: '+q.start+' '+(d>0?'+':MINUS)+' '+Math.abs(d)+'. Un salto de 10 es quedarse en la misma columna y moverse una fila.';
 }
+function saltoCod(n){ const q=SAL.q, d=n-q.start; return Math.sign(d)!==Math.sign(q.delta)?'SALTO_DIRECCION':(d%10===0?'SALTO_FILAS':'SALTO_COLUMNA'); }
 function saltosClick(n){
   if(!SAL.q||SAL.solved||SAL.idx>=10||n===S.ficha) return;
   setTarget(n); SAL.tries++;
+  const okS=n===SAL.q.end;
+  REG({tipo:'paso',tema:'saltos10',paso:'salto',intento:SAL.tries,item:{desde:SAL.q.start,salto:SAL.q.delta},esperado:String(SAL.q.end),respuesta:String(n),ok:okS,error:okS?null:saltoCod(n),ms:Date.now()-SAL.t0,ayuda:SAL.ayuda});
+  SAL.t0=Date.now();
   if(n===SAL.q.end){
     SAL.solved=true; SAL.round[SAL.idx]=SAL.tries===1?'ok':'half'; addStar(); S.hintCol=null;
     const k=Math.abs(SAL.q.delta)/10;
@@ -1075,6 +1087,11 @@ function hintDesarme(v,srcs,ans){
   }
   return 'Revisá los casilleros rojos.';
 }
+// Código del primer casillero mal en un desarme (mismo orden que hintDesarme).
+function codDesarme(v,srcs,ans){
+  for(let i=0;i<ans.length;i++){ if(v[i]===ans[i]) continue; if(ans[i]%10===0&&ans[i]>=10) return v[i]===Math.floor(srcs[i]/10)?'DIEZ_COMO_UNO':'DESARME_DIECES'; return 'DESARME_UNOS'; }
+  return 'OTRO';
+}
 function checkPairs(nums,ans){
   const m=[];
   [[0,1],[2,3]].forEach(gr=>{ const pool=[ans[gr[0]],ans[gr[1]]]; gr.forEach(i=>{ const k=pool.indexOf(nums[i]); if(k>=0){ m[i]=true; pool.splice(k,1); } else m[i]=false; }); });
@@ -1084,15 +1101,15 @@ function makeSuma(){
   const a1=rand(1,8), b1=rand(1,9-a1), a0=rand(1,8), b0=rand(1,9-a0);
   const a=a1*10+a0, b=b1*10+b0, T=(a1+b1)*10, U=a0+b0, res=a+b, ex=(a===47||b===47)?58:47;
   return {a,b,result:res,sym:'+',steps:[
-    {title:'Desarmo',tpl:a+' + '+b+' = [] + [] + [] + []',ans:[a1*10,a0,b1*10,b0],
+    {id:'desarmo',cod:v=>codDesarme(v,[a,a,b,b],[a1*10,a0,b1*10,b0]),title:'Desarmo',tpl:a+' + '+b+' = [] + [] + [] + []',ans:[a1*10,a0,b1*10,b0],
       help:()=>'Desarmá cada número en dieces y unos. Por ejemplo: '+ex+' = '+(Math.floor(ex/10)*10)+' + '+(ex%10)+'.',
       hint:v=>hintDesarme(v,[a,a,b,b],[a1*10,a0,b1*10,b0]),
       done:v=>v[0]+' + '+v[1]+' + '+v[2]+' + '+v[3]},
-    {title:'Agrupo',tpl:'[] + [] + [] + []',ans:[a1*10,b1*10,a0,b0],pairs:true,
+    {id:'agrupo',cod:()=>'AGRUPA_MAL',title:'Agrupo',tpl:'[] + [] + [] + []',ans:[a1*10,b1*10,a0,b0],pairs:true,
       help:()=>'Juntá los dieces con los dieces (los que terminan en 0) y después los unos con los unos.',
       hint:()=>'Primero van los dos dieces y después los dos unos. Mirá el paso 1.',
       done:v=>v[0]+' + '+v[1]+' + '+v[2]+' + '+v[3]},
-    {title:'Sumo por grupos',tpl:'[] + [] = []',ans:[T,U,res],
+    {id:'grupos',cod:v=>v[0]!==T?(v[0]===a1+b1?'DIECES_SIN_CERO':'SUMA_DIECES'):(v[1]!==U?'SUMA_UNOS':'JUNTA_MAL'),title:'Sumo por grupos',tpl:'[] + [] = []',ans:[T,U,res],
       start:()=>{ clearTarget(); setFicha(a1*10); },
       startTip:'Tip: en la tabla la ficha está en '+(a1*10)+'. Probá saltar '+(b1*10)+' y mirá la cuenta de arriba.',
       help:()=>{ S.hintCol=colOf(a1*10); return 'Los dieces se suman como los unos: '+a1+' + '+b1+' = '+(a1+b1)+', entonces '+(a1*10)+' + '+(b1*10)+' = ? Mirá la columna que brilla.'; },
@@ -1109,11 +1126,11 @@ function makeResta(){
   const a=a1*10+a0, b=b1*10+b0, B10=b1*10, mid=a-B10, res=a-b, ex=b===26?37:26;
   const filas=plural(b1,'una fila',b1+' filas');
   return {a,b,result:res,sym:MINUS,steps:[
-    {title:'Desarmo solo el que resta',tpl:a+' '+MINUS+' [] '+MINUS+' []',ans:[B10,b0],
+    {id:'desarmo',cod:v=>codDesarme(v,[b,b],[B10,b0]),title:'Desarmo solo el que resta',tpl:a+' '+MINUS+' [] '+MINUS+' []',ans:[B10,b0],
       help:()=>'Solo se desarma el '+b+'. Por ejemplo: '+ex+' = '+(Math.floor(ex/10)*10)+' + '+(ex%10)+'.',
       hint:v=>hintDesarme(v,[b,b],[B10,b0]),
       done:v=>a+' '+MINUS+' '+v[0]+' '+MINUS+' '+v[1]},
-    {title:'Resuelvo la 1ª resta',tpl:a+' '+MINUS+' '+B10+' = []',ans:[mid],
+    {id:'resta10',cod:v=>v[0]===a-b1?'RESTA_UNOS_EN_VEZ_DE_DIECES':(v[0]===a+B10?'SUMA_EN_VEZ_DE_RESTA':(v[0]%10!==a0?'CAMBIA_UNIDAD':'FILAS_MAL')),title:'Resuelvo la 1ª resta',tpl:a+' '+MINUS+' '+B10+' = []',ans:[mid],
       start:()=>{ clearTarget(); setFicha(a); },
       startTip:'Tip: restar 10 es subir una fila. Probalo en la tabla: la ficha está en '+a+'.',
       help:()=>{ S.hintCol=colOf(a); return 'Restar '+B10+' es subir '+filas+' por la columna que brilla. El '+a0+' del final no cambia.'; },
@@ -1123,7 +1140,7 @@ function makeResta(){
         if(x%10!==a0) return 'Fijate: cuando restás dieces, el '+a0+' del final se queda igual.';
         return 'Contá las filas: '+filas+' para arriba desde '+a+'.'; },
       done:v=>'('+a+' '+MINUS+' '+B10+'): '+v[0]+' '+MINUS+' '+b0},
-    {title:'Resto la unidad',tpl:mid+' '+MINUS+' '+b0+' = []',ans:[res],
+    {id:'resta1',cod:v=>v[0]===mid+b0?'SUMA_EN_VEZ_DE_RESTA':'CUENTA_MAL',title:'Resto la unidad',tpl:mid+' '+MINUS+' '+b0+' = []',ans:[res],
       start:()=>{ clearTarget(); setFicha(mid); },
       startTip:'Tip: desde '+mid+', retrocedé '+b0+' '+plural(b0,'casillero','casilleros')+'.',
       help:()=>'Desde '+mid+', retrocedé '+b0+' '+plural(b0,'casillero','casilleros')+' en la tabla.',
@@ -1137,7 +1154,7 @@ function startSteps(kind){
   LOG('cuenta nueva',ST.q.a,ST.q.sym,ST.q.b);
 }
 function beginStep(){
-  const st=ST.q.steps[ST.step];
+  const st=ST.q.steps[ST.step]; ST.intento=0; ST.t0=Date.now(); ST.ayuda='ninguna';
   ST.vals=st.ans.map(()=>''); ST.marks=st.ans.map(()=>null); ST.focus=0; ST.shake=false; ST.replace=true; S.hintCol=null;
   FB={text:st.startTip||'',type:'tip'};
   if(st.start) st.start();
@@ -1150,7 +1167,10 @@ function checkStep(){
   const empty=nums.findIndex(v=>v===null);
   if(empty>=0){ ST.focus=empty; FB={text:'Completá todos los casilleros.',type:'tip'}; renderPanel(); return; }
   const marks=st.pairs?checkPairs(nums,st.ans):nums.map((v,i)=>v===st.ans[i]);
-  ST.marks=marks;
+  ST.marks=marks; ST.intento++;
+  const okP=marks.every(Boolean);
+  REG({tipo:'paso',tema:ST.kind,paso:st.id,intento:ST.intento,item:{cuenta:q.a+' '+(q.sym==='+'?'+':'-')+' '+q.b},esperado:st.ans.join(' '),respuesta:nums.join(' '),ok:okP,error:okP?null:st.cod(nums,marks),ms:Date.now()-ST.t0,ayuda:ST.ayuda});
+  ST.t0=Date.now();
   if(marks.every(Boolean)){
     ST.busy=true; FB={text:pick(['¡Muy bien!','¡Genial!','¡Eso es!','¡Perfecto!']),type:'ok'}; sfx.good();
     if(S.ficha!==null) puff(fichaRoot.position.clone(),12);
@@ -1165,6 +1185,7 @@ function finishSteps(){
   const q=ST.q; ST.finished=true; S.hintCol=null; panelMax=false; addStar(); sfx.win(); FB={text:'',type:''}; // achica la cuenta para que se vean los saltos y los fuegos
   renderPanel(); clearTarget(); setFicha(q.a);
   setTimeout(()=>{ if(ST.q!==q) return; setTarget(q.result,.1); afterArcs=()=>celebrate(true); },650);
+  REG({tipo:'item_fin',tema:ST.kind,item:{cuenta:q.a+' '+(q.sym==='+'?'+':'-')+' '+q.b}});
   LOG('cuenta terminada',q.a,q.sym,q.b,'=',q.result);
 }
 function keyDigit(d){
@@ -1266,11 +1287,11 @@ panel.addEventListener('click',e=>{
   switch(b.dataset.action){
     case 'collapse': panelCollapsed=!panelCollapsed; if(panelCollapsed) panelMax=false; renderPanel(); updateLayout(); break;
     case 'max': panelMax=!panelMax; sfx.click(); renderPanel(); break;
-    case 'next-salto': SAL.idx++; if(SAL.idx>=10){ S.hintCol=null; renderPanel(); celebrate(true); sfx.win(); toast('¡Ronda terminada! 🎉'); } else nextSalto(); break;
+    case 'next-salto': SAL.idx++; if(SAL.idx>=10){ REG({tipo:'ronda_fin',tema:'saltos10',pct:Math.round(100*SAL.round.filter(x=>x==='ok').length/10)}); S.hintCol=null; renderPanel(); celebrate(true); sfx.win(); toast('¡Ronda terminada! 🎉'); } else nextSalto(); break;
     case 'new-round': newSaltosRound(); break;
     case 'help':
-      if(S.mode==='saltos'){ S.hintCol=colOf(S.ficha); FB={text:'Los saltos de 10 van derecho por la columna que brilla: +10 baja una fila, '+MINUS+'10 sube una.',type:'tip'}; }
-      else if(ST.q&&!ST.finished){ FB={text:ST.q.steps[ST.step].help(),type:'tip'}; }
+      if(S.mode==='saltos'){ SAL.ayuda='ayuda'; S.hintCol=colOf(S.ficha); FB={text:'Los saltos de 10 van derecho por la columna que brilla: +10 baja una fila, '+MINUS+'10 sube una.',type:'tip'}; }
+      else if(ST.q&&!ST.finished){ ST.ayuda='ayuda'; FB={text:ST.q.steps[ST.step].help(),type:'tip'}; }
       renderPanel(); break;
     case 'new': startSteps(S.mode); break;
     case 'key': keyDigit(b.dataset.k); break;

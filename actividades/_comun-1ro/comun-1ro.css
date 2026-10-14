@@ -1,0 +1,72 @@
+/* Lectura y escritura de 1ro — estilos comunes (v1.0.0). Todos los colores son variables, en claro y oscuro.
+   Letras grandes en Andika (hecha para chicos que empiezan a leer: la "a" y la "g" de imprenta). */
+:root{
+  --l1-tecla:#ffffff; --l1-tecla-borde:#c9c2e8; --l1-sobre:#ffffff; --l1-papel:#fffdf4; --l1-tinta:#1f2a44; --l1-raya:rgba(60,110,200,.35);
+  --l1-ok-bg:rgba(21,146,74,.16); --l1-mal-bg:rgba(212,32,74,.14); --l1-sil:#fde68a; --l1-sil2:#bae6fd; --l1-sil-txt:#3b2f00; --l1-velo:rgba(10,8,30,.55);
+  --l1-escena:#e8f6ff; --l1-pasto:#9be27a; --l1-agua:#7cc4f5; --l1-trazo:#3a3350;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --l1-tecla:#2a2658; --l1-tecla-borde:#4a4488; --l1-sobre:#1c1a3c; --l1-papel:#1c1a3c; --l1-tinta:#ece9ff; --l1-raya:rgba(255,255,255,.18);
+    --l1-ok-bg:rgba(74,222,128,.18); --l1-mal-bg:rgba(251,113,133,.18); --l1-sil:#7a6420; --l1-sil2:#1f5f7d; --l1-sil-txt:#fff8e1; --l1-velo:rgba(0,0,0,.65);
+    --l1-escena:#1d2550; --l1-pasto:#2f6b3a; --l1-agua:#25507e; --l1-trazo:#e9e5ff;
+  }
+}
+:root[data-theme="dark"]{
+  --l1-tecla:#2a2658; --l1-tecla-borde:#4a4488; --l1-sobre:#1c1a3c; --l1-papel:#1c1a3c; --l1-tinta:#ece9ff; --l1-raya:rgba(255,255,255,.18);
+  --l1-ok-bg:rgba(74,222,128,.18); --l1-mal-bg:rgba(251,113,133,.18); --l1-sil:#7a6420; --l1-sil2:#1f5f7d; --l1-sil-txt:#fff8e1; --l1-velo:rgba(0,0,0,.65);
+  --l1-escena:#1d2550; --l1-pasto:#2f6b3a; --l1-agua:#25507e; --l1-trazo:#e9e5ff;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--text);background:var(--bg);min-height:100vh}
+button{font-family:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.l1-letra,.l1-tecla,.l1-sil,.l1-preg,.l1-cajas{font-family:"Andika",var(--font)}
+.l1-barra{display:flex;align-items:center;gap:8px;padding:10px 12px;flex-wrap:wrap}
+.l1-barra h1{font-size:20px;margin:0;flex:1 1 140px}
+.l1-ver{font-size:12px;color:var(--muted)}
+.l1-btn{min-height:48px;min-width:48px;padding:6px 14px;font-size:18px;font-weight:600;cursor:pointer;border-radius:14px;
+  border:2px solid var(--glass-border);background:var(--glass-strong);box-shadow:var(--shadow)}
+.l1-btn.main{background:var(--accent);color:var(--l1-sobre);border-color:transparent}
+.l1-btn[disabled]{opacity:.45;cursor:default}
+.l1-caso{font-family:"Andika",var(--font);font-size:20px}
+#app{max-width:860px;margin:0 auto;padding:4px 12px 40px}
+.l1-panel{background:var(--glass-strong);border:1px solid var(--glass-border);border-radius:22px;box-shadow:var(--shadow);padding:14px;margin-top:6px}
+.l1-prog{display:flex;gap:6px;justify-content:center;margin:2px 0 8px}
+.l1-prog i{width:26px;height:10px;border-radius:6px;background:var(--l1-raya)}
+.l1-prog i.hecho{background:var(--ok)} .l1-prog i.actual{background:var(--accent)} .l1-prog i.mal{background:var(--bad)}
+.l1-fila{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center;margin:8px 0}
+.l1-msg{font-size:22px;font-weight:700;text-align:center;margin:8px 0;min-height:1.3em;line-height:1.35}
+.l1-msg.ok{color:var(--ok)} .l1-msg.mal{color:var(--bad)}
+/* teclado en pantalla */
+.l1-teclado{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;max-width:560px;margin:10px auto 0}
+.l1-teclado.num{grid-template-columns:repeat(10,1fr);margin-bottom:-4px}
+.l1-tecla{min-height:52px;font-size:26px;font-weight:700;border-radius:12px;border:2px solid var(--l1-tecla-borde);background:var(--l1-tecla);cursor:pointer;
+  color:var(--l1-tinta);box-shadow:0 2px 0 var(--l1-tecla-borde);touch-action:manipulation}
+.l1-tecla:active{transform:translateY(2px);box-shadow:none}
+.l1-tecla.borrar{grid-column:span 2;font-size:20px}
+.l1-tecla.listo{grid-column:span 3;font-size:22px;background:var(--accent);color:var(--l1-sobre);border-color:transparent}
+.l1-teclado.num .l1-tecla{font-size:22px;min-height:48px}
+/* casilleros de la palabra */
+.l1-cajas{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:8px 0;min-height:70px}
+.l1-caja{min-width:48px;height:66px;padding:0 4px;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:700;
+  border-bottom:4px solid var(--l1-raya);color:var(--text)}
+.l1-caja.vacia{color:transparent}
+.l1-caja.cursor{border-bottom-color:var(--accent);animation:l1-late 1s ease-in-out infinite}
+.l1-caja.ok{background:var(--l1-ok-bg);border-radius:10px 10px 0 0}
+.l1-caja.mal{background:var(--l1-mal-bg);border-bottom-color:var(--bad);border-radius:10px 10px 0 0;color:var(--bad)}
+.l1-linea{min-width:min(100%,420px);justify-content:flex-start;border-bottom:4px solid var(--l1-raya);padding:0 8px}
+@keyframes l1-late{50%{border-bottom-color:transparent}}
+/* sílabas que suenan */
+.l1-sils{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;align-items:center;margin:6px 0}
+.l1-sils small{font-size:16px;color:var(--muted);margin-right:4px}
+.l1-sil{min-height:48px;min-width:48px;padding:2px 14px;font-size:30px;font-weight:700;border-radius:14px;border:none;cursor:pointer;color:var(--l1-sil-txt);background:var(--l1-sil)}
+.l1-sil:nth-of-type(even){background:var(--l1-sil2)}
+.l1-sil.habla{transform:scale(1.12);box-shadow:0 0 0 3px var(--accent)}
+/* modal de resumen */
+.l1-modal{position:fixed;inset:0;background:var(--l1-velo);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.l1-modal .l1-panel{max-width:440px;width:100%;text-align:center}
+.l1-estrellas{font-size:46px;letter-spacing:6px}
+.l1-estrellas .off{opacity:.25;filter:grayscale(1)}
+@media (max-width:480px){.l1-tecla{min-height:46px;font-size:22px}.l1-caja{min-width:36px;height:56px;font-size:34px}.l1-teclado{gap:4px}}
+@media (prefers-reduced-motion: reduce){.l1-caja.cursor{animation:none}}

@@ -45,7 +45,7 @@
     var perfiles = cfg.perfiles || [];
     var out = '';
     perfiles.forEach(function (p) {
-      var acts = cfg.actividades.filter(function (a) { return !a.perfiles || a.perfiles.indexOf(p.id) >= 0; });
+      var acts = cfg.actividades.filter(function (a) { return a.grados ? a.grados.indexOf(p.grado) >= 0 : (!a.perfiles || a.perfiles.indexOf(p.id) >= 0); });
       if (!acts.length) return;
       out += '<div class="ref4-perfil"><h3>' + esc(p.avatar) + ' ' + esc(p.nombre) + ' · refuerzo de ' + esc(p.grado) + '</h3>';
       var todosAg = [];

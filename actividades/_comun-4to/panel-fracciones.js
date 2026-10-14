@@ -36,7 +36,7 @@
   function render(cont, cfg) {
     var ls = cfg.ls || root.localStorage, ahora = Date.now(), out = '';
     (cfg.perfiles || []).forEach(function (p) {
-      var acts = cfg.actividades.filter(function (a) { return /^4to-fracciones-/.test(a.id) && (!a.perfiles || a.perfiles.indexOf(p.id) >= 0); });
+      var acts = cfg.actividades.filter(function (a) { return /^4to-fracciones-/.test(a.id) && (a.grados ? a.grados.indexOf(p.grado) >= 0 : (!a.perfiles || a.perfiles.indexOf(p.id) >= 0)); });
       if (!acts.length) return;
       var eventos = []; acts.forEach(function (a) { eventos = eventos.concat(EV.leerDirecto(ls, p.id, a.id).eventos || []); });
       var m = mapa(eventos, ahora), ult = leer(ls, p.id, REPASO, 'ultimo', null), conf = leer(ls, p.id, CONFIG_ACT, 'config', { incluirModulo: false });

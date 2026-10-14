@@ -4,7 +4,7 @@ Guía para Claude Code (claude.ai/code) en este repositorio.
 
 ## Qué es
 
-"Matemática": app de práctica de matemática para Luz (1ro, 6 años) e Ian (4to, 10 años). Un shell con perfiles y menú abre actividades independientes. Luz tiene la Tabla del 100 (`actividades/1ro-tabla100/`); Ian, las actividades de refuerzo de 4to y las de fracciones (`actividades/4to-*`). El diseño de la estructura está en `PLAN.md`.
+"Matemática": app de práctica de matemática para Luz (1ro, 6 años) e Ian (4to, 10 años). Un shell con perfiles y menú abre actividades independientes. Luz tiene la Tabla del 100 (`actividades/1ro-tabla100/`), Escritura y Lectura (`actividades/1ro-escritura/`, `actividades/1ro-lectura/`); Ian, las actividades de refuerzo de 4to y las de fracciones (`actividades/4to-*`). El diseño de la estructura está en `PLAN.md`.
 
 - **Ejecutar:** abrir `index.html` en el navegador, o servir la carpeta (`python -m http.server`). Con `file://` Chrome comparte localStorage entre archivos y Firefox lo aísla por archivo; con `http://localhost` todo se comparte. El perfil, el tema y el fondo viajan también por la URL (`?p=luz&t=dark&f=oceano`). Hace falta internet para three.js r128 (cdnjs) y la fuente Fredoka.
 - **Depurar:** logs con prefijo `[Mate vX.Y]` (core y shell) y `[Tabla100 vX.Y]` (actividad).
@@ -12,11 +12,13 @@ Guía para Claude Code (claude.ai/code) en este repositorio.
 ## Estructura
 
 ```
-index.html              shell: perfiles, menú, ajustes de padres con PIN (v2.4)
-perfiles.js             MATE.perfiles = [{id,nombre,grado,avatar,color}]
+index.html              shell: perfiles (y "➕ Nuevo perfil"), menú, ajustes de padres con PIN (v2.5)
+perfiles.js             MATE.perfiles = [{id,nombre,grado,avatar,color}] + los creados en el dispositivo
 core/core.css           tokens claro/oscuro, estilos base y fondos
-core/core.js            global MATE (único global)
-actividades/registro.js MATE.actividades = [{id,titulo,descripcion,icono,perfiles,ruta,version,stats?,teoria?}]
+core/core.js            global MATE (único global), con la cola de la nube
+core/panel-nube.js      "Registro en la nube" de Ajustes de padres (solo el shell)
+nube/                   planilla.gs (Apps Script de la planilla de Google) y LEEME.md (cómo implementarlo)
+actividades/registro.js MATE.actividades = [{id,titulo,descripcion,icono,grados,ruta,version,stats?,teoria?,errores?}]
 actividades/<id>/       cada actividad (con su propio CLAUDE.md)
 ```
 
@@ -25,7 +27,7 @@ Orden de scripts: `core.js`, `perfiles.js`, `registro.js`, y después el de la p
 ## Reglas
 
 - **Sin compilar:** sin bundlers, npm ni build. Varios archivos, scripts clásicos (sin ES modules ni `fetch` local, porque no funcionan en `file://`), todo colgado de `MATE`.
-- **Versiones:** el shell tiene la suya (v2.4) y cada actividad la suya. Cada cambio sube la versión, agrega una entrada al historial del comentario del principio del archivo (`vX.Y  descripción`, viñetas con `+`) y actualiza la línea `Versión:`. Se muestra en pantalla en elementos `.ver`. Si cambia una actividad, actualizar `version` en el registro.
+- **Versiones:** el shell tiene la suya (v2.5) y cada actividad la suya. Cada cambio sube la versión, agrega una entrada al historial del comentario del principio del archivo (`vX.Y  descripción`, viñetas con `+`) y actualiza la línea `Versión:`. Se muestra en pantalla en elementos `.ver`. Si cambia una actividad, actualizar `version` en el registro.
 - **Modo claro/oscuro:** tokens CSS en `:root` con overrides por `[data-theme]` (media query y atributo). Todo color o elemento nuevo tiene que verse bien en los dos modos.
 - **Textos en español rioplatense con voseo** ("Elegí", "Probá"); comentarios y logs también en español. Cada actividad decide su tono y tipografía: la de Luz usa frases cortas y MAYÚSCULAS de imprenta; eso no es regla del shell.
 - Estilo compacto: nombres cortos, varias sentencias por línea, sin frameworks.
@@ -36,6 +38,9 @@ Orden de scripts: `core.js`, `perfiles.js`, `registro.js`, y después el de la p
 - `MATE.fondo.get/set(id)`, `MATE.fondo.lista` (`{id,nombre,muestra}`) y `MATE.fondo.menu(boton)` (menú flotante para elegir): fondo **global** (Aurora, Océano, Bosque, Atardecer, Espacio) en `mate.global.fondo`, viaja por `?f=`. Se aplica como `data-bg` en `<html>` ("aurora" sin atributo) y core.js agrega solo la capa `#mate-fondo` (z-index −1) al `<body>`; los tokens `--bg`, `--blob1..5`, `--blob-op`, `--star` están en `core.css`, en claro y oscuro. Una página que quiera el fondo tiene que dejar ver `--bg` (sin fondo opaco en contenedores de pantalla completa).
 - `MATE.store(idActividad)` → `{get,set}` en `mate.<perfil>.<actividad>.<clave>` (sin perfil no guarda). `MATE.global.get/set` → `mate.global.<clave>`.
 - `MATE.perfil()` (activo o null), `MATE.setPerfil(id)`, `MATE.perfiles`, `MATE.actividades`.
+- `MATE.perfilesNuevos.lista/crear(nombre,avatar,grado)/borrar(id)`: perfiles creados en el dispositivo (`mate.global.perfiles`, id `nombre-xxxx` para que no se mezclen). `MATE.puedeVer(actividad, perfil)`: por `grados` (o por ids en `perfiles`, lo viejo).
+- `MATE.dispositivo` `{id, nombre, renombrar(n)}` en `mate.global.dispositivo`.
+- `MATE.ejercicio(act, ev)`: registra un intento del perfil activo y lo encola para la nube. `MATE.nube`: `enviar(e)` (cola en `mate.global.nube.cola`, lotes de 300, reintenta sin internet), `vaciar()`, `leer(clave)`, `subirHistorial()`, `pendientes()`, `estado()`. La URL del Apps Script va en `NUBE_URL` (core.js) o en `mate.global.nube.url`; cada evento lleva un `id` estable y la planilla descarta los repetidos.
 - `MATE.irMenu()` y `MATE.abrir(id)`: navegan conservando `?p=&t=&f=`. `MATE.raiz`: URL de la raíz del proyecto.
 - `MATE.log(tag, ...)`, `MATE.ver(el)`.
 - `MATE.pin.check/set`: en `mate.global.pin`, por defecto 1234 (hash simple; es un candado para chicos, no seguridad).
@@ -46,13 +51,22 @@ Orden de scripts: `core.js`, `perfiles.js`, `registro.js`, y después el de la p
 - Lee el perfil con MATE; sin perfil, vuelve al menú.
 - Guarda solo con `MATE.store(idActividad)`; lo global, en `mate.global.<clave>`.
 - Botón "Volver al menú", respeta el tema y el fondo globales (botón 🎨 con `MATE.fondo.menu`) y muestra su versión.
+- **Registra cada intento** (todas las actividades, de cualquier grado): `MATE.ejercicio(id, {tipo:'paso', tema, paso, intento, item, esperado, respuesta, ok, error, ms, ayuda, v, sesion})`; `error` es un código en MAYÚSCULAS y su nombre para padres va en `errores:{}` de su entrada del registro. También `ronda_inicio`/`ronda_fin`/`item_fin` si tiene rondas. Las de 4to lo hacen solas con `REF4_EV` (que reenvía cada evento a `MATE.nube`).
 - Opcional: `stats()` en su entrada del registro, que devuelve un texto para Ajustes de padres.
 
 ## Cómo agregar una actividad
 
 1. Crear `actividades/<grado>-<nombre>/index.html` (y un `CLAUDE.md` con su arquitectura) siguiendo el contrato.
-2. Agregar su entrada a `actividades/registro.js` (`perfiles` = ids que la ven; `ruta` relativa a la raíz).
+2. Agregar su entrada a `actividades/registro.js` (`grados` = grados que la ven, p. ej. `['1ro']`; `ruta` relativa a la raíz; `errores` con los nombres de sus códigos).
 3. Probar con `file://` y con `http.server`, en claro y oscuro, y revisar que la consola quede limpia.
+
+## Actividades de 1ro (lectura y escritura): convenciones
+
+- **Código común** en `actividades/_comun-1ro/` (UMD): `lengua.js` (`LENGUA1`: sílabas, cómo suena, `clasificar`/`elegirMejor` con códigos de error de escritura y `ERRORES`), `repaso.js` (`REPASO1`: cajas de Leitner; estados nuevo/bien/repaso/persiste/aprendido), `ui-1ro.js` (`UI1`: cabecera con ABC/abc, voz, teclado en pantalla, sílabas que suenan, resumen) y `comun-1ro.css` (letras en Andika). Usan también `REF4_AZAR`, `REF4_EV` (registro local + nube) y `REF4_UI` (sonidos, fuegos, voz) de `_comun-4to/`.
+- **MAYÚS/minús**: por perfil en `mate.<perfil>.1ro-lengua.caso`; cada evento lleva `forma`. `UI1.txt` para letras sueltas, `UI1.frase` para oraciones.
+- **Repaso**: lo que sale mal al primer intento vuelve seguido hasta que se afirma y después cada tanto (`REPASO1.elegir` con `minRepaso`). Se guarda en `mate.<perfil>.<act>.repaso`.
+- **Panel**: `analisis:'palabras'|'preguntas'` en el registro arma la tabla por ítem en "Registro en la nube".
+- **Pruebas:** `node tests/lectoescritura-1ro/run.js` (lectura con 1000 rondas por nivel y semilla fija).
 
 ## Actividades de 4to: convenciones
 
@@ -68,4 +82,4 @@ Orden de scripts: `core.js`, `perfiles.js`, `registro.js`, y después el de la p
   1. Lógica pura (generador con `tipos(nivel)`, `ronda(nivel)`, `generar(nivel, tipo, az, ses)`, validadores y pistas) en `_comun-4to/` o en la carpeta de la actividad, con sus pruebas.
   2. `index.html` copiado de una actividad de fracciones (mismos scripts y encabezado) y `<nombre>.js` con `REF4_FRUI.actividad({act, titulo, version, nivelMax, tamRonda, tipos, generar, pintar, meperdi, textoPaso, esperado, aprendiste})`: el marco hace la ronda, el registro, el resumen, el debug y la inactividad.
   3. Colores solo con variables (claro y oscuro), botones de 48 px o más, todo tocando; probar a 375 px y 1024 px en los dos temas.
-  4. Alta en `actividades/registro.js` (con `nivelMax` y `perfiles:['ian']`) recién cuando funciona y pasa sus pruebas.
+  4. Alta en `actividades/registro.js` (con `nivelMax` y `grados:['4to']`) recién cuando funciona y pasa sus pruebas.

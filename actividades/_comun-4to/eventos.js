@@ -145,6 +145,7 @@
       ultimos.push(e); if (ultimos.length > 8) ultimos.shift();
       if (eventos.length > MAX_EVENTOS) compactar(eventos.length - Math.floor(MAX_EVENTOS * 0.8));
       agendar();
+      if (root.MATE && root.MATE.nube) { try { root.MATE.nube.enviar(e); } catch (err) { /* sin nube: queda solo local */ } }   // registro en la planilla
       if (typeof console !== 'undefined' && cfg.log) cfg.log(e);
       return e;
     }
