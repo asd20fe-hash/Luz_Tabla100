@@ -1,6 +1,8 @@
 /* Escritura de 1ro — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.1  (2026-10-14) Fuegos artificiales
+     + Cada palabra terminada (bien, corregida o copiada) tiene fuegos artificiales hasta tocar Siguiente.
    v1.0.0  (2026-10-14) Primera versión
      + Muestra un dibujo y Luz escribe la palabra con el teclado en pantalla (o el de la compu). MAYÚSCULAS o minúsculas
        con el botón ABC/abc (se guarda por perfil y queda en cada registro).
@@ -13,7 +15,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.0', ACT = '1ro-escritura', TAM = 6;
+  var VERSION = '1.0.1', ACT = '1ro-escritura', TAM = 6;
   var L = LENGUA1, RP = REPASO1, UI = REF4_UI, esc = UI1.esc, T = UI1.txt;
   var ctx = UI1.base({ act: ACT, version: VERSION, titulo: 'Escribí lo que ves', alCambiarCaso: function () { render(); } });
   if (!ctx) return;
@@ -39,6 +41,7 @@
     nuevaPalabra();
   }
   function nuevaPalabra() {
+    UI.fuegos.parar();
     var w = R.lista[R.idx];
     R.w = w; R.buf = ''; R.intento = 0; R.fase = 'escribe'; R.marcas = null; R.msg = ''; R.tipoMsg = ''; R.t0 = Date.now(); R.ayuda = {};
     ctx.log('palabra', w.p, 'nivel', w.nivel, 'repaso', RP.estado(rep.items[w.p]));
@@ -96,7 +99,7 @@
       R.res[R.idx] = c.ok ? 'ok' : 'mal'; guardar();
     }
     if (c.ok) {
-      UI.sonar('ok'); R.fase = 'ok'; R.marcas = null; R.tipoMsg = 'ok';
+      UI.sonar('ok'); UI.fuegos.iniciar(); R.fase = 'ok'; R.marcas = null; R.tipoMsg = 'ok';
       R.msg = copia ? '¡Eso! Ahora ya la conocés.' : (R.intento === 1 ? '¡Muy bien! 🎉' : '¡Bien! La corregiste.');
     } else {
       UI.sonar('mal'); R.tipoMsg = 'mal';

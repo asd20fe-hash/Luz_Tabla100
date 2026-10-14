@@ -1,6 +1,8 @@
 /* Lectura de 1ro — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.1  (2026-10-14) Fuegos artificiales
+     + Cada pregunta contestada bien tiene fuegos artificiales hasta tocar Siguiente.
    v1.0.0  (2026-10-14) Primera versión
      + Preguntas para leer (MAYÚSCULAS o minúsculas con el botón ABC/abc): contar en un dibujo, tocar en el dibujo,
        sí o no, y preguntas para contestar escribiendo ("¿EN QUÉ MES ESTAMOS?" → OCTUBRE).
@@ -12,7 +14,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.0', ACT = '1ro-lectura';
+  var VERSION = '1.0.1', ACT = '1ro-lectura';
   var L = LENGUA1, LE = LECT1, RP = REPASO1, UI = REF4_UI, esc = UI1.esc, T = UI1.txt;
   var ctx = UI1.base({ act: ACT, version: VERSION, titulo: 'Leé y contestá', alCambiarCaso: function () { render(); } });
   if (!ctx) return;
@@ -36,6 +38,7 @@
     nuevaPregunta();
   }
   function nuevaPregunta() {
+    UI.fuegos.parar();
     R.p = R.lista[R.idx]; R.intento = 0; R.fase = 'responde'; R.msg = ''; R.tipoMsg = ''; R.t0 = Date.now(); R.ayuda = 'ninguna'; R.buf = ''; R.malos = []; R.resaltar = null; R.ortografia = null;
     ctx.log('pregunta', R.p.clave, R.p.texto, 'esperado', R.p.esperado === undefined ? R.p.validos : R.p.esperado);
     render();
@@ -141,7 +144,7 @@
       R.res[R.idx] = err ? 'mal' : 'ok'; try { ctx.store.set('repaso', rep); } catch (e2) { /* sin espacio */ }
     }
     if (!err) {
-      UI.sonar('ok'); R.fase = 'ok'; R.tipoMsg = 'ok'; R.resaltar = p.vale || null;
+      UI.sonar('ok'); UI.fuegos.iniciar(); R.fase = 'ok'; R.tipoMsg = 'ok'; R.resaltar = p.vale || null;
       R.msg = p.tipo === 'contar' ? '¡Sí! Hay ' + p.esperado + '.' : (p.tipo === 'toca' ? '¡Ese es!' : (p.tipo === 'sino' ? '¡Sí, muy bien!' : (R.ortografia && R.ortografia.length ? '¡Bien! Se escribe así:' : '¡Muy bien!')));
     } else if (R.intento === 1) {
       UI.sonar('mal'); R.tipoMsg = 'mal'; R.msg = MSG[err] || 'Leé otra vez.';
