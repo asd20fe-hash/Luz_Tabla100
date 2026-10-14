@@ -1,5 +1,6 @@
 /* Registro de actividades. Cargar después de core.js y perfiles.js.
-   ruta: relativa a la raíz del proyecto. stats (opcional): función que devuelve estadísticas. */
+   ruta: relativa a la raíz del proyecto. stats (opcional): función que devuelve estadísticas.
+   teoria (opcional): pantalla de teoría, sin rondas ni niveles; no aparece en el panel de refuerzo de 4to. */
 (function(){
 'use strict';
 MATE.actividades=[
@@ -12,6 +13,9 @@ MATE.actividades=[
   // Fracciones de 4to (las siete juntas)
   {id:'4to-fracciones-repartos',nivelMax:3,titulo:'Repartos',descripcion:'Repartí en partes iguales: primero los enteros, después lo que sobra.',icono:'🍕',perfiles:['ian'],ruta:'actividades/4to-fracciones-repartos/index.html',version:'1.0.2'},
   {id:'4to-fracciones-partes',nivelMax:3,titulo:'Partes iguales',descripcion:'Leé, pintá y armá fracciones: cuenta el tamaño, no los pedazos.',icono:'🍫',perfiles:['ian'],ruta:'actividades/4to-fracciones-partes/index.html',version:'1.0.2'},
+  {id:'4to-fracciones-equivalentes',teoria:true,titulo:'¿Qué son las fracciones equivalentes?',descripcion:'Teoría con dibujos: cortá, juntá y compará para ver que valen lo mismo.',icono:'📖',perfiles:['ian'],ruta:'actividades/4to-fracciones-equivalentes/index.html',version:'1.0.0',
+   stats:()=>{ const v=JSON.parse(localStorage.getItem('mate.ian.4to-fracciones-equivalentes.progreso')||'null'); if(!v) return 'Ian todavía no la abrió.';
+     return 'Ian vio '+v.vistas.length+' de 5 pantallas'+(v.desafios?'; desafíos: '+v.desafios.ok1+' de '+v.desafios.total+' al primer intento ('+new Date(v.desafios.fecha).toLocaleDateString('es-AR')+').':'; todavía no terminó los desafíos.'); }},
   {id:'4to-fracciones-muro',nivelMax:3,titulo:'Muro de fracciones',descripcion:'Fracciones equivalentes: la misma cantidad escrita de otra forma.',icono:'🧱',perfiles:['ian'],ruta:'actividades/4to-fracciones-muro/index.html',version:'1.0.2'},
   {id:'4to-fracciones-comparar',nivelMax:3,titulo:'¿Cuál es más?',descripcion:'Compará fracciones con criterios, sin adivinar.',icono:'⚖️',perfiles:['ian'],ruta:'actividades/4to-fracciones-comparar/index.html',version:'1.0.2'},
   {id:'4to-fracciones-cuanto-falta',nivelMax:3,titulo:'¿Cuánto falta?',descripcion:'Cuánto falta, sumas y restas, y problemas para leer con lupa.',icono:'🧩',perfiles:['ian'],ruta:'actividades/4to-fracciones-cuanto-falta/index.html',version:'1.0.2'},

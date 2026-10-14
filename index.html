@@ -3,9 +3,12 @@
 <!--
   ============================================================
   Matemática — shell: perfiles, menú de actividades y ajustes de padres
-  Versión: v2.3 (2026-10-13)
+  Versión: v2.4 (2026-10-14)
   ------------------------------------------------------------
   Historial de cambios
+  v2.4  Teoría de fracciones equivalentes
+    + Las actividades de teoría (teoria:true en el registro) no aparecen en el panel de refuerzo de 4to:
+      no tienen rondas ni niveles. Su resumen sale en Estadísticas con stats().
   v2.3  Fracciones de 4to
     + Ajustes de padres suma el mapa de fracciones de Ian (por tema: % al primer intento en 14 días, ítems,
       tendencia y último repaso) y el interruptor "Incluir ejercicios del módulo de la escuela".
@@ -89,7 +92,7 @@ input{font:inherit;color:var(--text);background:var(--box-bg);border:2px solid v
 'use strict';
 const $=s=>document.querySelector(s), view=$('#view');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-document.querySelectorAll('.ver').forEach(el=>el.textContent='v2.3');
+document.querySelectorAll('.ver').forEach(el=>el.textContent='v2.4');
 
 /* ==== TEMA ==== */
 function pintaTema(){ $('#themeBtn').textContent=MATE.tema.oscuro()?'☀️':'🌙'; }
@@ -135,7 +138,7 @@ function verAjustes(){
     '<div class="row"><button class="btn main" id="gp">Guardar PIN</button></div></div>'+
     (stats.length||!window.REF4_PANEL?'<div class="panel"><h2>Estadísticas</h2>':'<div hidden>')+(stats.length?stats.map(a=>{ let r=''; try{ r=a.stats(); }catch(e){ r='(sin datos)'; } return '<p><b>'+esc(a.titulo)+'</b><br>'+esc(r)+'</p>'; }).join(''):'<p class="sub" style="margin:0">Todavía no hay estadísticas.</p>')+'</div>'+
     '<div class="panel ancho" id="ref4"></div><div class="panel ancho" id="fr4"></div><div class="row"><button class="btn" id="sal">Salir</button></div>';
-  if(window.REF4_PANEL) REF4_PANEL.render($('#ref4'),{perfiles:MATE.perfiles,actividades:MATE.actividades.filter(a=>/^4to-/.test(a.id))});
+  if(window.REF4_PANEL) REF4_PANEL.render($('#ref4'),{perfiles:MATE.perfiles,actividades:MATE.actividades.filter(a=>/^4to-/.test(a.id)&&!a.teoria)});
   else $('#ref4').remove();
   if(window.REF4_PANEL_FR) REF4_PANEL_FR.render($('#fr4'),{perfiles:MATE.perfiles,actividades:MATE.actividades});
   else $('#fr4').remove();

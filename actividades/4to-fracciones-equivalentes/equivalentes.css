@@ -1,0 +1,45 @@
+/* ¿Qué son las fracciones equivalentes? — estilos propios (lo común está en _comun-4to/comun.css y fracciones.css). */
+.eq-puntos{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:2px 0 10px}
+.eq-puntos button{min-width:48px;min-height:48px;border-radius:999px;font:700 18px var(--font);cursor:pointer;
+  border:2px solid var(--tecla-borde);background:var(--tecla);color:var(--text)}
+.eq-puntos button.visto{background:var(--ok-bg);border-color:var(--ok)}
+.eq-puntos button.on{background:var(--accent);color:var(--sobre-acento);border-color:transparent}
+.eq-titulo{font-size:26px;font-weight:700;margin:4px 0 6px;text-align:center}
+.eq-texto{font-size:21px;line-height:1.55;margin:8px auto;max-width:720px}
+.eq-texto b{color:var(--accent)}
+.eq-ctrl{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin:10px 0}
+.eq-ctrl .lbl{font-size:18px;color:var(--muted);margin-right:2px}
+.eq-ctrl .ref-btn{font-size:20px}
+.eq-sel{border-color:var(--resalte-borde)!important;background:var(--resalte)!important}
+.eq-dibujo{display:flex;justify-content:center;margin:6px 0}
+.eq-svg{width:100%;max-width:600px;height:auto;display:block;margin:0 auto}
+.eq-svg.pizza{max-width:250px}
+.eq-fondo{fill:var(--fr-vacio)}
+.eq-pint{fill:var(--fr-pintado)}
+.eq-pint2{fill:var(--fr-pintado2)}
+.eq-corte{stroke:var(--fr-borde);stroke-width:1.5;opacity:.7}
+.eq-corte.grueso{stroke-width:4;opacity:1}
+.eq-corte.nuevo{animation:eq-aparece .6s ease both}
+@keyframes eq-aparece{from{opacity:0}to{opacity:.7}}
+.eq-borde{fill:none;stroke:var(--fr-borde);stroke-width:4;stroke-linejoin:round}
+.eq-guia{stroke:var(--fr-guia);stroke-width:3;stroke-dasharray:7 5}
+.eq-toca{fill:transparent;cursor:pointer}
+.eq-toca:hover{fill:var(--fr-resalte)}
+.eq-ecu{display:flex;align-items:center;justify-content:center;gap:14px;font-size:44px;font-weight:700;margin:8px 0;flex-wrap:wrap}
+.eq-op{display:inline-flex;flex-direction:column;align-items:center;line-height:1.1}
+.eq-op small{font-size:20px;color:var(--fr-guia);font-weight:700}
+.eq-cadena{font-size:30px;text-align:center;margin:6px 0;line-height:1.6}
+.eq-veredicto{font-size:21px;font-weight:600;text-align:center;line-height:1.45;padding:10px 14px;border-radius:14px;margin:10px auto;max-width:640px;
+  border:2px solid var(--glass-border);background:var(--papel);color:var(--tinta)}
+.eq-veredicto.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--text)}
+.eq-veredicto.mal{background:var(--bad-bg);border-color:var(--bad);color:var(--text)}
+.eq-paso{display:inline-flex;align-items:center;gap:6px;font-size:19px}
+.eq-paso b{min-width:96px;text-align:center}
+.eq-hueco{display:inline-flex;min-width:46px;min-height:42px;align-items:center;justify-content:center;border:3px dashed var(--resalte-borde);border-radius:10px;background:var(--resalte)}
+.eq-ap{display:inline-flex;flex-direction:column;align-items:center;line-height:1.05}
+.eq-ap .n{border-bottom:4px solid currentColor;padding:0 6px 3px}
+.eq-ap .d{padding:3px 6px 0}
+.eq-recuerda{font-size:20px;line-height:1.5;padding:12px 16px;border-radius:14px;border:2px dashed var(--resalte-borde);background:var(--resalte);max-width:640px;margin:10px auto}
+.eq-nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px;flex-wrap:wrap}
+@media (max-width:640px){.eq-texto{font-size:19px}.eq-ecu{font-size:36px}.eq-titulo{font-size:22px}}
+@media (prefers-reduced-motion: reduce){.eq-corte.nuevo{animation:none}}

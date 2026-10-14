@@ -12,11 +12,11 @@ Guía para Claude Code (claude.ai/code) en este repositorio.
 ## Estructura
 
 ```
-index.html              shell: perfiles, menú, ajustes de padres con PIN (v2.3)
+index.html              shell: perfiles, menú, ajustes de padres con PIN (v2.4)
 perfiles.js             MATE.perfiles = [{id,nombre,grado,avatar,color}]
 core/core.css           tokens claro/oscuro, estilos base y fondos
 core/core.js            global MATE (único global)
-actividades/registro.js MATE.actividades = [{id,titulo,descripcion,icono,perfiles,ruta,version,stats?}]
+actividades/registro.js MATE.actividades = [{id,titulo,descripcion,icono,perfiles,ruta,version,stats?,teoria?}]
 actividades/<id>/       cada actividad (con su propio CLAUDE.md)
 ```
 
@@ -25,7 +25,7 @@ Orden de scripts: `core.js`, `perfiles.js`, `registro.js`, y después el de la p
 ## Reglas
 
 - **Sin compilar:** sin bundlers, npm ni build. Varios archivos, scripts clásicos (sin ES modules ni `fetch` local, porque no funcionan en `file://`), todo colgado de `MATE`.
-- **Versiones:** el shell tiene la suya (v2.3) y cada actividad la suya. Cada cambio sube la versión, agrega una entrada al historial del comentario del principio del archivo (`vX.Y  descripción`, viñetas con `+`) y actualiza la línea `Versión:`. Se muestra en pantalla en elementos `.ver`. Si cambia una actividad, actualizar `version` en el registro.
+- **Versiones:** el shell tiene la suya (v2.4) y cada actividad la suya. Cada cambio sube la versión, agrega una entrada al historial del comentario del principio del archivo (`vX.Y  descripción`, viñetas con `+`) y actualiza la línea `Versión:`. Se muestra en pantalla en elementos `.ver`. Si cambia una actividad, actualizar `version` en el registro.
 - **Modo claro/oscuro:** tokens CSS en `:root` con overrides por `[data-theme]` (media query y atributo). Todo color o elemento nuevo tiene que verse bien en los dos modos.
 - **Textos en español rioplatense con voseo** ("Elegí", "Probá"); comentarios y logs también en español. Cada actividad decide su tono y tipografía: la de Luz usa frases cortas y MAYÚSCULAS de imprenta; eso no es regla del shell.
 - Estilo compacto: nombres cortos, varias sentencias por línea, sin frameworks.
