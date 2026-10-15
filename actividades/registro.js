@@ -17,7 +17,7 @@ MATE.actividades=[
   {id:'1ro-ingles',nivelMax:3,analisis:'palabras',titulo:'English',descripcion:'Escuchá palabras en inglés y tocá el dibujo.',icono:'🇬🇧',grados:['1ro'],ruta:'actividades/1ro-ingles/index.html',version:'1.0.0',
    errores:{CONFUNDE_TEMA:'Confundió con otra palabra del mismo tema (DOG por CAT)',CONFUNDE_PARECIDA:'Confundió con una palabra que suena parecido (TREE por THREE)',CONFUNDE_OTRA:'Eligió otra palabra',SI_NO_MAL:'Contestó mal "¿es esto un…?"',LEE_MAL:'Leyó mal la palabra en inglés'}},
   // Inglés con mascota: el código común está en _comun-ingles/ (temas, juegos, mascota, mundo 3D).
-  {id:'1ro-ingles-mascota',nivelMax:3,analisis:'palabras',titulo:'Mi mascota en inglés',descripcion:'Cuidá a tu mascota, llevala al súper y aprendé inglés con Miss Hoot.',icono:'🐾',grados:['1ro'],ruta:'actividades/1ro-ingles-mascota/index.html',version:'1.1.0',
+  {id:'1ro-ingles-mascota',nivelMax:3,analisis:'palabras',titulo:'Mi mascota en inglés',descripcion:'Cuidá a tu mascota: súper, baño, a dormir y fútbol en el patio, todo en inglés con Miss Hoot.',icono:'🐾',grados:['1ro'],ruta:'actividades/1ro-ingles-mascota/index.html',version:'1.2.0',
    errores:{CONFUNDE_TEMA:'Confundió con otra palabra del mismo tema (BLUE por RED)',CONFUNDE_PARECIDA:'Confundió con una palabra que suena parecido (TREE por THREE)',CONFUNDE_OTRA:'Eligió otra palabra'},
    stats:()=>MATE.perfiles.filter(p=>p.grado==='1ro').map(p=>{ let m=null; try{ m=JSON.parse(localStorage.getItem('mate.'+p.id+'.1ro-ingles-mascota.pet')||'null'); }catch(e){}
      if(!m||!m.nacido) return p.nombre+': la mascota todavía no nació.';

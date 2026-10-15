@@ -24,3 +24,9 @@ prueba('mascota: premios, ánimo y crecimiento', function () {
   e.panza = 90; e.alegria = 50; assert.strictEqual(PET.animo(e), 'contento');
   assert.strictEqual(PET.etapa(e).id, 'bebe'); e.aciertos = 40; assert.strictEqual(PET.etapa(e).id, 'chico'); e.aciertos = 500; assert.strictEqual(PET.etapa(e).id, 'grande');
 });
+prueba('mascota: limpieza y energía, con su ánimo', function () {
+  var e = PET.nuevo(0); assert.strictEqual(e.limpieza, 80); assert.strictEqual(e.energia, 80);
+  e.limpieza = 30; assert.strictEqual(PET.animo(e), 'sucio');
+  e.limpieza = 90; e.energia = 25; assert.strictEqual(PET.animo(e), 'sueno');
+  var viejo = PET.normalizar({ nacido: true, alegria: 50, panza: 50 }, 0); assert.strictEqual(viejo.energia, 80, 'los estados viejos reciben las necesidades nuevas');
+});

@@ -1,4 +1,5 @@
-/* Inglés — mundo 3D (three.js r128). window.ING_MUNDO. Versión 1.0.0 (2026-10-15).
+/* Inglés — mundo 3D (three.js r128). window.ING_MUNDO. Versión 1.1.0 (2026-10-15).
+   v1.1.0 + M.atenuar(k) (apagar la luz al dormir), M.sala({piso, bordePiso, pared, texPiso, sinPared}) para armar otras habitaciones.
    crear(canvas) → M: una habitación tipo maqueta (plataforma redonda, pared curva con ventana, alfombra) con fondo transparente
    (se ve el fondo global de la app), luces toon, cámara que se acomoda a la pantalla y una ventana de día o de noche según la hora.
    Herramientas para los demás módulos:
@@ -109,19 +110,47 @@
     libros.forEach(function (l, i) { var b = new T.Mesh(new T.BoxGeometry(0.14, l[1], 0.24), M.toon(l[0])); b.position.set(-0.4 + i * 0.17, 0.04 + l[1] / 2, 0); repisa.add(b); });
     var pel = new T.Mesh(new T.SphereGeometry(0.15, 16, 12), M.toon('#ffffff')); pel.position.set(0.35, 0.19, 0); repisa.add(pel);
 
+    // Otra habitación con la misma forma (plataforma redonda y pared curva). Devuelve {grupo, mats}; empieza oculta.
+    M.sala = function (o) {
+      var g = new T.Group(); g.visible = false; scene.add(g);
+      var mats = { piso: M.toon(o.piso || '#ffffff'), borde: M.toon(o.bordePiso || '#c08048'), pared: M.toon(o.pared || '#cdb8ff') };
+      mats.pared.side = T.DoubleSide; if (o.texPiso) mats.piso.map = o.texPiso;
+      var pi = new T.Mesh(new T.CylinderGeometry(4.6, 4.4, 0.5, 64), [mats.borde, mats.piso, mats.borde]); pi.position.y = -0.25; g.add(pi); M.contorno(pi, 0.012);
+      if (!o.sinPared) { var pa = new T.Mesh(new T.CylinderGeometry(4.5, 4.5, o.altoPared || 3.8, 64, 1, true, Math.PI * 0.62, Math.PI * 0.76), mats.pared); pa.position.y = (o.altoPared || 3.8) / 2; g.add(pa); }
+      return { grupo: g, mats: mats };
+    };
+    // Textura a cuadros o a rayas para pisos (a, b: colores; rayas: true para rayas).
+    M.texPiso = function (a, b, rep, rayas) {
+      var c = document.createElement('canvas'); c.width = c.height = 128; var x = c.getContext('2d');
+      x.fillStyle = a; x.fillRect(0, 0, 128, 128); x.fillStyle = b;
+      if (rayas) x.fillRect(0, 0, 64, 128); else { x.fillRect(0, 0, 64, 64); x.fillRect(64, 64, 64, 64); }
+      var t = new T.CanvasTexture(c); t.wrapS = t.wrapT = T.RepeatWrapping; t.repeat.set(rep || 5, rep || 5); t.userData = { cv: c, rayas: rayas };
+      t.pintar = function (a2, b2) { x.fillStyle = a2; x.fillRect(0, 0, 128, 128); x.fillStyle = b2; if (rayas) x.fillRect(0, 0, 64, 128); else { x.fillRect(0, 0, 64, 64); x.fillRect(64, 64, 64, 64); } t.needsUpdate = true; };
+      return t;
+    };
+    M.alTema = function (fn) { temas.push(fn); fn(M.oscuro()); };
+    var temas = [];
+
     /* ---------- tema y hora ---------- */
     M.noche = function () { var h = new Date().getHours(); return h >= 20 || h < 7; };
     M.oscuro = function () { return MATE.tema.oscuro(); };
+    var atenua = 1;
     function aplicarTema() {
       var osc = M.oscuro();
       // Con más luz el toon se quema a blanco: en claro se aclaran los colores, no las luces.
-      hemi.intensity = osc ? 0.55 : 0.6; sol.intensity = osc ? 0.55 : 0.6; amb.intensity = osc ? 0.2 : 0.16;
+      hemi.intensity = (osc ? 0.55 : 0.6) * atenua; sol.intensity = (osc ? 0.55 : 0.6) * atenua; amb.intensity = (osc ? 0.2 : 0.16) * Math.max(0.6, atenua);
       hemi.color.set(osc ? '#c8c4ff' : '#ffffff'); hemi.groundColor.set(osc ? '#4a3a7a' : '#b59ad8');
       matPared.color.set(osc ? '#5b4b9a' : '#b9a3f5'); matPiso.color.set(osc ? '#b98a5a' : '#e8b06a'); matAlfombra.color.set(osc ? '#b0558a' : '#f27bb3');
       matBordePiso.color.set(osc ? '#8a5a32' : '#c08048');
       matBorde.color.set(osc ? '#120c26' : '#2b2340');
       pintarVentana(M.noche());
+      if (typeof temas !== 'undefined') temas.forEach(function (f) { f(osc); });
     }
+    // k: 1 luz normal, menos para oscurecer (al dormir); con dur, de a poco.
+    M.atenuar = function (k, dur) {
+      var a0 = atenua; if (!dur) { atenua = k; aplicarTema(); return; }
+      M.tween(dur, function (t) { atenua = a0 + (k - a0) * t; aplicarTema(); }, null, 'entraSale');
+    };
     aplicarTema();
     if (root.MutationObserver) new MutationObserver(aplicarTema).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'data-bg'] });
     if (root.matchMedia) { var mq = matchMedia('(prefers-color-scheme: dark)'); if (mq.addEventListener) mq.addEventListener('change', aplicarTema); }
@@ -154,7 +183,7 @@
     M.cuadro = function (fn) { cuadros.push(fn); return function () { var i = cuadros.indexOf(fn); if (i >= 0) cuadros.splice(i, 1); }; };
 
     /* ---------- partículas ---------- */
-    var EMO = { corazon: '❤️', estrella: '⭐', nota: '🎵' };
+    var EMO = { corazon: '❤️', estrella: '⭐', nota: '🎵', zzz: '💤' };
     M.particulas = function (tipo, pos, n, o) {
       o = o || {};
       for (var i = 0; i < (n || 8); i++) (function () {
@@ -163,9 +192,9 @@
         if (tipo === 'brillo') mat.blending = T.AdditiveBlending;
         var s = new T.Sprite(mat), tam = (o.tam || (EMO[tipo] ? 0.32 : (tipo === 'brillo' ? 0.5 : 0.14))) * (0.7 + Math.random() * 0.6);
         s.scale.setScalar(tam); s.position.copy(pos); scene.add(s);
-        var a = Math.random() * Math.PI * 2, f = o.fuerza || (tipo === 'corazon' || tipo === 'nota' ? 1.2 : 2.4);
+        var a = Math.random() * Math.PI * 2, f = o.fuerza || (tipo === 'corazon' || tipo === 'nota' || tipo === 'zzz' ? 1.2 : 2.4);
         var v = new T.Vector3(Math.cos(a) * f * (0.4 + Math.random()), (o.arriba === undefined ? 2.2 : o.arriba) * (0.6 + Math.random() * 0.8), Math.sin(a) * f * 0.5);
-        var g = tipo === 'corazon' || tipo === 'nota' || tipo === 'brillo' ? -0.4 : 6, vida = o.vida || (tipo === 'corazon' || tipo === 'nota' ? 1.4 : 0.9), t = 0, giro = (Math.random() - 0.5) * 4;
+        var flota = tipo === 'corazon' || tipo === 'nota' || tipo === 'zzz', g = flota || tipo === 'brillo' ? -0.4 : (o.gravedad === undefined ? 6 : o.gravedad), vida = o.vida || (flota ? 1.4 : 0.9), t = 0, giro = (Math.random() - 0.5) * 4;
         M.fx({ update: function (dt) {
           t += dt; v.y -= g * dt; s.position.addScaledVector(v, dt); mat.rotation += giro * dt;
           if (tipo === 'gota' && s.position.y < 0.02) { s.position.y = 0.02; v.set(0, 0, 0); }
@@ -253,5 +282,5 @@
     return M;
   }
 
-  root.ING_MUNDO = { VERSION: '1.0.0', crear: crear, EASE: EASE };
+  root.ING_MUNDO = { VERSION: '1.1.0', crear: crear, EASE: EASE };
 })(window);

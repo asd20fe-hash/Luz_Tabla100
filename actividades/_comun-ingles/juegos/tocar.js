@@ -1,4 +1,4 @@
-/* Inglés — juego "Touch Pip!" (partes del cuerpo). Versión 1.0.0 (2026-10-15).
+/* Inglés — juego "Touch Pip!" (partes del cuerpo). Versión 1.0.1 (2026-10-15): cuando la parte ya brilla (2 errores), cualquier toque en la mascota la da por tocada (nunca se traba).
    La profe dice "Touch Pip's nose!": Luz toca esa parte en la mascota 3D. Si toca otra, la mascota dice cuál tocó
    y la profe repite; al segundo error, la parte pedida brilla. Al acertar, la mascota reacciona según la parte
    (estornuda, mueve las orejas, guiña…). Usa J.tocarPip(fn) para enterarse de qué parte se tocó y J.acercarPip(true) para verla grande. */
@@ -16,6 +16,7 @@
       var partes = V.palabras({ temas: ['cuerpo'] });
       J.opciones(paso.opciones.map(function (w) { return { w: w, elegir: function () { elegir(w); } }; }));
       J.tocarPip(function (parte) {
+        if (aura) { elegir(paso.w); return; }            // ya se mostró cuál era: cualquier toque vale
         var w = partes.filter(function (x) { return x.parte === parte; })[0];
         if (w) elegir(w);
       });

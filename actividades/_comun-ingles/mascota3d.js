@@ -1,4 +1,5 @@
-/* Inglés — la mascota en 3D, hecha con formas (sin modelos). window.ING_MASCOTA3D. Versión 1.1.0 (2026-10-15).
+/* Inglés — la mascota en 3D, hecha con formas (sin modelos). window.ING_MASCOTA3D. Versión 1.1.1 (2026-10-15).
+   v1.1.1 Nariz más grande, con contorno y zona de toque más grande (antes casi no se veía ni se podía tocar).
    v1.1.0 + estornudar, orejear, guinar (juego "Touch Pip!") e irA (va saltando hasta otro lugar: supermercado).
    crear(M, {color}) → P. Cabezona tipo juguete de vinilo, con contorno de dibujito.
    Partes con nombre para tocarlas (las del tema cuerpo): head, eyes, ears, nose, mouth, hands, feet, tummy (y body, el resto).
@@ -13,7 +14,7 @@
     raiz.position.set(0, 0, -0.2); raiz.add(cuerpo); cuerpo.add(cabeza); cabeza.position.y = 1.28; M.scene.add(raiz);
     var colorBase = new T.Color(op.color || '#ffb3d1');
     var matC = M.toon(colorBase), matPanza = M.toon('#ffffff'), matRosa = M.toon('#ff8fb8'), matCachete = M.toon('#ff7aa8', { transparente: true, opacidad: 0.55 });
-    var matOjo = new T.MeshBasicMaterial({ color: 0xffffff }), matPupila = new T.MeshBasicMaterial({ color: 0x1d1530 }), matBoca = new T.MeshBasicMaterial({ color: 0x5a1f3a });
+    var matNariz = M.toon('#e0457b'), matOjo = new T.MeshBasicMaterial({ color: 0xffffff }), matPupila = new T.MeshBasicMaterial({ color: 0x1d1530 }), matBoca = new T.MeshBasicMaterial({ color: 0x5a1f3a });
     function tonoPanza() { matPanza.color.copy(matC.color).lerp(new T.Color('#ffffff'), 0.6); matRosa.color.copy(matC.color).lerp(new T.Color('#ff7aa8'), 0.6); }
     tonoPanza();
     var partes = {}, piezas = [];
@@ -46,7 +47,10 @@
       esfera(0.095, matPupila, 0, 0, 0, 1, 1.1, 0.6, p); esfera(0.034, matOjo, 0.035, 0.05, 0.05, 1, 1, 1, p);
       parte('eyes', g); ojos.push(g); pupilas.push(p);
     });
-    parte('nose', esfera(0.055, matRosa, 0, -0.07, 0.6, 1.3, 1, 1));
+    // nariz: bien visible (con contorno) y con una zona invisible más grande para el dedo
+    var nariz = new T.Group(); nariz.position.set(0, -0.07, 0.6); cabeza.add(nariz); parte('nose', nariz);
+    esfera(0.085, matNariz, 0, 0, 0.02, 1.35, 1, 0.9, nariz, 0.12); esfera(0.025, matOjo, -0.03, 0.03, 0.09, 1, 1, 1, nariz);
+    var zonaNariz = new T.Mesh(new T.SphereGeometry(0.12, 8, 6), new T.MeshBasicMaterial({ visible: false })); nariz.add(zonaNariz);
     [-1, 1].forEach(function (s) { esfera(0.1, matCachete, s * 0.4, -0.13, 0.42, 1.2, 0.7, 0.4, cabeza); });
     var boca = new T.Group(); boca.position.set(0, -0.22, 0.54); cabeza.add(boca); parte('mouth', boca);
     var sonrisa = new T.Mesh(new T.TorusGeometry(0.08, 0.022, 8, 18, Math.PI), matBoca); sonrisa.rotation.z = Math.PI; boca.add(sonrisa);
@@ -172,5 +176,5 @@
     P.esMio = function (hit) { var o = hit && hit.obj; while (o) { if (o === raiz) return true; o = o.parent; } return false; };
     return P;
   }
-  root.ING_MASCOTA3D = { VERSION: '1.1.0', crear: crear };
+  root.ING_MASCOTA3D = { VERSION: '1.1.1', crear: crear };
 })(window);

@@ -1,7 +1,7 @@
-/* Inglés — voz y sonidos. window.ING_VOZ. Versión 1.1.0 (2026-10-15): + sonidos achis, caja, moneda, rueda.
+/* Inglés — voz y sonidos. window.ING_VOZ. Versión 1.2.0 (2026-10-15): + sonidos patada, pique, palo, gol, burbuja, click; v1.1.0 + achis, caja, moneda, rueda.
    - decir(texto, {quien:'profe'|'pip', despues, lento}): voz en inglés (en-US primero, después en-GB). La profe habla normal y
      la mascota con tono alto. Siempre llama a despues (aunque no haya voz o el navegador no avise que terminó).
-   - sfx(nombre): efectos con WebAudio (pop, nam, splash, risa, pio, crack, brillo, woosh, mal, ok, monedas, boing, achis, caja, moneda, rueda).
+   - sfx(nombre): efectos con WebAudio (pop, nam, splash, risa, pio, crack, brillo, woosh, mal, ok, monedas, boing, achis, caja, moneda, rueda, patada, pique, palo, gol, burbuja, click).
    - balbuceo(n): la "voz" de la mascota cuando no habla en inglés (piquitos, estilo dibujito).
    Respeta el sonido global (MATE.global 'sonido'). */
 (function (root) {
@@ -94,6 +94,12 @@
       else if (que === 'caja') { tono(a, 1500, 0, 0.08, 0, 'square', 0.03); tono(a, 2200, 0, 0.35, 0.09, 'sine', 0.08); }
       else if (que === 'moneda') tono(a, 1400, 2100, 0.07, 0, 'square', 0.025);
       else if (que === 'rueda') ruido(a, 0.5, 0, 300, 0.08, 0.6);
+      else if (que === 'patada') { ruido(a, 0.08, 0, 400, 0.3, 1); tono(a, 160, 60, 0.12, 0, 'sine', 0.15); }
+      else if (que === 'pique') tono(a, 220, 120, 0.08, 0, 'sine', 0.08);
+      else if (que === 'palo') { tono(a, 900, 880, 0.35, 0, 'triangle', 0.08); tono(a, 1350, 1320, 0.3, 0, 'sine', 0.04); }
+      else if (que === 'gol') { [523, 659, 784, 1046].forEach(function (f, k) { tono(a, f, 0, 0.22, k * 0.1, 'triangle', 0.08); }); ruido(a, 0.9, 0.1, 1500, 0.06, 0.4); }
+      else if (que === 'burbuja') tono(a, 600 + Math.random() * 400, 1600, 0.06, 0, 'sine', 0.1);
+      else if (que === 'click') tono(a, 1800, 0, 0.03, 0, 'square', 0.04);
       else if (que === 'boing') tono(a, 180, 520, 0.22, 0, 'sine', 0.12);
       else tono(a, 500, 0, 0.05, 0, 'sine', 0.04);
     } catch (e) { /* sin audio */ }

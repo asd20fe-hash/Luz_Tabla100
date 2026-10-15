@@ -2,7 +2,7 @@
 var assert = require('assert'), C = require('./comun.js'), V = C.V, JG = C.JG, LC = C.LC, RP = C.RP;
 function juegos(p) { return p.filter(function (x) { return x.tipo === 'juego'; }); }
 prueba('juegos: registrados con su tema y sus frases', function () {
-  assert.deepStrictEqual(JG.lista().map(function (j) { return j.id; }), ['pintar', 'comer', 'tocar']);
+  assert.deepStrictEqual(JG.lista().map(function (j) { return j.id; }), ['pintar', 'comer', 'tocar', 'buscar']);
   JG.lista().forEach(function (j) { assert.ok(V.getTema(j.tema), j.id); assert.strictEqual(typeof j.jugar, 'function'); });
   assert.strictEqual(JG.get('pintar').orden(V.por('BLUE'), 'Pip'), 'Paint Pip blue!');
   assert.strictEqual(JG.get('comer').orden(V.por('APPLE'), 'Mimi'), 'Give Mimi an apple!');
@@ -13,7 +13,7 @@ prueba('lección: la primera presenta palabras nuevas y las practica enseguida',
   assert.strictEqual(p[0].tipo, 'hola'); assert.strictEqual(p[p.length - 1].tipo, 'chau');
   var pres = p.filter(function (x) { return x.tipo === 'presenta'; });
   assert.strictEqual(pres.length, LC.NUEVAS); assert.strictEqual(juegos(p).length, LC.PRACTICA);
-  assert.deepStrictEqual(pres.map(function (x) { return x.w.tema; }).sort(), ['colores', 'comida', 'cuerpo']);   // alterna temas
+  var tm = pres.map(function (x) { return x.w.tema; }); assert.strictEqual(new Set(tm).size, tm.length, 'alterna temas: ' + tm);
   pres.forEach(function (x) { var i = p.indexOf(x); assert.strictEqual(p[i + 1].tipo, 'juego'); assert.strictEqual(p[i + 1].w, x.w); });
 });
 prueba('lección: 1000 lecciones por nivel, con semilla y repaso', function () {
@@ -26,7 +26,7 @@ prueba('lección: 1000 lecciones por nivel, con semilla y repaso', function () {
       for (var i = 1; i < p.length; i++) if (p[i].tipo === 'juego' && p[i - 1].tipo === 'juego') assert.notStrictEqual(p[i].w, p[i - 1].w, 'dos seguidas');
       js.forEach(function (x) {
         assert.ok(x.w.nivel <= nv); assert.strictEqual(JG.get(x.juego).tema, x.w.tema);
-        assert.strictEqual(x.opciones.length, JG.cuantas(nv)); assert.ok(x.opciones.indexOf(x.w) >= 0);
+        assert.strictEqual(x.opciones.length, JG.cuantas(nv) + (x.juego === 'buscar' ? 1 : 0)); assert.ok(x.opciones.indexOf(x.w) >= 0);
         RP.registrar(rep, x.w.en, az.prob(0.8)); vistas[x.w.en] = 1;
       });
     }
@@ -50,4 +50,9 @@ prueba('juego libre: ronda de un solo juego', function () {
     assert.strictEqual(r.length, 6);
     r.forEach(function (x, i) { assert.strictEqual(x.juego, 'comer'); assert.strictEqual(x.w.tema, 'comida'); if (i) assert.notStrictEqual(x.w, r[i - 1].w); });
   }
+});
+prueba('juego Find it: orden y opciones', function () {
+  var j = JG.get('buscar'), w = V.por('BALL'), az = C.AZ.crear(3);
+  assert.strictEqual(j.orden(w), 'Where is the ball?');
+  for (var i = 0; i < 200; i++) { var op = j.opciones(w, 1, az); assert.ok(op.indexOf(w) >= 0); assert.strictEqual(op.length, JG.cuantas(1) + 1); op.forEach(function (x) { assert.strictEqual(x.tema, 'cosas'); }); }
 });

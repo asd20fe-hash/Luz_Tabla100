@@ -1,4 +1,5 @@
-/* Inglés — objetos 3D para los juegos. window.ING_OBJ3D. Versión 1.1.0 (2026-10-15).
+/* Inglés — objetos 3D para los juegos. window.ING_OBJ3D. Versión 1.2.0 (2026-10-15).
+   v1.2.0 + pelota (de fútbol, con gajos pintados) y flecha (para apuntar al patear), burbuja.
    v1.1.0 + moneda (para pagar en el súper) y etiqueta (cartelito de texto: precios, cantidades).
    El truco para no modelar: cada palabra con emoji se ve como una "ficha" (el emoji en un sprite que siempre mira a la cámara,
    con un platito y su sombra), así cualquier palabra nueva existe en 3D sin hacer nada.
@@ -92,6 +93,41 @@
     }
     var s = new T.Sprite(new T.SpriteMaterial({ map: tex, transparent: true })), h = o.alto || 0.26;
     s.scale.set(h * 2, h, 1); s.raycast = function () {};
+    return s;
+  };
+  var texPelota = null;
+  O.pelota = function (M, r) {
+    var T = M.T; r = r || 0.22;
+    if (!texPelota) {
+      var c = document.createElement('canvas'); c.width = 256; c.height = 128; var g = c.getContext('2d');
+      g.fillStyle = '#ffffff'; g.fillRect(0, 0, 256, 128); g.fillStyle = '#222033';
+      for (var i = 0; i < 8; i++) for (var j = 0; j < 3; j++) { var x = i * 32 + (j % 2) * 16 + 8, y = 20 + j * 44; g.beginPath();
+        for (var k = 0; k < 5; k++) { var a = k * Math.PI * 2 / 5 - Math.PI / 2; g.lineTo(x + Math.cos(a) * 10, y + Math.sin(a) * 10 * (j === 1 ? 1 : 0.7)); } g.fill(); }
+      texPelota = new T.CanvasTexture(c);
+    }
+    var mat = M.toon('#ffffff'); mat.map = texPelota;
+    var m = new T.Mesh(new T.SphereGeometry(r, 24, 18), mat); M.contorno(m, 0.05);
+    var g2 = new T.Group(); g2.add(m); m.position.y = r; var sombra = M.sombra(r * 1.3); g2.add(sombra);
+    g2.userData = { bola: m, sombra: sombra, r: r };
+    return g2;
+  };
+  // Flecha sobre el piso, apuntando hacia -z (se gira con rotation.y); largo(l) la estira; color(c).
+  O.flecha = function (M) {
+    var T = M.T, g = new T.Group(), mat = new T.MeshBasicMaterial({ color: 0x40c057, transparent: true, opacity: 0.9, depthTest: false });
+    var palo = new T.Mesh(new T.BoxGeometry(0.12, 0.03, 1), mat); palo.position.z = -0.5; g.add(palo);
+    var punta = new T.Mesh(new T.ConeGeometry(0.2, 0.36, 3), mat); punta.rotation.x = -Math.PI / 2; punta.rotation.y = Math.PI; g.add(punta);
+    palo.renderOrder = punta.renderOrder = 8; palo.raycast = punta.raycast = function () {};
+    g.userData.largo = function (l) { palo.scale.z = l; palo.position.z = -l / 2; punta.position.z = -l - 0.15; };
+    g.userData.color = function (c) { mat.color.set(c); };
+    g.userData.largo(1);
+    return g;
+  };
+  // Burbuja de jabón (sprite con brillo) para reventar.
+  O.burbuja = function (M, tam) {
+    var T = M.T, c = document.createElement('canvas'); c.width = c.height = 128; var g = c.getContext('2d');
+    var gr = g.createRadialGradient(54, 50, 6, 64, 64, 60); gr.addColorStop(0, 'rgba(255,255,255,.85)'); gr.addColorStop(0.35, 'rgba(190,230,255,.25)'); gr.addColorStop(0.85, 'rgba(160,120,255,.35)'); gr.addColorStop(1, 'rgba(255,255,255,.9)');
+    g.fillStyle = gr; g.beginPath(); g.arc(64, 64, 60, 0, 7); g.fill(); g.strokeStyle = 'rgba(255,255,255,.95)'; g.lineWidth = 3; g.stroke();
+    var s = new T.Sprite(new T.SpriteMaterial({ map: new T.CanvasTexture(c), transparent: true, depthWrite: false })); s.scale.setScalar(tam || 0.45);
     return s;
   };
   O.flotar = function (M, obj, amp) {

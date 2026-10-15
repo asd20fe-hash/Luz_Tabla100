@@ -1,4 +1,4 @@
-/* Inglés — estilos de la capa de interfaz sobre la escena 3D (v1.1.0: + lista del súper). Colores con variables, en claro y oscuro. */
+/* Inglés — estilos de la capa de interfaz sobre la escena 3D (v1.2.0: + botones de lugares; v1.1.0 lista del súper). Colores con variables, en claro y oscuro. */
 :root{ --ing-card:rgba(255,255,255,.88); --ing-card-borde:rgba(255,255,255,.95); --ing-tinta:#2b2453; --ing-sombra:0 8px 26px rgba(80,50,150,.22);
   --ing-anillo:#e8e0ff; --ing-moneda:#f2a20c; --ing-chip:#fff6cf; --ing-chip-tinta:#4a3800; }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --ing-card:rgba(34,28,74,.9); --ing-card-borde:rgba(255,255,255,.16); --ing-tinta:#f3efff;
@@ -75,3 +75,7 @@ body{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:trans
 .ing-lista span.ok{background:var(--l1-ok-bg,var(--ing-chip))}
 .ing-lista span.ok::after{content:"✔";position:absolute;right:-4px;top:-6px;font-size:16px;color:var(--ok);font-weight:700}
 .ing-lista .ing-color{width:28px;height:28px}
+/* botones de lugares (solo ícono) y marcador del patio */
+.ing-lugar{font-size:30px;padding:6px 12px;min-width:64px;position:relative}
+.ing-lugar b{font-size:16px;margin-left:2px;vertical-align:middle}
+.ing-goles{font-size:24px;padding:8px 16px}

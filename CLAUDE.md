@@ -12,7 +12,7 @@ Guía para Claude Code (claude.ai/code) en este repositorio.
 ## Estructura
 
 ```
-index.html              shell: perfiles (y "➕ Nuevo perfil"), menú, ajustes de padres con PIN (v2.5)
+index.html              shell: perfiles (y "➕ Nuevo perfil"), menú, ajustes de padres con PIN y "Reiniciar progreso" (v2.6)
 perfiles.js             MATE.perfiles = [{id,nombre,grado,avatar,color}] + los creados en el dispositivo
 core/core.css           tokens claro/oscuro, estilos base y fondos
 core/core.js            global MATE (único global), con la cola de la nube
@@ -27,7 +27,7 @@ Orden de scripts: `core.js`, `perfiles.js`, `registro.js`, y después el de la p
 ## Reglas
 
 - **Sin compilar:** sin bundlers, npm ni build. Varios archivos, scripts clásicos (sin ES modules ni `fetch` local, porque no funcionan en `file://`), todo colgado de `MATE`.
-- **Versiones:** el shell tiene la suya (v2.5) y cada actividad la suya. Cada cambio sube la versión, agrega una entrada al historial del comentario del principio del archivo (`vX.Y  descripción`, viñetas con `+`) y actualiza la línea `Versión:`. Se muestra en pantalla en elementos `.ver`. Si cambia una actividad, actualizar `version` en el registro.
+- **Versiones:** el shell tiene la suya (v2.6) y cada actividad la suya. Cada cambio sube la versión, agrega una entrada al historial del comentario del principio del archivo (`vX.Y  descripción`, viñetas con `+`) y actualiza la línea `Versión:`. Se muestra en pantalla en elementos `.ver`. Si cambia una actividad, actualizar `version` en el registro.
 - **Modo claro/oscuro:** tokens CSS en `:root` con overrides por `[data-theme]` (media query y atributo). Todo color o elemento nuevo tiene que verse bien en los dos modos.
 - **Textos en español rioplatense con voseo** ("Elegí", "Probá"); comentarios y logs también en español. Cada actividad decide su tono y tipografía: la de Luz usa frases cortas y MAYÚSCULAS de imprenta; eso no es regla del shell.
 - Estilo compacto: nombres cortos, varias sentencias por línea, sin frameworks.
@@ -71,7 +71,7 @@ Orden de scripts: `core.js`, `perfiles.js`, `registro.js`, y después el de la p
 
 ## Rama de inglés (`_comun-ingles/`): convenciones
 
-- **Modular para crecer:** vocabulario por temas (`temas/*.js` se registran en `ING_VOCAB`), minijuegos (`juegos/*.js` en `ING_JUEGOS`: pintar, comer, tocar), lecciones como datos (`ING_LECC`), estado de la mascota puro (`ING_PET`), súper y despensa puros (`ING_TIENDA`) y la parte 3D aparte (`mundo3d.js`, `mascota3d.js`, `profe3d.js`, `objetos3d.js`, `escena-super.js`, con three.js r128). Una escena nueva (como el súper) es un grupo que esconde `M.cuarto`. Detalle en `actividades/1ro-ingles-mascota/CLAUDE.md`.
+- **Modular para crecer:** vocabulario por temas (`temas/*.js` se registran en `ING_VOCAB`), minijuegos (`juegos/*.js` en `ING_JUEGOS`: pintar, comer, tocar, buscar), lecciones como datos (`ING_LECC`), estado de la mascota puro (`ING_PET`), súper y despensa puros (`ING_TIENDA`) y la parte 3D aparte (`mundo3d.js`, `mascota3d.js`, `profe3d.js`, `objetos3d.js`, `escena-super.js`, `escenas-casa.js` (baño, dormitorio, patio), con three.js r128). Una escena nueva es un grupo que esconde `M.cuarto` (`M.sala()` arma piso y pared). Detalle en `actividades/1ro-ingles-mascota/CLAUDE.md`.
 - **Sin modelos:** la mascota y la profe son formas con contorno; cada palabra se ve como un emoji en una ficha 3D. Archivos externos no (nada de `fetch`: tiene que andar con `file://`).
 - **Mascota sin culpa:** las necesidades bajan con tope (`ING_PET.PISO`) y nunca se enferma.
 - **Pruebas:** `node tests/ingles/run.js`.

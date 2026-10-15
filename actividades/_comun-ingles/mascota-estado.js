@@ -1,4 +1,4 @@
-/* Inglés — estado de la mascota virtual (parte pura). window.ING_PET / require. Versión 1.1.0 (2026-10-15): + despensa (lo comprado en el supermercado).
+/* Inglés — estado de la mascota virtual (parte pura). window.ING_PET / require. Versión 1.2.0 (2026-10-15): + limpieza y energía (baño y dormitorio); v1.1.0 + despensa (lo comprado en el supermercado).
    Necesidades de 0 a 100 que bajan despacio con el tiempo real y nunca por debajo de PISO: la mascota no se enferma ni se muere,
    y si pasan días sin jugar solo está con hambre o con sueño y contenta de volver a verla.
    Para sumar una necesidad (energía, limpieza…) basta agregarla a NECESIDADES; los estados viejos la reciben con su valor inicial. */
@@ -8,7 +8,9 @@
   // id, emoji para la interfaz, cuánto baja por hora, valor inicial.
   var NECESIDADES = [
     { id: 'alegria', icono: '❤️', baja: 3, inicial: 80 },
-    { id: 'panza', icono: '🍎', baja: 5, inicial: 60 }
+    { id: 'panza', icono: '🍎', baja: 5, inicial: 60 },
+    { id: 'limpieza', icono: '🫧', baja: 3, inicial: 80 },
+    { id: 'energia', icono: '⚡', baja: 3, inicial: 80 }
   ];
   var NOMBRES = ['PIP', 'BO', 'MIMI', 'LUNA'];
   var ETAPAS = [{ id: 'bebe', desde: 0, escala: 0.8 }, { id: 'chico', desde: 40, escala: 0.92 }, { id: 'grande', desde: 120, escala: 1.05 }];
@@ -42,12 +44,14 @@
     NECESIDADES.forEach(function (n) { if (e[n.id] < 40 && (!peor || e[n.id] < e[peor])) peor = n.id; });
     if (peor === 'panza') return 'hambre';
     if (peor === 'alegria') return 'aburrido';
+    if (peor === 'limpieza') return 'sucio';
+    if (peor === 'energia') return 'sueno';
     if (peor) return peor;
     return e.alegria >= 75 ? 'feliz' : 'contento';
   }
   function etapa(e) { var r = ETAPAS[0]; ETAPAS.forEach(function (x) { if (e.aciertos >= x.desde) r = x; }); return r; }
 
-  var api = { VERSION: '1.1.0', PISO: PISO, NECESIDADES: NECESIDADES, NOMBRES: NOMBRES, ETAPAS: ETAPAS, nuevo: nuevo, normalizar: normalizar, avanzar: avanzar, sumar: sumar, premiar: premiar, animo: animo, etapa: etapa };
+  var api = { VERSION: '1.2.0', PISO: PISO, NECESIDADES: NECESIDADES, NOMBRES: NOMBRES, ETAPAS: ETAPAS, nuevo: nuevo, normalizar: normalizar, avanzar: avanzar, sumar: sumar, premiar: premiar, animo: animo, etapa: etapa };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.ING_PET = api;
 })(typeof window !== 'undefined' ? window : this);
