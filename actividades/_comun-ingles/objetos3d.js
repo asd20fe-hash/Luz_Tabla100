@@ -1,0 +1,114 @@
+/* Inglés — objetos 3D para los juegos. window.ING_OBJ3D. Versión 1.1.0 (2026-10-15).
+   v1.1.0 + moneda (para pagar en el súper) y etiqueta (cartelito de texto: precios, cantidades).
+   El truco para no modelar: cada palabra con emoji se ve como una "ficha" (el emoji en un sprite que siempre mira a la cámara,
+   con un platito y su sombra), así cualquier palabra nueva existe en 3D sin hacer nada.
+   - ficha(M, w, tam): para comida y cosas · balde(M, color): balde de pintura · mancha(M, color): gota grande de pintura (presentar colores)
+   - palabra(M, w, tam): ficha o mancha según la palabra · huevo(M): el huevo de la mascota, con rajarse(n) · mano(M): manito que señala
+   - moneda(M): moneda dorada con estrella, parada mirando a la cámara · etiqueta(M, texto, {fondo, tinta, alto}): cartelito que siempre mira a la cámara
+   - flotar(M, obj): sube y baja suave · temblar(M, obj) · apagar(obj, on): la pone gris y transparente (opción descartada) */
+(function (root) {
+  'use strict';
+  var O = {};
+  O.ficha = function (M, w, tam) {
+    var T = M.T, g = new T.Group(); tam = tam || 0.8;
+    var plato = new T.Mesh(new T.CylinderGeometry(tam * 0.55, tam * 0.45, 0.08, 28), M.toon('#ffffff')); plato.position.y = 0.04; g.add(plato); M.contorno(plato, 0.04);
+    var mat = new T.SpriteMaterial({ map: M.texEmoji(w.img), transparent: true }), s = new T.Sprite(mat);
+    s.scale.setScalar(tam); s.position.y = tam * 0.55 + 0.06; g.add(s);
+    g.add(M.sombra(tam * 0.7));
+    g.userData = { w: w, sprite: s, plato: plato, mats: [mat, plato.material] };
+    return g;
+  };
+  O.balde = function (M, color, tam) {
+    var T = M.T, g = new T.Group(); tam = tam || 1;
+    var cuerpo = new T.Mesh(new T.CylinderGeometry(0.34 * tam, 0.27 * tam, 0.46 * tam, 24, 1, true), M.toon('#e9eef5')); cuerpo.material.side = T.DoubleSide;
+    cuerpo.position.y = 0.23 * tam; g.add(cuerpo); M.contorno(cuerpo, 0.05);
+    var fondo = new T.Mesh(new T.CircleGeometry(0.27 * tam, 24), M.toon('#cfd6e0')); fondo.rotation.x = -Math.PI / 2; fondo.position.y = 0.01; g.add(fondo);
+    var matPintura = M.toon(color);
+    var pintura = new T.Mesh(new T.CircleGeometry(0.32 * tam, 24), matPintura); pintura.rotation.x = -Math.PI / 2; pintura.position.y = 0.4 * tam; g.add(pintura);
+    var franja = new T.Mesh(new T.CylinderGeometry(0.343 * tam, 0.32 * tam, 0.12 * tam, 24, 1, true), matPintura); franja.position.y = 0.36 * tam; g.add(franja);
+    var chorro = new T.Mesh(new T.SphereGeometry(0.06 * tam, 10, 8), matPintura); chorro.scale.set(1, 2.2, 0.6); chorro.position.set(0.12 * tam, 0.3 * tam, 0.31 * tam); g.add(chorro);
+    var asa = new T.Mesh(new T.TorusGeometry(0.3 * tam, 0.018 * tam, 6, 20, Math.PI), M.toon('#8a94a6')); asa.position.y = 0.46 * tam; asa.rotation.y = 0.3; g.add(asa);
+    g.add(M.sombra(0.5 * tam));
+    g.userData = { color: color, mats: [cuerpo.material, matPintura, fondo.material, asa.material] };
+    return g;
+  };
+  O.mancha = function (M, color, tam) {
+    var T = M.T, g = new T.Group(); tam = tam || 0.6;
+    var m = new T.Mesh(new T.SphereGeometry(tam, 28, 20), M.toon(color)); m.scale.set(1, 0.85, 0.85); m.position.y = tam * 0.85; g.add(m); M.contorno(m, 0.05);
+    var brillo = new T.Mesh(new T.SphereGeometry(tam * 0.18, 10, 8), new T.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7 })); brillo.position.set(-tam * 0.35, tam * 1.2, tam * 0.6); g.add(brillo);
+    g.add(M.sombra(tam * 1.1));
+    g.userData = { color: color, mats: [m.material] };
+    return g;
+  };
+  O.palabra = function (M, w, tam) { return w.color ? O.mancha(M, w.color, (tam || 0.8) * 0.65) : O.ficha(M, w, tam); };
+  O.huevo = function (M) {
+    var T = M.T, g = new T.Group();
+    var cascara = new T.Mesh(new T.SphereGeometry(0.62, 32, 24), M.toon('#fff4dc')); cascara.scale.set(0.82, 1, 0.82); cascara.position.y = 0.62; g.add(cascara); M.contorno(cascara, 0.04);
+    var manchas = ['#ff9ec7', '#8ecbff', '#ffd43b', '#a3e3a1'];
+    for (var i = 0; i < 9; i++) {
+      var a = i * 2.4 + 0.5, y = 0.3 + (i % 3) * 0.3, r = 0.62 * 0.82 * Math.sqrt(1 - Math.pow((y - 0.62) / 0.62, 2)) - 0.01;   // radio del huevo a esa altura
+      var p = new T.Mesh(new T.SphereGeometry(0.09, 10, 8), M.toon(manchas[i % 4])); p.scale.set(1, 1, 0.35);
+      p.position.set(Math.cos(a) * r, y, Math.sin(a) * r); p.lookAt(0, y, 0); g.add(p);
+    }
+    g.add(M.sombra(0.6));
+    var rajas = new T.Group(); g.add(rajas);
+    var matRaja = new T.MeshBasicMaterial({ color: 0x3a2a1a });
+    // n: cuántas rajas (1 a 3): zigzag sobre el frente del huevo.
+    g.userData.rajarse = function (n) {
+      var y0 = 0.75 - (n - 1) * 0.12, x = -0.28 + (n - 1) * 0.06;
+      for (var k = 0; k < 5; k++) {
+        var seg = new T.Mesh(new T.BoxGeometry(0.14, 0.02, 0.02), matRaja), y = y0 + (k % 2 ? 0.05 : -0.05);
+        seg.position.set(x + k * 0.12, y, Math.sqrt(Math.max(0, Math.pow(0.51 * Math.sqrt(Math.max(0, 1 - Math.pow((y - 0.62) / 0.62, 2))), 2) - Math.pow(x + k * 0.12, 2))) + 0.012);
+        seg.rotation.z = k % 2 ? -0.7 : 0.7; rajas.add(seg);
+      }
+    };
+    g.userData.cascara = cascara;
+    return g;
+  };
+  O.mano = function (M) {
+    var T = M.T, s = new T.Sprite(new T.SpriteMaterial({ map: M.texEmoji('👆'), transparent: true, depthTest: false }));
+    s.scale.setScalar(0.6); s.renderOrder = 10; s.raycast = function () {};
+    var t = 0; M.fx({ update: function (dt) { if (!s.parent) return s.userData.vivo !== false; t += dt; s.center.set(0.5, 1 - 0.12 * Math.abs(Math.sin(t * 5))); return s.userData.vivo !== false; } });
+    s.userData.quitar = function () { s.userData.vivo = false; if (s.parent) s.parent.remove(s); };
+    return s;
+  };
+  O.moneda = function (M, tam) {
+    var T = M.T, g = new T.Group(); tam = tam || 1;
+    var cara = M.toon('#ffe58a'); cara.map = M.texEmoji('⭐');
+    var m = new T.Mesh(new T.CylinderGeometry(0.15 * tam, 0.15 * tam, 0.045 * tam, 28), [M.toon('#f2a20c'), cara, M.toon('#f2a20c')]);
+    m.rotation.x = Math.PI / 2; g.add(m); M.contorno(m, 0.06);
+    g.userData = { mats: m.material };
+    return g;
+  };
+  var cacheEtq = {};
+  O.etiqueta = function (M, texto, o) {
+    o = o || {}; var T = M.T, clave = texto + '|' + (o.fondo || '') + '|' + (o.tinta || ''), tex = cacheEtq[clave];
+    if (!tex) {
+      var c = document.createElement('canvas'); c.width = 256; c.height = 128; var g = c.getContext('2d');
+      g.fillStyle = o.fondo || '#ffffff'; g.strokeStyle = '#2b2340'; g.lineWidth = 8; g.beginPath();
+      if (g.roundRect) g.roundRect(8, 8, 240, 112, 40); else g.rect(8, 8, 240, 112); g.fill(); g.stroke();
+      g.fillStyle = o.tinta || '#2b2340'; g.font = 'bold 70px Fredoka, "Segoe UI Emoji", Arial, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(texto, 128, 70);
+      tex = cacheEtq[clave] = new T.CanvasTexture(c);
+    }
+    var s = new T.Sprite(new T.SpriteMaterial({ map: tex, transparent: true })), h = o.alto || 0.26;
+    s.scale.set(h * 2, h, 1); s.raycast = function () {};
+    return s;
+  };
+  O.flotar = function (M, obj, amp) {
+    var y0 = obj.position.y, t = Math.random() * 6, vivo = true;
+    M.fx({ update: function (dt) { if (!vivo || !obj.parent) return false; t += dt; obj.position.y = y0 + Math.sin(t * 2.2) * (amp || 0.06); obj.rotation.y = Math.sin(t * 1.3) * 0.15; return true; } });
+    return { parar: function () { vivo = false; obj.position.y = y0; } };
+  };
+  O.temblar = function (M, obj) {
+    var x0 = obj.position.x;
+    M.tween(450, function (k) { obj.position.x = x0 + Math.sin(k * Math.PI * 6) * 0.08 * (1 - k); }, function () { obj.position.x = x0; }, 'lineal');
+  };
+  O.apagar = function (obj, on) {
+    (obj.userData.mats || []).forEach(function (m) { m.transparent = true; m.opacity = on ? 0.3 : 1; });
+  };
+  O.rebotar = function (M, obj, alto) {
+    var y0 = obj.position.y;
+    M.tween(420, function (k) { obj.position.y = y0 + Math.sin(k * Math.PI) * (alto || 0.4); }, function () { obj.position.y = y0; }, 'lineal');
+  };
+  root.ING_OBJ3D = O;
+})(window);

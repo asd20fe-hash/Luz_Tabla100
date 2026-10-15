@@ -1,0 +1,9 @@
+/* Carga los módulos puros de _comun-ingles como en la página (vocabulario, temas, juegos y lecciones). */
+'use strict';
+var R = '../../actividades/';
+var V = require(R + '_comun-ingles/vocab.js');
+['colores', 'comida', 'numeros', 'cosas', 'cuerpo'].forEach(function (t) { require(R + '_comun-ingles/temas/' + t + '.js'); });
+var JG = require(R + '_comun-ingles/juegos.js');
+require(R + '_comun-ingles/juegos/pintar.js'); require(R + '_comun-ingles/juegos/comer.js'); require(R + '_comun-ingles/juegos/tocar.js');
+module.exports = { V: V, JG: JG, LC: require(R + '_comun-ingles/lecciones.js'), PET: require(R + '_comun-ingles/mascota-estado.js'), TD: require(R + '_comun-ingles/tienda.js'),
+  RP: require(R + '_comun-1ro/repaso.js'), AZ: require(R + '_comun-4to/azar.js'), R: R };

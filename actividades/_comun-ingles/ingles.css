@@ -1,0 +1,77 @@
+/* Inglés — estilos de la capa de interfaz sobre la escena 3D (v1.1.0: + lista del súper). Colores con variables, en claro y oscuro. */
+:root{ --ing-card:rgba(255,255,255,.88); --ing-card-borde:rgba(255,255,255,.95); --ing-tinta:#2b2453; --ing-sombra:0 8px 26px rgba(80,50,150,.22);
+  --ing-anillo:#e8e0ff; --ing-moneda:#f2a20c; --ing-chip:#fff6cf; --ing-chip-tinta:#4a3800; }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --ing-card:rgba(34,28,74,.9); --ing-card-borde:rgba(255,255,255,.16); --ing-tinta:#f3efff;
+  --ing-sombra:0 8px 26px rgba(0,0,0,.5); --ing-anillo:#3d3478; --ing-moneda:#fbbf24; --ing-chip:#4a3d12; --ing-chip-tinta:#fff3c4; } }
+:root[data-theme="dark"]{ --ing-card:rgba(34,28,74,.9); --ing-card-borde:rgba(255,255,255,.16); --ing-tinta:#f3efff;
+  --ing-sombra:0 8px 26px rgba(0,0,0,.5); --ing-anillo:#3d3478; --ing-moneda:#fbbf24; --ing-chip:#4a3d12; --ing-chip-tinta:#fff3c4; }
+
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#escena{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0}
+.ing-hud{position:fixed;inset:0;z-index:5;pointer-events:none;display:flex;flex-direction:column}
+.ing-hud button,.ing-hud .ing-card{pointer-events:auto}
+.ing-hud .l1-barra{padding:8px 10px}
+.ing-hud .l1-barra h1{text-shadow:0 1px 0 var(--ing-card)}
+.ing-card{background:var(--ing-card);border:2px solid var(--ing-card-borde);border-radius:20px;box-shadow:var(--ing-sombra);color:var(--ing-tinta)}
+/* estado de la mascota */
+.ing-estado{display:flex;gap:8px;padding:0 12px;flex-wrap:wrap;align-items:center}
+.ing-burbuja{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;font-weight:700;font-size:18px;pointer-events:auto}
+.ing-anillo{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:20px;
+  background:conic-gradient(var(--c) calc(var(--v)*1%),var(--ing-anillo) 0)}
+.ing-anillo span{width:30px;height:30px;border-radius:50%;background:var(--ing-card);display:grid;place-items:center}
+.ing-moneda{font-size:22px}
+.ing-burbuja.salta{animation:ing-salta .5s ease}
+@keyframes ing-salta{40%{transform:scale(1.25)}}
+/* cartel de la orden */
+.ing-banner{align-self:center;margin:6px 12px 0;padding:8px 10px 8px 16px;display:flex;align-items:center;gap:10px;max-width:min(680px,calc(100% - 24px))}
+.ing-banner[hidden]{display:none}
+.ing-banner .ic{font-size:34px;line-height:1}
+.ing-banner .en{font-family:"Andika",var(--font);font-weight:700;font-size:clamp(24px,5vw,38px);line-height:1.1}
+.ing-banner .es{font-size:16px;color:var(--muted);font-weight:600}
+.ing-oir{min-width:56px;min-height:56px;font-size:26px;border-radius:50%}
+.ing-color{display:inline-block;width:34px;height:34px;border-radius:50%;border:3px solid var(--ing-tinta);vertical-align:middle}
+.ing-chip{align-self:center;margin-top:8px;padding:6px 16px;border-radius:999px;background:var(--ing-chip);color:var(--ing-chip-tinta);font-weight:700;
+  font-family:"Andika",var(--font);font-size:clamp(20px,4vw,28px);box-shadow:var(--ing-sombra);animation:ing-entra .35s ease}
+.ing-chip[hidden]{display:none}
+.ing-chip.mal{background:var(--l1-mal-bg);color:var(--bad)}
+@keyframes ing-entra{from{transform:translateY(-8px) scale(.9);opacity:0}}
+.ing-aviso{align-self:center;margin-bottom:8px;padding:8px 18px;font-size:20px;font-weight:700;animation:ing-late 1.2s ease-in-out infinite}
+.ing-aviso[hidden]{display:none}
+@keyframes ing-late{50%{transform:scale(1.06)}}
+/* barra de abajo */
+.ing-abajo{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;padding:8px 12px calc(12px + env(safe-area-inset-bottom))}
+.ing-espacio{flex:1}
+.ing-btn{min-height:64px;min-width:64px;padding:8px 18px;font-size:20px;font-weight:700;border-radius:20px;cursor:pointer;
+  border:2px solid var(--ing-card-borde);background:var(--ing-card);color:var(--ing-tinta);box-shadow:var(--ing-sombra);touch-action:manipulation;font-family:inherit}
+.ing-btn:active{transform:translateY(2px)}
+.ing-btn.main{background:var(--accent);color:var(--l1-sobre);border-color:transparent;font-size:24px;padding:8px 26px}
+.ing-btn.main.late{animation:ing-late 1.4s ease-in-out infinite}
+.ing-btn .ic{font-size:28px;vertical-align:middle;margin-right:4px}
+.ing-prog{display:flex;gap:6px;padding:8px 12px;border-radius:999px}
+.ing-prog i{width:22px;height:12px;border-radius:6px;background:var(--ing-anillo)}
+.ing-prog i.ok{background:var(--ok)} .ing-prog i.mal{background:var(--bad)} .ing-prog i.actual{background:var(--accent)}
+/* pantallas encima (inicio, nombre, resumen) */
+.ing-velo{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:16px;background:var(--l1-velo)}
+.ing-velo[hidden]{display:none}
+.ing-panel{width:min(520px,100%);padding:20px 16px;text-align:center}
+.ing-panel h2{font-family:"Andika",var(--font);font-size:clamp(30px,7vw,44px);margin:4px 0 10px}
+.ing-panel p{font-size:20px;margin:8px 0}
+.ing-panel .grande{font-size:64px;line-height:1.1}
+.ing-nombres{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:12px 0}
+.ing-nombres .ing-btn{font-family:"Andika",var(--font);font-size:28px}
+.ing-nombres .ing-btn.elegido{outline:4px solid var(--accent);outline-offset:2px}
+.ing-estrellas{font-size:48px;letter-spacing:6px}
+.ing-estrellas .off{filter:grayscale(1);opacity:.3}
+.ing-palabras{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:8px 0}
+.ing-palabras span{padding:4px 12px;border-radius:999px;background:var(--ing-chip);color:var(--ing-chip-tinta);font-weight:700;font-family:"Andika",var(--font);font-size:20px}
+.ing-fps{position:fixed;right:8px;bottom:8px;z-index:30;font:12px monospace;background:#000a;color:#0f0;padding:2px 6px;border-radius:4px;pointer-events:none}
+@media (max-width:480px){ .ing-btn{min-height:58px;font-size:17px;padding:6px 12px} .ing-btn.main{font-size:20px} .ing-anillo{width:34px;height:34px} .ing-anillo span{width:26px;height:26px} }
+/* lista del súper */
+.ing-lista{display:flex;gap:8px;padding:6px 12px;border-radius:999px;align-items:center}
+.ing-lista span{position:relative;min-width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:30px;background:var(--ing-anillo);padding:0 6px;grid-auto-flow:column;gap:2px}
+.ing-lista span b{font-size:16px;font-family:"Andika",var(--font)}
+.ing-lista span.actual{outline:3px solid var(--accent);animation:ing-late 1.4s ease-in-out infinite}
+.ing-lista span.ok{background:var(--l1-ok-bg,var(--ing-chip))}
+.ing-lista span.ok::after{content:"✔";position:absolute;right:-4px;top:-6px;font-size:16px;color:var(--ok);font-weight:700}
+.ing-lista .ing-color{width:28px;height:28px}
