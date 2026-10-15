@@ -7,7 +7,10 @@ Guía para Claude Code (claude.ai/code) en este repositorio.
 "Matemática": app de práctica de matemática para Luz (1ro, 6 años) e Ian (4to, 10 años). Un shell con perfiles y menú abre actividades independientes. Luz tiene la Tabla del 100 (`actividades/1ro-tabla100/`), Escritura, Lectura e Inglés (`actividades/1ro-escritura/`, `actividades/1ro-lectura/`, `actividades/1ro-ingles/`) y Mi mascota en inglés (`actividades/1ro-ingles-mascota/`, 3D); Ian, las actividades de refuerzo de 4to y las de fracciones (`actividades/4to-*`). El diseño de la estructura está en `PLAN.md`.
 
 - **Ejecutar:** abrir `index.html` en el navegador, o servir la carpeta (`python -m http.server`). Con `file://` Chrome comparte localStorage entre archivos y Firefox lo aísla por archivo; con `http://localhost` todo se comparte. El perfil, el tema y el fondo viajan también por la URL (`?p=luz&t=dark&f=oceano`). Hace falta internet para three.js r128 (cdnjs) y la fuente Fredoka.
-- **Depurar:** logs con prefijo `[Mate vX.Y]` (core y shell) y `[Tabla100 vX.Y]` (actividad).
+- **Pruebas** (node, sin dependencias): `node tests/ingles/run.js`, `node tests/lectoescritura-1ro/run.js`, `node tests/refuerzo-4to/run.js` y `node tests/fracciones-4to/run.js`.
+- **Depurar:** logs con prefijo `[Mate vX.Y]` (core y shell) y `[<actividad> vX.Y]` en cada actividad; muchas tienen `?debug=1`.
+- **Publicación:** se usa desde GitHub Pages (https://asd20fe-hash.github.io/Matematica/), que publica `main` solo. Hace falta `.nojekyll` en la raíz (sin él Jekyll no publica las carpetas que empiezan con `_`, como `_comun-4to`).
+- **Probar sin ensuciar la planilla:** antes de abrir actividades en un navegador de prueba, desviar la nube con `localStorage.setItem('mate.global.nube.url', JSON.stringify('http://localhost:9/nada'))` en un perfil aparte. La clave de lectura de la planilla nunca va en el código: se escribe a mano en Ajustes de padres.
 
 ## Estructura
 

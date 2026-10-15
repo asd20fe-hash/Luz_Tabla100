@@ -14,17 +14,18 @@ Luz cuida a una mascota virtual en una casa 3D y aprende inglés con Miss Hoot, 
 | `lecciones.js` | `ING_LECC` | `armar()` la lección del día (hola, presenta + juego por palabra nueva, repaso sin repetir seguidas, chau) y `rondaJuego()` |
 | `mascota-estado.js` | `ING_PET` | Necesidades con piso (nunca se enferma), monedas, etapas de crecimiento |
 | `voz-en.js` | `ING_VOZ` | Voz en inglés (profe normal, mascota aguda), `secuencia`, `hablando()`, efectos WebAudio, `balbuceo`, `vibrar` |
-| `mundo3d.js` | `ING_MUNDO` | Renderer, habitación, toon + contorno, tweens, partículas, aura, toques/arrastre (raycast), cámara que se acomoda |
-| `mascota3d.js` | `ING_MASCOTA3D` | La mascota con partes con nombre (head, eyes, ears, nose, mouth, hands, feet, tummy) y animaciones |
-| `profe3d.js` | `ING_PROFE3D` | Miss Hoot en su banquito |
-| `objetos3d.js` | `ING_OBJ3D` | Emoji como ficha 3D, balde, mancha, huevo, manito |
+| `mundo3d.js` | `ING_MUNDO` | Renderer, habitación (`M.cuarto`), toon + contorno, tweens, partículas (corazón, estrella, nota, zzz, brillo, gota, miga), aura, toques/arrastre (raycast), cámara que se acomoda, `M.sala()` y `M.texPiso()` para otras habitaciones, `M.alTema(fn)`, `M.atenuar(k)` (bajar la luz) |
+| `mascota3d.js` | `ING_MASCOTA3D` | La mascota con partes con nombre (head, eyes, ears, nose, mouth, hands, feet, tummy) y animaciones (saltar, feliz, no, reir, comer, estornudar, orejear, guinar, dormir, colores); `irA(x,z)` camina a saltitos y `ponerEn` la corta. La nariz y la boca tienen una zona invisible más grande para el dedo |
+| `profe3d.js` | `ING_PROFE3D` | Miss Hoot en su banquito (en la escena, no en `M.cuarto`); `ponerEn(lugar)`/`volver()` (cajera del súper) |
+| `objetos3d.js` | `ING_OBJ3D` | Emoji como ficha 3D, balde, mancha, huevo, manito, moneda, etiqueta (cartel de texto), pelota, flecha, burbuja |
 | `tienda.js` | `ING_TIENDA` | Súper (parte pura): `lista()` de compras que siempre alcanza con las monedas (total ≤ 10), `estante()`, precios 1–3 ⭐ por nivel de la palabra, `pedido(w,n)` ("two bananas"), despensa en `pet.despensa` |
 | `escena-super.js` | `ING_SUPER3D` | El supermercado 3D: góndola, carrito, caja registradora; `mostrar(on)` esconde la habitación (`M.cuarto`); lugares distintos en vertical |
 | `escenas-casa.js` | `ING_LUGARES` | Baño (bañera donde queda la mascota al acercarse), dormitorio (cama, lámpara, caja de juguetes; `acostar`/`levantar`) y patio (arco y `futbol()`: gomera con flecha, física de la pelota con piques, palos y red; resultado `gol`/`palo`/`afuera`/`corto`) |
 | `ingles.css` | | Capa de interfaz (tokens claro/oscuro) |
 
-- **Sumar un tema:** un archivo en `temas/` y un juego en `juegos/` que lo use, y agregar los dos `<script>` en `index.html` (y en `tests/ingles/comun.js`). La lección y la casa los toman solos (botón por juego).
-- **Juegos:** `pintar` (colores), `comer` (comida; también lo usa la despensa con la orden de la mascota) `tocar` (cuerpo: toca la parte en el modelo; la mascota se acerca a la cámara mientras dura; si la parte ya brilla, cualquier toque vale) y `buscar` (cosas: "Where is the ball?", desparramadas por el piso; en el dormitorio vuelan a la caja con `J.destino`). El baño usa `tocar` con la orden "Wash Mimi's ears!" y el dormitorio `buscar` con "Where is my car?".
+- **Sumar un tema:** un archivo en `temas/` y un juego en `juegos/` que lo use, y agregar los dos `<script>` en `index.html` (y en `tests/ingles/comun.js`). La lección y el menú 🎮 Juegos de la casa los toman solos. Si el juego tiene otra cantidad de opciones, ajustar la prueba de lecciones.
+- **Sumar un lugar:** su 3D en `escenas-casa.js` (un grupo con `M.sala()`, que empieza oculto, y `mostrar(on)`), un botón en `LUGARES` de juego.js y su función, que empieza con `entrar(modo, LG.x)`; lo que cambie de la mascota o de la luz se deshace en `salirLugares()`. Los grupos se crean antes de la foto `base` de la escena, así `limpiarEscena()` no los borra.
+- **Juegos:** `pintar` (colores), `comer` (comida; también lo usa la despensa con la orden de la mascota), `tocar` (cuerpo: toca la parte en el modelo; la mascota se acerca a la cámara mientras dura; si la parte ya brilla, cualquier toque vale) y `buscar` (cosas: "Where is the ball?", desparramadas por el piso; en el dormitorio vuelan a la caja con `J.destino`). El baño usa `tocar` con la orden "Wash Mimi's ears!" y el dormitorio `buscar` con "Where is my car?".
 - **Entorno `J` de los juegos** (`entorno()` en juego.js): `M, O, pip, hoot, az, nivel, nombre, debug, posiciones(n), responder(w) → {ok, mostrar, ignorar}, opciones(lista), aviso(icono, texto), pintado(color), alimentar(n), tocarPip(fn(parte)), acercarPip(on), destino()`. El juego anima; la actividad registra, premia y habla. Al segundo error `mostrar` pide resaltar la correcta; tocarla no se registra.
 - Si se sale a la casa en medio de un paso, `S.token` cambia y lo que llegue tarde no hace nada.
 
@@ -42,6 +43,11 @@ Alegría ❤️, panza 🍎, limpieza 🫧 (el baño la llena) y energía ⚡ (d
 ## Depurar
 `?debug=1`: FPS, modo y palabra abajo a la derecha, y `window.__pip` (`inicio()`, `elegir(en)`, `correcta()`, `incorrecta()`, `super()`, `despensa()`, `pagar()`, `tocar(parte)`, `bano()`, `burbujas()`, `dormir()`, `apagar()`, `despertar()`, `patio()`, `patear(fuerza, x)`, `LG`, `S`, `M`, `pip`, `pet`, `rep`). `?seed=N`, `?nivel=N`. Logs `[1ro-ingles-mascota v1.2.0]`.
 En Chrome headless (SwiftShader) aparecen "Context Lost/Restored" al arrancar; pasa también en la Tabla del 100 y no es un error de la actividad.
+
+## Probar en el navegador
+- Siempre con la nube desviada en un perfil de Chrome aparte (`localStorage.setItem('mate.global.nube.url', JSON.stringify('http://localhost:9/nada'))`) para no mandar filas de prueba a la planilla.
+- Mirar horizontal (1024×700) y vertical (500×900, el mínimo de Chrome headless): las escenas tienen lugares distintos en vertical (`M.vertical()`) y se acomodan mirando capturas.
+- Chrome guarda en caché los `.js` de `http.server`: si un cambio no aparece, borrar la caché del perfil.
 
 ## Pruebas
 `node tests/ingles/run.js` (vocabulario, partes del cuerpo contra el modelo, mascota, 1000 lecciones por nivel con semilla, 1000 listas del súper por nivel, despensa).
