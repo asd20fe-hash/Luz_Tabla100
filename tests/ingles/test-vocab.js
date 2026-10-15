@@ -1,7 +1,7 @@
 'use strict';
 var assert = require('assert'), fs = require('fs'), path = require('path'), C = require('./comun.js'), V = C.V;
 prueba('vocabulario: temas, palabras únicas y con dibujo', function () {
-  assert.deepStrictEqual(V.temas().map(function (t) { return t.id; }), ['colores', 'comida', 'numeros', 'cosas', 'cuerpo', 'sentimientos']);
+  assert.deepStrictEqual(V.temas().map(function (t) { return t.id; }), ['colores', 'comida', 'numeros', 'cosas', 'cuerpo', 'sentimientos', 'ropa']);
   var vistas = {};
   V.palabras().forEach(function (w) {
     assert.ok(!vistas[w.en], 'repetida ' + w.en); vistas[w.en] = 1;

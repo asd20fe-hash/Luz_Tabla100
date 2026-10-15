@@ -1,4 +1,5 @@
-/* Inglés — la mascota en 3D, hecha con formas (sin modelos). window.ING_MASCOTA3D. Versión 1.2.0 (2026-10-15).
+/* Inglés — la mascota en 3D, hecha con formas (sin modelos). window.ING_MASCOTA3D. Versión 1.2.1 (2026-10-15).
+   v1.2.1 + P.cuerpo (para engancharle la bufanda y las zapatillas, ropa3d.js).
    v1.2.0 + sentir(id): actúa los sentimientos (llora, bosteza, tiembla de frío, se enoja…) para "How is Pip?".
    v1.1.1 Nariz más grande, con contorno y zona de toque más grande (antes casi no se veía ni se podía tocar).
    v1.1.0 + estornudar, orejear, guinar (juego "Touch Pip!") e irA (va saltando hasta otro lugar: supermercado).
@@ -204,10 +205,10 @@
     P.escala = function (e) { A.escala = e; raiz.scale.setScalar(e); };
     P.dormir = function (on) { A.durmiendo = !!on; };
     P.visible = function (v) { raiz.visible = v; };
-    P.grupo = raiz; P.cabeza = cabeza; P.partes = partes;
+    P.grupo = raiz; P.cabeza = cabeza; P.cuerpo = cuerpo; P.partes = partes;
     P.alTocar = function (fn) { piezas.forEach(function (o) { M.tocable(o, function (hit) { fn(o.userData.parte, hit); }); }); };
     P.esMio = function (hit) { var o = hit && hit.obj; while (o) { if (o === raiz) return true; o = o.parent; } return false; };
     return P;
   }
-  root.ING_MASCOTA3D = { VERSION: '1.2.0', crear: crear };
+  root.ING_MASCOTA3D = { VERSION: '1.2.1', crear: crear };
 })(window);

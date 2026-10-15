@@ -1,5 +1,6 @@
-/* Inglés — más lugares de la casa (three.js r128): baño, dormitorio y patio. window.ING_LUGARES. Versión 1.0.0 (2026-10-15).
-   crear(M) → { bano, dormitorio, patio }. Cada uno tiene grupo y mostrar(on) (esconde la habitación de siempre, M.cuarto).
+/* Inglés — más lugares de la casa (three.js r128): baño, dormitorio y patio. window.ING_LUGARES. Versión 1.1.0 (2026-10-15).
+   v1.1.0 + placard (cambiador) en la habitación de siempre: abrir(on), abierto(); la puerta derecha tiene espejo.
+   crear(M) → { bano, dormitorio, patio, placard }. Cada uno tiene grupo y mostrar(on) (esconde la habitación de siempre, M.cuarto).
    - bano: bañera donde la mascota se baña (en el lugar donde queda cuando se acerca a la cámara), patito, canilla.
      zonaBurbujas() → {x, y, z, ancho} para soltar burbujas.
    - dormitorio: cama, mesa de luz con lámpara (lampara, prender(on)), caja de juguetes (posCaja()), ventana.
@@ -211,7 +212,42 @@
       }
       L.patio = { grupo: g, mostrar: mostrarCon(g), futbol: futbol, arco: A };
     })();
+
+    /* ================= placard (cambiador), dentro de la habitación de siempre ================= */
+    (function () {
+      var g = new T.Group(); g.position.set(2.5, 0, -3.1); g.rotation.y = -0.55; M.cuarto.add(g);
+      var madera = M.toon('#f2cf9a'), borde = M.toon('#c98f52');
+      caja(1.3, 2.1, 0.55, madera, 0, 1.08, 0, g, 0.015);
+      caja(1.42, 0.1, 0.62, borde, 0, 2.17, 0, g, 0.02);
+      [-0.55, 0.55].forEach(function (x) { caja(0.12, 0.08, 0.12, borde, x, 0.04, 0.15, g, false); });
+      caja(1.18, 1.92, 0.04, '#6b4a8a', 0, 1.1, 0.26, g, false);                         // fondo de adentro (se ve con las puertas abiertas)
+      var barra = new T.Mesh(new T.CylinderGeometry(0.025, 0.025, 1.1, 8), M.toon('#b8c2d1')); barra.rotation.z = Math.PI / 2; barra.position.set(0, 1.82, 0.32); g.add(barra);
+      [['#ff6b6b', -0.35], ['#4dabf7', 0], ['#ffd43b', 0.33]].forEach(function (r) {            // ropa colgada
+        caja(0.28, 0.42, 0.06, r[0], r[1], 1.55, 0.33, g, 0.04);
+        var p = new T.Mesh(new T.TorusGeometry(0.05, 0.012, 6, 10, Math.PI), M.toon('#b8c2d1')); p.position.set(r[1], 1.8, 0.33); g.add(p);
+      });
+      caja(1.1, 0.06, 0.4, borde, 0, 0.7, 0.12, g, false); caja(0.3, 0.2, 0.3, '#ff9ec7', -0.3, 0.83, 0.15, g, 0.04); caja(0.25, 0.15, 0.3, '#8ce99a', 0.25, 0.81, 0.15, g, 0.04);
+      var puertas = [-1, 1].map(function (s) {
+        var bisagra = new T.Group(); bisagra.position.set(s * 0.65, 1.08, 0.29); g.add(bisagra);
+        caja(0.64, 2.0, 0.05, madera, -s * 0.32, 0, 0, bisagra, 0.02);
+        bola(0.045, '#c98f52', -s * 0.56, 0, 0.05, bisagra, 0.08);
+        if (s > 0) {                                                                          // espejo en la puerta derecha
+          var esp = new T.Mesh(new T.CircleGeometry(0.22, 28), M.toon('#cfefff', { emisivo: '#3a6a8a' })); esp.scale.set(1, 1.9, 1); esp.position.set(-0.32, 0.15, 0.03); bisagra.add(esp);
+          var marco = new T.Mesh(new T.TorusGeometry(0.22, 0.025, 8, 28), M.toon('#ffffff')); marco.scale.set(1, 1.9, 1); marco.position.copy(esp.position); bisagra.add(marco);
+          var brillo = new T.Mesh(new T.PlaneGeometry(0.05, 0.3), new T.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 })); brillo.position.set(-0.4, 0.3, 0.035); brillo.rotation.z = 0.5; bisagra.add(brillo);
+        }
+        return bisagra;
+      });
+      g.add(M.sombra(0.9));
+      var abierto = false;
+      L.placard = { grupo: g, abierto: function () { return abierto; },
+        abrir: function (on, dur) {
+          if (on === abierto) return; abierto = on;
+          var a0 = on ? 0 : 1.9, a1 = on ? 1.9 : 0;
+          M.tween(dur === undefined ? 600 : dur, function (k) { var a = a0 + (a1 - a0) * k; puertas[0].rotation.y = -a; puertas[1].rotation.y = a; }, null, 'sale');
+        } };
+    })();
     return L;
   }
-  root.ING_LUGARES = { VERSION: '1.0.0', crear: crear };
+  root.ING_LUGARES = { VERSION: '1.1.0', crear: crear };
 })(window);

@@ -2,7 +2,7 @@
 var assert = require('assert'), C = require('./comun.js'), V = C.V, JG = C.JG, LC = C.LC, RP = C.RP;
 function juegos(p) { return p.filter(function (x) { return x.tipo === 'juego'; }); }
 prueba('juegos: registrados con su tema y sus frases', function () {
-  assert.deepStrictEqual(JG.lista().map(function (j) { return j.id; }), ['pintar', 'comer', 'tocar', 'buscar', 'contar', 'sentir']);
+  assert.deepStrictEqual(JG.lista().map(function (j) { return j.id; }), ['pintar', 'comer', 'tocar', 'buscar', 'contar', 'sentir', 'vestir']);
   JG.lista().forEach(function (j) { assert.ok(V.getTema(j.tema), j.id); assert.strictEqual(typeof j.jugar, 'function'); });
   assert.strictEqual(JG.get('pintar').orden(V.por('BLUE'), 'Pip'), 'Paint Pip blue!');
   assert.strictEqual(JG.get('comer').orden(V.por('APPLE'), 'Mimi'), 'Give Mimi an apple!');

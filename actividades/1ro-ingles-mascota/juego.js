@@ -29,14 +29,20 @@
      + Al llegar a la casa, la profe pregunta "How is Mimi?" según lo que le pasa (hambre, sueño…) y Luz toca la carita.
      + Al inclinar la tablet la escena se mueve un poco; la pantalla no se apaga mientras juega (Wake Lock).
      + El botón para ir a English muestra la bandera de Estados Unidos.
+   v1.4.0  (2026-10-15) Ropa, cambiador y tienda
+     + Tema ropa (hat, glasses, shoes, scarf, cap, bow, crown) con prendas 3D que la mascota se pone de verdad.
+     + 👗 Cambiador: un placard en la habitación (se toca o se usa el botón) que se abre; Luz le pone y le saca la ropa
+       ("A red hat!", "Bye bye, hat!") y lo puesto queda guardado. La primera vez le regalan un sombrero rojo.
+     + 🛍️ Tienda de ropa en el cambiador: cada prenda cuesta 2, 3 o 4 ⭐ y se paga contando en inglés.
+     + Juego "Dress up!": "Put the hat on Mimi!" (nivel 1) o "Put a red hat on Mimi!" (color + prenda); error nuevo COLOR_MAL.
    ------------------------------------------------------------
    El entorno J que reciben los juegos (ING_JUEGOS) se arma en entorno(): M, O, pip, hoot, az, nivel, nombre, debug,
    posiciones(n), responder(w) → {ok, mostrar, ignorar}, opciones(lista), aviso(icono, texto), pintado(color), alimentar(n),
    decir(texto, alEmpezar) (la profe habla cuando se calla lo anterior: la cuenta de "How many?"). */
 (function () {
   'use strict';
-  var VERSION = '1.3.0', ACT = '1ro-ingles-mascota';
-  var V = ING_VOCAB, JG = ING_JUEGOS, LC = ING_LECC, PET = ING_PET, TD = ING_TIENDA, VZ = ING_VOZ, O = ING_OBJ3D, RP = REPASO1, UI = REF4_UI;
+  var VERSION = '1.4.0', ACT = '1ro-ingles-mascota';
+  var ROPA = ING_ROPA, R3 = ING_ROPA3D, V = ING_VOCAB, JG = ING_JUEGOS, LC = ING_LECC, PET = ING_PET, TD = ING_TIENDA, VZ = ING_VOZ, O = ING_OBJ3D, RP = REPASO1, UI = REF4_UI;
   var esc = UI1.esc, TX = UI1.txt, F = UI1.frase;
   var ctx = UI1.base({ act: ACT, version: VERSION, titulo: 'Mi mascota', alCambiarCaso: function () { pintarHUD(); if (S.banner) banner(S.banner); } });
   if (!ctx) return;
@@ -65,6 +71,8 @@
   var SUP = ING_SUPER3D.crear(M), LG = ING_LUGARES.crear(M);
   addEventListener('resize', function () { if (SUP.grupo.visible) { hoot.ponerEn(SUP.lugarProfe()); var lp = SUP.lugarPip(); pip.ponerEn(lp[0], lp[1]); pip.escala(PET.etapa(pet).escala * SUP.escalaPip()); } });
   pip.visible(pet.nacido);
+  function vestirGuardado() { R3.vestir(M, pip, pet.puesto); }
+  vestirGuardado();
   var base = M.scene.children.slice();             // lo que queda siempre (lo demás se limpia entre pasos)
   function limpiarEscena() { M.limpiar(M.scene.children.filter(function (o) { return base.indexOf(o) < 0; })); }
   M.alMover(function (info) { pip.mirar(info.x * 1.3, info.y * 1.1 + 0.25); });
@@ -120,7 +128,7 @@
         LUGARES.map(function (l) { return '<button class="ing-btn ing-lugar' + (S.sugerido === l[0] ? ' late' : '') + '" data-l="' + l[0] + '" title="' + l[2] + '">' + l[1] + '</button>'; }).join('') +
         (TD.cuantas(pet) ? '<button class="ing-btn ing-lugar' + (S.recienCompro ? ' main late' : '') + '" id="b-comida" title="Su comida">🧺<b>' + TD.cuantas(pet) + '</b></button>' : '');
       $('#b-leccion').onclick = leccion; $('#b-juegos').onclick = menuJuegos; if ($('#b-comida')) $('#b-comida').onclick = despensa;
-      ab.querySelectorAll('[data-l]').forEach(function (b) { b.onclick = function () { ({ super: supermercado, bano: bano, dormir: dormitorio, patio: patio })[b.dataset.l](); }; });
+      ab.querySelectorAll('[data-l]').forEach(function (b) { b.onclick = function () { ({ super: supermercado, ropa: cambiador, bano: bano, dormir: dormitorio, patio: patio })[b.dataset.l](); }; });
     } else if (S.modo === 'leccion' || S.modo === 'libre') {
       ab.innerHTML = '<button class="ing-btn" id="b-salir" title="Volver a la casa">✖</button><div class="ing-prog ing-card">' + S.res.map(function (r, i) {
         return '<i class="' + (r || (i === S.k ? 'actual' : '')) + '"></i>'; }).join('') + '</div><span style="width:64px"></span>';
@@ -139,13 +147,20 @@
         (S.fase === 'duerme' ? '<button class="ing-btn main late" id="b-dia"><span class="ic">☀️</span>Good morning!</button>' : '');
       $('#b-salir').onclick = function () { VZ.callar(); casa(false); };
       if ($('#b-dia')) $('#b-dia').onclick = despertar;
+    } else if (S.modo === 'ropa') {
+      ab.innerHTML = '<button class="ing-btn" id="b-salir" title="Volver a la casa">🏠</button>' +
+        (S.vista === 'mia' && S.paginas > 1 ? '<button class="ing-btn" id="b-pag">▶ ' + (S.pag + 1) + '/' + S.paginas + '</button>' : '') +
+        '<button class="ing-btn main" id="b-vista"><span class="ic">' + (S.vista === 'mia' ? '🛍️' : '👗') + '</span>' + esc(F(S.vista === 'mia' ? 'Tienda' : 'Mi ropa')) + '</button>';
+      $('#b-salir').onclick = function () { VZ.callar(); casa(false); };
+      $('#b-vista').onclick = function () { if (!S.ocupado) verRopa(S.vista === 'mia' ? 'tienda' : 'mia'); };
+      if ($('#b-pag')) $('#b-pag').onclick = function () { if (S.ocupado) return; S.pag = (S.pag + 1) % S.paginas; VZ.sfx('woosh'); mostrarRopa(S.token); };
     } else if (S.modo === 'despensa') {
       ab.innerHTML = '<button class="ing-btn" id="b-salir" title="Volver a la casa">🏠 ' + esc(F('Casa')) + '</button>' + (TD.cuantas(pet) ? '' : '<button class="ing-btn main" id="b-super"><span class="ic">🛒</span>' + esc(F('Súper')) + '</button>');
       $('#b-salir').onclick = function () { VZ.callar(); casa(false); };
       if ($('#b-super')) $('#b-super').onclick = supermercado;
     } else ab.innerHTML = '';
   }
-  var LUGARES = [['super', '🛒', 'Súper'], ['bano', '🛁', 'Baño'], ['dormir', '🛏️', 'Dormitorio'], ['patio', '⚽', 'Patio']];
+  var LUGARES = [['super', '🛒', 'Súper'], ['ropa', '👗', 'Ropa'], ['bano', '🛁', 'Baño'], ['dormir', '🛏️', 'Dormitorio'], ['patio', '⚽', 'Patio']];
   function menuJuegos() {
     velo('<h2>🎮 ' + esc(F('Juegos')) + '</h2><div class="ing-nombres">' + JG.lista().map(function (j) {
       return '<button class="ing-btn" data-j="' + j.id + '"><span class="ic">' + j.icono + '</span>' + esc(j.nombre.replace('Pip', nombreVoz())) + '</button>'; }).join('') +
@@ -258,7 +273,7 @@
   /* ---------- casa ---------- */
   function casa(saludo) {
     S.modo = 'casa'; S.token++; S.oirActual = null; S.tocarPip = null; limpiarEscena(); banner(null); chip(null); aviso(); UI.fuegos.parar();
-    salirLugares(); pintarHUD(); S.recienCompro = false;
+    salirLugares(); vestirGuardado(); pintarHUD(); S.recienCompro = false;
     if (!saludo) return;
     var an = PET.animo(pet), tk = S.token;
     S.sugerido = an === 'sucio' ? 'bano' : (an === 'sueno' ? 'dormir' : (an === 'hambre' && !TD.cuantas(pet) ? 'super' : null)); pintarHUD();
@@ -316,7 +331,7 @@
   function leccion() { empezar('leccion', LC.armar({ nivel: nivel(), rep: rep, az: ctx.az })); }
   function jugarSolo(id) { empezar('libre', LC.rondaJuego({ juego: id, nivel: nivel(), rep: rep, az: ctx.az, n: 6 })); }
   function siguientePaso() {
-    var tk = ++S.token; limpiarEscena(); aviso(); hoot.senalar(false); S.tocarPip = null; acercar(false);
+    var tk = ++S.token; limpiarEscena(); aviso(); hoot.senalar(false); S.tocarPip = null; acercar(false); vestirGuardado();
     S.i++; var p = S.pasos[S.i]; S.paso = p; S.oirActual = null;
     if (!p) return terminar();
     ({ hola: hola, presenta: presenta, juego: juego, chau: chau })[p.tipo](p, tk);
@@ -343,6 +358,7 @@
       listo = false; mano.userData.quitar(); aviso(); hoot.senalar(false); aura.quitar(); if (fl) fl.parar();
       VZ.sfx('pop'); M.particulas('estrella', obj.position.clone().setY(0.9), 10);
       if (w.color) pip.destello(w.color, 900); else if (w.sentir) pip.sentir(w.sentir); else pip.saltar(0.5);
+      if (w.tema === 'ropa') { R3.poner(M, pip, { en: w.en, color: ctx.az.elegir(['RED', 'BLUE', 'GREEN', 'YELLOW']) }); VZ.sfx('brillo'); }
       M.tween(350, function (k) { obj.scale.setScalar(Math.max(0.01, 1 + 0.3 * k - 1.3 * k * k)); }, function () { M.limpiar([obj]); });
       pipDice(w.en + '!', function () { if (vivo(tk)) M.esperar(400, siguientePaso); });
     });
@@ -370,7 +386,8 @@
   function entorno(tk) {
     return {
       M: M, O: O, pip: pip, hoot: hoot, az: ctx.az, nivel: nivel(), nombre: nombre(), debug: ctx.debug, posiciones: posiciones,
-      responder: function (w) { return vivo(tk) ? responder(w) : { ignorar: true }; },
+      responder: function (w, det) { return vivo(tk) ? responder(w, det) : { ignorar: true }; },
+      vestir: function (en, color) { if (vivo(tk)) R3.poner(M, pip, { en: en, color: color }); },
       opciones: function (lista) { S.opciones = lista; },
       aviso: function (icono, texto) { if (vivo(tk)) aviso(icono, texto); },
       decir: function (texto, alEmpezar) { cuandoCalle(function () { if (!vivo(tk)) return; profe(texto); if (alEmpezar) alEmpezar(); }, 0.1); },
@@ -381,27 +398,30 @@
       tocarPip: function (fn) { S.tocarPip = fn && vivo(tk) ? fn : null; }
     };
   }
-  function registrar(ok, error, w) {
+  // det: detalle de lo elegido (el color de la prenda en "Dress up!").
+  function registrar(ok, error, w, det) {
     var p = S.paso, pw = p.w;
     if (p.sinRegistro) return;
-    ctx.reg.evento({ tipo: 'paso', tema: pw.tema, paso: p.juego, intento: S.intento, item: { palabra: pw.en, img: pw.img || '🎨', tema: pw.tema, es: pw.es },
-      esperado: pw.en, respuesta: w.en, ok: ok, error: error, forma: UI1.caso(), ms: Date.now() - S.t0, ayuda: S.repite ? 'repitio ' + S.repite : 'ninguna', modo: S.modo, cantidad: p.n || undefined });
+    ctx.reg.evento({ tipo: 'paso', tema: pw.tema, paso: p.juego, intento: S.intento, item: { palabra: pw.en, img: pw.img || '🎨', tema: pw.tema, es: pw.es, color: p.color || undefined },
+      esperado: (p.color ? p.color + ' ' : '') + pw.en, respuesta: (det && det.color && p.color ? det.color + ' ' : '') + w.en, ok: ok, error: error, forma: UI1.caso(), ms: Date.now() - S.t0, ayuda: S.repite ? 'repitio ' + S.repite : 'ninguna', modo: S.modo, cantidad: p.n || undefined });
     S.t0 = Date.now();
     if (S.intento === 1) { RP.registrar(rep, pw.en, ok); S.res[S.k] = ok ? 'ok' : 'mal'; }
     guardar();
   }
   var BIEN = ['Yes!', 'Great!', 'Good job!', 'Super!'];
-  function responder(w) {
-    var p = S.paso, j = JG.get(p.juego), err = j && j.error ? j.error(p.w, w) : V.errorEleccion(p.w, w);
+  // Cómo se dice lo elegido: "a blue hat" si la prenda tiene color pedido, si no "an apple".
+  var dicho = function (w, color) { return color ? ROPA.frase({ en: w.en, color: color }) : frase(w); };
+  function responder(w, det) {
+    var p = S.paso, j = JG.get(p.juego), err = j && j.error ? j.error(p.w, w, p, det) : V.errorEleccion(p.w, w), dc = det && p.color ? det.color : null;
     if (S.fase === 'fin') return { ignorar: true };
     if (S.fase === 'muestra') { if (err) return { ignorar: true }; S.fase = 'fin'; acierto(false, true); return { ok: true }; }
     S.intento++;
-    registrar(!err, err, w);
+    registrar(!err, err, w, det);
     if (!err) { S.fase = 'fin'; acierto(S.intento === 1); return { ok: true, primera: S.intento === 1 }; }
     VZ.sfx('mal'); VZ.vibrar(60);
-    chip(dib(w) + ' ' + esc(TX(w.en)) + ' = ' + esc(TX(w.es)), true, 3500);
-    if (S.intento >= 2) { S.fase = 'muestra'; charla([{ t: "That's " + frase(w) + '.' }, { t: 'Look! ' + frase(p.w) + '.' }]); return { ok: false, mostrar: true }; }
-    charla([{ t: "No, that's " + frase(w) + '.' }, { t: S.orden, quien: S.quienOrden }]);
+    var cw = err === 'COLOR_MAL' ? V.por(dc) : w; chip(dib(cw) + ' ' + esc(TX(cw.en)) + ' = ' + esc(TX(cw.es)), true, 3500);
+    if (S.intento >= 2) { S.fase = 'muestra'; charla([{ t: "That's " + dicho(w, dc) + '.' }, { t: 'Look! ' + dicho(p.w, p.color) + '.' }]); return { ok: false, mostrar: true }; }
+    charla([{ t: "No, that's " + dicho(w, dc) + '.' }, { t: S.orden, quien: S.quienOrden }]);
     return { ok: false };
   }
   function acierto(primera, mostrado) {
@@ -413,7 +433,7 @@
       PET.premiar(pet, primera); S.ganadas += primera ? 2 : 1;
       setTimeout(function () { VZ.sfx('monedas'); pintarHUD(); saltarMonedas(); }, 400);
     }
-    profe((mostrado ? 'Good! ' : BIEN[Math.floor(Math.random() * BIEN.length)] + ' ') + w.en.toLowerCase() + '!');
+    profe((mostrado ? 'Good! ' : BIEN[Math.floor(Math.random() * BIEN.length)] + ' ') + ((S.paso.color ? S.paso.color + ' ' : '') + w.en).toLowerCase() + '!');
     if (PET.etapa(pet).id !== etapa0) {          // creció
       var e = PET.etapa(pet).escala; M.esperar(1600, function () { M.tween(800, function (k) { pip.escala(e * (0.9 + 0.1 * k)); }, null, 'elastico'); M.particulas('estrella', new M.T.Vector3(0, 1.4, 0), 16); });
       ctx.log('creció', PET.etapa(pet).id);
@@ -421,7 +441,7 @@
     guardar();
   }
   function terminar() {
-    acercar(false);
+    acercar(false); vestirGuardado();
     var tk = ++S.token, n = S.res.length, ok1 = S.res.filter(function (r) { return r === 'ok'; }).length, pct = n ? Math.round(100 * ok1 / n) : 100;
     var r = ctx.reg.cerrarRonda(pct, Date.now() - S.t0r, false, 3);
     if (S.modo === 'leccion') pet.lecciones++;
@@ -596,12 +616,14 @@
     if (S.futbol) { S.futbol.parar(); S.futbol = null; }
     if (S.zzz) { S.zzz(); S.zzz = null; }
     if (S.mirarPelota) { S.mirarPelota(); S.mirarPelota = null; }
+    if (LG.placard.abierto()) LG.placard.abrir(false, 300);
+    S.ocupado = false;
     LG.dormitorio.levantar(pip); M.atenuar(1); pip.dormir(false); acercar(false, true);
     pip.ponerEn(0, -0.2); pip.escala(PET.etapa(pet).escala);
   }
   function entrar(modo, lugar) {
     VZ.callar(); velo(''); limpiarEscena(); chip(null); aviso(); banner(null); UI.fuegos.parar();
-    salirLugares(); lugar.mostrar(true); VZ.sfx('woosh');
+    salirLugares(); if (lugar) lugar.mostrar(true); VZ.sfx('woosh');
     S.modo = modo; S.fase = null; S.paso = null; S.opciones = null; S.oirActual = null; S.tocarPip = null; S.res = []; S.k = -1;
     var tk = ++S.token; pintarHUD(); return tk;
   }
@@ -614,7 +636,7 @@
 
   // Baño: lavar 3 partes del cuerpo (en la bañera) y reventar burbujas contando.
   function bano() {
-    var tk = entrar('bano', LG.bano); S.lavados = 0; S.ult = null;
+    var tk = entrar('bano', LG.bano); S.lavados = 0; S.ult = null; R3.vestir(M, pip, {});    // al agua sin ropa
     acercar(true);
     banner({ icono: '🛁', en: 'Bath time!' });
     charla([{ t: 'Bath time!' }, { t: 'Splash splash!', quien: 'pip' }], function () { if (vivo(tk)) lavar(); });
@@ -734,19 +756,107 @@
     S.mirarPelota = M.cuadro(function () { if (S.futbol) pip.mirarA(S.futbol.pelota.position); });
   }
 
+  /* ---------- cambiador: la ropa (placard de la habitación) y la tienda de ropa ---------- */
+  M.tocable(LG.placard.grupo, function () { if (S.modo === 'casa') cambiador(); });
+  function cambiador() {
+    var tk = entrar('ropa', null), reg = ROPA.regalo(pet);
+    S.vista = 'mia'; S.pag = 0; S.ofertas = ROPA.ofertas(pet, nivel(), ctx.az, 3);
+    LG.placard.abrir(true); VZ.sfx('click'); vestirGuardado();
+    if (reg) { guardar(); vestirGuardado(); M.esperar(1600, function () { if (vivo(tk)) { pip.feliz(); M.particulas('estrella', pip.cabeza.getWorldPosition(new M.T.Vector3()).add(new M.T.Vector3(0, 0.6, 0)), 10); } }); }
+    banner({ icono: '👗', en: "Let's get dressed!", es: 'Tocá la ropa para ponérsela o sacársela' });
+    charla([{ t: "Let's get dressed!" }].concat(reg ? [{ t: 'A present for ' + nombreVoz() + '!' }, { t: mayus(ROPA.frase(reg)) + '!' }, { t: 'Thank you!', quien: 'pip' }] : []));
+    mostrarRopa(tk);
+  }
+  function verRopa(vista) {
+    S.vista = vista; S.pag = 0; aviso(); VZ.sfx('woosh');
+    if (vista === 'tienda') { banner({ icono: '🛍️', en: 'Clothes shop', es: 'Tocá algo para comprarlo con tus ⭐' }); profe("Let's go shopping!"); }
+    else banner({ icono: '👗', en: "Let's get dressed!", es: 'Tocá la ropa para ponérsela o sacársela' });
+    mostrarRopa(S.token);
+  }
+  var POR_PAG = 5;
+  // Muestra una fila de prendas (las suyas o las de la tienda), cada una sobre un plato; sinPop: sin la animación de aparecer.
+  function mostrarRopa(tk, sinPop) {
+    if (!vivo(tk)) return;
+    limpiarEscena(); aviso(); S.itemsRopa = [];
+    var mia = S.vista === 'mia', lista = mia ? pet.ropa : S.ofertas;
+    S.paginas = mia ? Math.max(1, Math.ceil(lista.length / POR_PAG)) : 1; if (S.pag >= S.paginas) S.pag = 0;
+    var ver = lista.slice(S.pag * POR_PAG, S.pag * POR_PAG + POR_PAG), pos = posiciones(ver.length);
+    pintarHUD();
+    if (!ver.length) { aviso('🛍️', mia ? '¡Todavía no tiene ropa: mirá la tienda!' : 'Ya tiene toda la ropa de la tienda'); return; }
+    ver.forEach(function (it, i) {
+      var T = M.T, g = new T.Group(), plato = new T.Mesh(new T.CylinderGeometry(0.5, 0.4, 0.08, 28), M.toon(mia ? '#ffffff' : '#fff6cf')); plato.position.y = 0.04; g.add(plato); M.contorno(plato, 0.04);
+      var m = R3.vitrina(M, it.en, V.por(it.color).color); m.position.y = 0.12; g.add(m); g.add(M.sombra(0.6));
+      var t = i * 1.3; M.fx({ update: function (dt) { if (!m.parent) return false; t += dt; m.rotation.y = Math.sin(t * 0.9) * 0.6; return true; } });
+      var marca = !mia ? O.etiqueta(M, ROPA.precio(it) + '⭐', { fondo: '#fff6cf', alto: 0.2 }) : (ROPA.puesta(pet, it) ? O.etiqueta(M, '✔', { fondo: '#b8f5c8', alto: 0.2 }) : null);
+      if (marca) { marca.position.set(0.38, 0.2 + m.userData.alto, 0.2); g.add(marca); }
+      g.position.copy(pos[i]); M.scene.add(g);
+      if (sinPop) g.scale.setScalar(1);
+      else { g.scale.setScalar(0.01); M.esperar(i * 70, function () { VZ.sfx('pop'); M.tween(400, function (k) { g.scale.setScalar(Math.max(0.01, k)); }, null, 'rebote'); }); }
+      var tocar = function () { tocarRopa(it, g, tk); };
+      M.tocable(g, tocar); S.itemsRopa.push({ it: it, tocar: tocar });
+    });
+  }
+  function tocarRopa(it, g, tk) {
+    if (!vivo(tk) || S.ocupado) return;
+    var w = V.por(it.en), cw = V.por(it.color), slot = ROPA.SLOT[it.en];
+    chip(dib(cw) + ' ' + esc(TX(cw.en)) + ' · ' + dib(w) + ' ' + esc(TX(w.en)) + ' = ' + esc(TX(w.es)), false, 2500);
+    if (S.vista === 'tienda') return comprarRopa(it, g, tk);
+    O.rebotar(M, g, 0.3);
+    if (ROPA.puesta(pet, it)) {
+      ROPA.sacar(pet, slot); R3.sacar(pip, slot); guardar(); VZ.sfx('woosh'); pip.saltar(0.3);
+      pipDice('Bye bye, ' + it.en.toLowerCase() + '!'); mostrarRopa(tk, true); return;
+    }
+    ROPA.poner(pet, it); guardar(); profe(mayus(ROPA.frase(it)) + '!');
+    volarA(g, it, tk, function () { pipDice('I like it!'); pip.feliz(); mostrarRopa(tk, true); });
+  }
+  // Una copia de la prenda vuela del plato a la mascota y se la pone.
+  function volarA(g, it, tk, fin) {
+    var T = M.T, m = R3.vitrina(M, it.en, V.por(it.color).color), desde = g.position.clone().setY(0.4), hasta = pip.cabeza.getWorldPosition(new T.Vector3()), e0 = m.scale.x;
+    m.position.copy(desde); M.scene.add(m); S.ocupado = true;
+    M.tween(550, function (k) { m.position.lerpVectors(desde, hasta, k); m.position.y += Math.sin(k * Math.PI) * 0.7; m.scale.setScalar(Math.max(0.01, e0 * (1 - 0.6 * k))); }, function () {
+      M.limpiar([m]); S.ocupado = false; if (!vivo(tk)) return;
+      R3.poner(M, pip, it); VZ.sfx('brillo'); M.particulas('estrella', hasta, 6); if (fin) fin();
+    }, 'entraSale');
+  }
+  // Comprar: la profe dice qué es y cuánto cuesta, y se paga moneda por moneda contando ("One! Two! Three!").
+  function comprarRopa(it, g, tk) {
+    var c = ROPA.precio(it), dice = mayus(ROPA.frase(it)) + '! ' + NUMW(c) + ' coins!';
+    O.rebotar(M, g, 0.3);
+    if (pet.monedas < c) { pip.no(); VZ.sfx('mal'); charla([{ t: dice }, { t: 'Oh no! No coins!', quien: 'pip' }]); aviso('⭐', 'Te faltan estrellas: jugá con Miss Hoot para ganar'); return; }
+    S.ocupado = true; profe(dice);
+    cuandoCalle(function () {
+      var k = 0;
+      (function una() {
+        if (!vivo(tk)) return;
+        if (k < c) {
+          k++; VZ.sfx('moneda'); profe(NUMS[k]); chip('⭐ ' + esc(TX(TD.numero(k))) + ' = ' + k, false, 1200);
+          var mon = $('#monedas'); if (mon) mon.lastChild.textContent = pet.monedas - k;
+          M.particulas('brillo', g.position.clone().setY(0.9), 2); M.esperar(650, una); return;
+        }
+        ROPA.comprar(pet, it); ROPA.poner(pet, it); guardar(); VZ.sfx('caja'); hoot.aplaudir(); ctx.log('compró ropa', it.color, it.en, '-' + c + '⭐');
+        S.ofertas = S.ofertas.filter(function (x) { return !ROPA.igual(x, it); });
+        var nueva = ROPA.ofertas(pet, nivel(), ctx.az, 4).filter(function (x) { return !S.ofertas.some(function (y) { return y.en === x.en; }); })[0];
+        if (nueva) S.ofertas.push(nueva);
+        S.ocupado = false; pintarHUD();
+        volarA(g, it, tk, function () { charla([{ t: 'Thank you!', quien: 'pip' }]); pip.feliz(); mostrarRopa(tk, true); });
+      })();
+    }, 0.2);
+  }
+
   /* ---------- debug ---------- */
   if (ctx.debug) {
     var fps = document.createElement('div'); fps.className = 'ing-fps'; document.body.appendChild(fps);
     setInterval(function () { fps.textContent = M.fps + ' fps · ' + S.modo + (S.paso && S.paso.w ? ' · ' + S.paso.w.en : '') + ' · nivel ' + nivel(); }, 500);
     window.__pip = { S: S, M: M, pip: pip, pet: pet, rep: rep, inicio: function () { $('#v-jugar').click(); },
       elegir: function (en) { var o = (S.opciones || []).filter(function (x) { return x.w.en === en; })[0]; if (o) o.elegir(); return !!o; },
-      correcta: function () { return window.__pip.elegir(S.paso.w.en); },
+      correcta: function () { var p = S.paso, o = (S.opciones || []).filter(function (x) { return x.w === p.w && (!p.color || x.color === p.color); })[0]; if (o) o.elegir(); return !!o; },
+      ropa: function () { cambiador(); }, tocarRopa: function (i) { var x = (S.itemsRopa || [])[i]; if (x) x.tocar(); return x && x.it; }, verRopa: function (v) { verRopa(v); },
       super: function () { supermercado(); }, despensa: function () { despensa(); }, TD: TD, LG: LG,
       bano: function () { bano(); }, dormir: function () { dormitorio(); }, patio: function () { patio(); }, apagar: function () { apagar(); }, despertar: function () { despertar(); },
       patear: function (k, x) { if (S.futbol) S.futbol.patear(k, x); }, burbujas: function () { return (S.burbujas || []).filter(function (b) { return !b.userData.rota; }); },
       pagar: function () { (S.monedas || []).forEach(function (m) { if (m.userData.tocar) m.userData.tocar(); }); },
       tocar: function (parte) { if (S.tocarPip) S.tocarPip(parte); }, juego: function (id) { jugarSolo(id); }, sentir: function (id) { pip.sentir(id); },
-      incorrecta: function () { var o = (S.opciones || []).filter(function (x) { return x.w !== S.paso.w; })[0]; if (o) o.elegir(); return o && o.w.en; } };
+      incorrecta: function () { var p = S.paso, o = (S.opciones || []).filter(function (x) { return !(x.w === p.w && (!p.color || x.color === p.color)); })[0]; if (o) o.elegir(); return o && (o.color ? o.color + ' ' : '') + o.w.en; } };
   }
   inicio();
 })();

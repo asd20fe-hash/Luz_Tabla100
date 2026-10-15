@@ -74,7 +74,7 @@ Orden de scripts: `core.js`, `perfiles.js`, `registro.js`, y después el de la p
 
 ## Rama de inglés (`_comun-ingles/`): convenciones
 
-- **Modular para crecer:** vocabulario por temas (`temas/*.js` se registran en `ING_VOCAB`), minijuegos (`juegos/*.js` en `ING_JUEGOS`: pintar, comer, tocar, buscar, contar, sentir), lecciones como datos (`ING_LECC`), estado de la mascota puro (`ING_PET`), súper y despensa puros (`ING_TIENDA`) y la parte 3D aparte (`mundo3d.js`, `mascota3d.js`, `profe3d.js`, `objetos3d.js`, `escena-super.js`, `escenas-casa.js` (baño, dormitorio, patio), con three.js r128). Una escena nueva es un grupo que esconde `M.cuarto` (`M.sala()` arma piso y pared). Detalle en `actividades/1ro-ingles-mascota/CLAUDE.md`.
+- **Modular para crecer:** vocabulario por temas (`temas/*.js` se registran en `ING_VOCAB`), minijuegos (`juegos/*.js` en `ING_JUEGOS`: pintar, comer, tocar, buscar, contar, sentir, vestir), lecciones como datos (`ING_LECC`), estado de la mascota puro (`ING_PET`), súper y despensa puros (`ING_TIENDA`), ropa pura (`ING_ROPA`) y la parte 3D aparte (`mundo3d.js`, `mascota3d.js`, `profe3d.js`, `objetos3d.js`, `escena-super.js`, `escenas-casa.js` (baño, dormitorio, patio y el placard), `ropa3d.js`, con three.js r128). Una escena nueva es un grupo que esconde `M.cuarto` (`M.sala()` arma piso y pared). Detalle en `actividades/1ro-ingles-mascota/CLAUDE.md`.
 - **Sin modelos:** la mascota y la profe son formas con contorno; cada palabra se ve como un emoji en una ficha 3D. Archivos externos no (nada de `fetch`: tiene que andar con `file://`).
 - **Mascota sin culpa:** las necesidades bajan con tope (`ING_PET.PISO`) y nunca se enferma.
 - **Pruebas:** `node tests/ingles/run.js`.
