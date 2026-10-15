@@ -14,11 +14,11 @@ MATE.actividades=[
      RESTA_UNOS_EN_VEZ_DE_DIECES:'Restó unos en vez de dieces (2 en vez de 20)',SUMA_EN_VEZ_DE_RESTA:'Sumó en vez de restar',CAMBIA_UNIDAD:'Cambió los unos al restar dieces',FILAS_MAL:'Subió una cantidad de filas equivocada',CUENTA_MAL:'Contó mal para atrás'}},
   // Lectura y escritura de 1ro: los errores de escritura (R_RR, OMITE_TRABADA…) están en LENGUA1.ERRORES. analisis: cómo agrupa el panel de la nube.
   {id:'1ro-escritura',nivelMax:3,analisis:'palabras',titulo:'Escribí lo que ves',descripcion:'Mirá el dibujo y escribí la palabra. Tocá las sílabas para escucharlas.',icono:'✏️',grados:['1ro'],ruta:'actividades/1ro-escritura/index.html',version:'1.0.2'},
-  {id:'1ro-ingles',nivelMax:3,analisis:'palabras',titulo:'English',descripcion:'Escuchá palabras en inglés y tocá el dibujo.',icono:'🇬🇧',grados:['1ro'],ruta:'actividades/1ro-ingles/index.html',version:'1.0.0',
+  {id:'1ro-ingles',nivelMax:3,analisis:'palabras',titulo:'English',descripcion:'Escuchá palabras en inglés y tocá el dibujo.',icono:'🇺🇸',grados:['1ro'],ruta:'actividades/1ro-ingles/index.html',version:'1.0.1',
    errores:{CONFUNDE_TEMA:'Confundió con otra palabra del mismo tema (DOG por CAT)',CONFUNDE_PARECIDA:'Confundió con una palabra que suena parecido (TREE por THREE)',CONFUNDE_OTRA:'Eligió otra palabra',SI_NO_MAL:'Contestó mal "¿es esto un…?"',LEE_MAL:'Leyó mal la palabra en inglés'}},
   // Inglés con mascota: el código común está en _comun-ingles/ (temas, juegos, mascota, mundo 3D).
-  {id:'1ro-ingles-mascota',nivelMax:3,analisis:'palabras',titulo:'Mi mascota en inglés',descripcion:'Cuidá a tu mascota: súper, baño, a dormir y fútbol en el patio, todo en inglés con Miss Hoot.',icono:'🐾',grados:['1ro'],ruta:'actividades/1ro-ingles-mascota/index.html',version:'1.2.0',
-   errores:{CONFUNDE_TEMA:'Confundió con otra palabra del mismo tema (BLUE por RED)',CONFUNDE_PARECIDA:'Confundió con una palabra que suena parecido (TREE por THREE)',CONFUNDE_OTRA:'Eligió otra palabra'},
+  {id:'1ro-ingles-mascota',nivelMax:3,analisis:'palabras',titulo:'Mi mascota en inglés',descripcion:'Cuidá a tu mascota: súper, baño, a dormir y fútbol en el patio, contar y cómo se siente, todo en inglés con Miss Hoot.',icono:'🐾',grados:['1ro'],ruta:'actividades/1ro-ingles-mascota/index.html',version:'1.3.0',
+   errores:{CONFUNDE_TEMA:'Confundió con otra palabra del mismo tema (BLUE por RED)',CONFUNDE_PARECIDA:'Confundió con una palabra que suena parecido (TREE por THREE)',CONFUNDE_OTRA:'Eligió otra palabra',CANTIDAD_MAL:'Eligió otra cantidad ("How many?")'},
    stats:()=>MATE.perfiles.filter(p=>p.grado==='1ro').map(p=>{ let m=null; try{ m=JSON.parse(localStorage.getItem('mate.'+p.id+'.1ro-ingles-mascota.pet')||'null'); }catch(e){}
      if(!m||!m.nacido) return p.nombre+': la mascota todavía no nació.';
      const d=Object.values(m.despensa||{}).reduce((a,b)=>a+b,0);

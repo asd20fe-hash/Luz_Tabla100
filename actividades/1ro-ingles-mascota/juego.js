@@ -22,12 +22,20 @@
      + Juego "Find it!" (cosas) también en la lección. Necesidades nuevas: limpieza 🫧 y energía ⚡.
      + La nariz de la mascota se ve y se toca bien; si la parte pedida ya brilla, cualquier toque avanza (antes se trababa).
      + La casa ordena los botones: ¡A aprender!, 🎮 Juegos (menú) y los lugares 🛒 🛁 🛏️ ⚽.
+   v1.3.0  (2026-10-15) Números, sentimientos e inclinación
+     + Juego "How many?" (números): "Give Mimi three apples!" y Luz toca el plato con esa cantidad; la profe cuenta mientras
+       cada cosa vuela a la boca. Error nuevo CANTIDAD_MAL.
+     + Tema sentimientos y juego "How is Mimi?": "Mimi is sad!" → Luz toca la carita y la mascota lo actúa.
+     + Al llegar a la casa, la profe pregunta "How is Mimi?" según lo que le pasa (hambre, sueño…) y Luz toca la carita.
+     + Al inclinar la tablet la escena se mueve un poco; la pantalla no se apaga mientras juega (Wake Lock).
+     + El botón para ir a English muestra la bandera de Estados Unidos.
    ------------------------------------------------------------
    El entorno J que reciben los juegos (ING_JUEGOS) se arma en entorno(): M, O, pip, hoot, az, nivel, nombre, debug,
-   posiciones(n), responder(w) → {ok, mostrar, ignorar}, opciones(lista), aviso(icono, texto), pintado(color), alimentar(n). */
+   posiciones(n), responder(w) → {ok, mostrar, ignorar}, opciones(lista), aviso(icono, texto), pintado(color), alimentar(n),
+   decir(texto, alEmpezar) (la profe habla cuando se calla lo anterior: la cuenta de "How many?"). */
 (function () {
   'use strict';
-  var VERSION = '1.2.0', ACT = '1ro-ingles-mascota';
+  var VERSION = '1.3.0', ACT = '1ro-ingles-mascota';
   var V = ING_VOCAB, JG = ING_JUEGOS, LC = ING_LECC, PET = ING_PET, TD = ING_TIENDA, VZ = ING_VOZ, O = ING_OBJ3D, RP = REPASO1, UI = REF4_UI;
   var esc = UI1.esc, TX = UI1.txt, F = UI1.frase;
   var ctx = UI1.base({ act: ACT, version: VERSION, titulo: 'Mi mascota', alCambiarCaso: function () { pintarHUD(); if (S.banner) banner(S.banner); } });
@@ -48,7 +56,7 @@
   catch (e) {
     console.error('[' + ACT + ' v' + VERSION + ']', 'sin 3D:', e && e.message);
     velo('<div class="grande">😿</div><h2>' + esc(F('Sin 3D')) + '</h2><p>' + esc(F('Este dispositivo no puede mostrar la casa de la mascota.')) + '</p>' +
-      '<div class="l1-fila"><button class="ing-btn" id="v-menu">🏠 ' + esc(F('Menú')) + '</button><button class="ing-btn main" id="v-eng">🇬🇧 English</button></div>');
+      '<div class="l1-fila"><button class="ing-btn" id="v-menu">🏠 ' + esc(F('Menú')) + '</button><button class="ing-btn main" id="v-eng">🇺🇸 English</button></div>');
     $('#v-menu').onclick = function () { MATE.irMenu(); }; $('#v-eng').onclick = function () { MATE.abrir('1ro-ingles'); };
     return;
   }
@@ -177,9 +185,13 @@
     var avisoVoz = !VZ.hayVoz() ? '<p class="l1-msg mal">' + esc(F('Este dispositivo no tiene voz en inglés.')) + '</p>' : (!VZ.sonidoOn() ? '<p class="l1-msg mal">' + esc(F('Prendé el sonido 🔊 para escuchar.')) + '</p>' : '');
     velo('<div class="grande">' + (pet.nacido ? '🐾' : '🥚') + '</div><h2>' + esc(pet.nacido ? TX(nombre()) : F('¡Hola!')) + '</h2>' + avisoVoz +
       '<div class="l1-fila"><button class="ing-btn main" id="v-jugar">▶ ' + esc(F('¡A jugar!')) + '</button></div>');
-    $('#v-jugar').onclick = function () { velo(''); VZ.sfx('pop'); if (pet.nacido) casa(true); else huevo(); };
+    $('#v-jugar').onclick = function () { velo(''); VZ.sfx('pop'); despierta(); M.inclinacion(); if (pet.nacido) casa(true); else huevo(); };
   }
   VZ.alCambiarVoces(function () { if (S.modo === 'inicio') inicio(); });
+  // Que la pantalla no se apague mientras juega (se suelta sola al salir de la pestaña; al volver se pide de nuevo).
+  var wake = null;
+  function despierta() { try { if (navigator.wakeLock && document.visibilityState === 'visible') navigator.wakeLock.request('screen').then(function (l) { wake = l; }).catch(function () {}); } catch (e) { /* sin Wake Lock */ } }
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && wake) despierta(); });
 
   /* ---------- nacimiento ---------- */
   function huevo() {
@@ -248,13 +260,38 @@
     S.modo = 'casa'; S.token++; S.oirActual = null; S.tocarPip = null; limpiarEscena(); banner(null); chip(null); aviso(); UI.fuegos.parar();
     salirLugares(); pintarHUD(); S.recienCompro = false;
     if (!saludo) return;
-    var an = PET.animo(pet), lista = [{ t: 'Hello, ' + nena + '!' }];
+    var an = PET.animo(pet), tk = S.token;
     S.sugerido = an === 'sucio' ? 'bano' : (an === 'sueno' ? 'dormir' : (an === 'hambre' && !TD.cuantas(pet) ? 'super' : null)); pintarHUD();
-    if (an === 'hambre') { lista.push({ t: nombreVoz() + ' is hungry!' }); aviso('🍎', nombre() + ' tiene hambre' + (TD.cuantas(pet) ? ': tocá 🧺' : ': ¡vamos al súper 🛒!')); setTimeout(function () { aviso(); }, 5000); }
-    else if (an === 'sucio') { lista.push({ t: nombreVoz() + ' is dirty!' }); aviso('🛁', nombre() + ' necesita un baño'); setTimeout(function () { aviso(); }, 5000); }
-    else if (an === 'sueno') { lista.push({ t: nombreVoz() + ' is sleepy!' }); aviso('🛏️', nombre() + ' tiene sueño'); setTimeout(function () { aviso(); }, 5000); }
-    else lista.push({ t: 'Hello!', quien: 'pip' });
-    charla(lista); M.esperar(600, function () { pip.feliz(); });
+    function avisar() {
+      if (!vivo(tk)) return;
+      var a = an === 'hambre' ? ['🍎', nombre() + ' tiene hambre' + (TD.cuantas(pet) ? ': tocá 🧺' : ': ¡vamos al súper 🛒!')] : (an === 'sucio' ? ['🛁', nombre() + ' necesita un baño'] : (an === 'sueno' ? ['🛏️', nombre() + ' tiene sueño'] : null));
+      if (an === 'sucio') profe(nombreVoz() + ' is dirty!');
+      if (a) { aviso(a[0], a[1]); setTimeout(function () { if (vivo(tk)) aviso(); }, 5000); }
+    }
+    charla([{ t: 'Hello, ' + nena + '!' }, { t: 'Hello!', quien: 'pip' }], function () { if (vivo(tk)) comoEsta(an, tk, avisar); });
+    M.esperar(600, function () { pip.feliz(); });
+  }
+  // "How is Mimi?": la mascota actúa lo que le pasa y Luz toca la carita (no se registra: es parte del cuidado).
+  var SENTIR = { hambre: 'HUNGRY', sueno: 'SLEEPY', aburrido: 'SAD', feliz: 'HAPPY', contento: 'HAPPY' };
+  function comoEsta(an, tk, despues) {
+    var w = V.por(SENTIR[an] || ''); if (!w) return despues();
+    var ops = ctx.az.mezclar([w].concat(ctx.az.mezclar(V.palabras({ temas: ['sentimientos'], nivel: 1 }).filter(function (x) { return x !== w; })).slice(0, 2)));
+    var pos = posiciones(3), listo = false, dicho = 'How is ' + nombreVoz() + '?', oir = function () { profe(dicho); };
+    pip.sentir(w.sentir); banner({ icono: '🎭', en: dicho, es: '¿Cómo está ' + nombre() + '?', oir: oir }); oir();
+    var fichas = ops.map(function (x, i) {
+      var f = O.ficha(M, x, 0.7); f.position.copy(pos[i]); f.scale.setScalar(0.01); M.scene.add(f);
+      M.esperar(300 + i * 90, function () { VZ.sfx('pop'); M.tween(450, function (k) { f.scale.setScalar(Math.max(0.01, k)); }, null, 'rebote'); });
+      M.tocable(f, function () { elegir(f); }); return f;
+    });
+    S.opciones = fichas.map(function (f) { return { w: f.userData.w, elegir: function () { elegir(f); } }; });
+    function elegir(f) {
+      var x = f.userData.w; if (listo || !vivo(tk) || f.userData.fuera) return;
+      if (x !== w) { f.userData.fuera = true; O.temblar(M, f); O.apagar(f, true); pip.no(); VZ.sfx('mal'); chip(dib(x) + ' ' + esc(TX(x.en)) + ' = ' + esc(TX(x.es)), true, 2500); charla([{ t: "No, that's " + x.en.toLowerCase() + '.' }, { t: dicho }]); return; }
+      listo = true; S.opciones = null; VZ.sfx('ok'); hoot.aplaudir(); banner(null); O.rebotar(M, f, 0.4);
+      chip(dib(w) + ' ' + esc(TX(w.en)) + ' = ' + esc(TX(w.es)), false, 3000);
+      fichas.forEach(function (y) { M.esperar(y === f ? 600 : 0, function () { M.tween(300, function (k) { y.scale.setScalar(Math.max(0.01, 1 - k)); }, function () { M.limpiar([y]); }); }); });
+      pip.sentir(w.sentir); charla([{ t: 'Yes! ' + nombreVoz() + ' is ' + w.en.toLowerCase() + '!' }], function () { if (vivo(tk)) despues(); });
+    }
   }
 
   /* ---------- lección y juegos ---------- */
@@ -305,7 +342,7 @@
       if (!listo || !vivo(tk)) return;
       listo = false; mano.userData.quitar(); aviso(); hoot.senalar(false); aura.quitar(); if (fl) fl.parar();
       VZ.sfx('pop'); M.particulas('estrella', obj.position.clone().setY(0.9), 10);
-      if (w.color) pip.destello(w.color, 900); else pip.saltar(0.5);
+      if (w.color) pip.destello(w.color, 900); else if (w.sentir) pip.sentir(w.sentir); else pip.saltar(0.5);
       M.tween(350, function (k) { obj.scale.setScalar(Math.max(0.01, 1 + 0.3 * k - 1.3 * k * k)); }, function () { M.limpiar([obj]); });
       pipDice(w.en + '!', function () { if (vivo(tk)) M.esperar(400, siguientePaso); });
     });
@@ -314,7 +351,7 @@
   function juego(p, tk, o) {
     o = o || {};
     S.k++; S.intento = 0; S.fase = 'responde'; S.t0 = Date.now(); S.repite = 0; pintarHUD(); chip(null);
-    var j = JG.get(p.juego); S.orden = o.orden || j.orden(p.w, nombreVoz()); S.quienOrden = o.quien || 'profe';
+    var j = JG.get(p.juego); S.orden = o.orden || j.orden(p.w, nombreVoz(), p); S.quienOrden = o.quien || 'profe';
     var oir = function () { (S.quienOrden === 'pip' ? pipDice : profe)(S.orden); };
     banner({ icono: o.icono || j.accion, en: S.orden, oir: oir }); S.oirActual = oir;
     ctx.log('juego', p.juego, p.w.en, p.opciones.map(function (w) { return w.en; }).join(','));
@@ -336,6 +373,7 @@
       responder: function (w) { return vivo(tk) ? responder(w) : { ignorar: true }; },
       opciones: function (lista) { S.opciones = lista; },
       aviso: function (icono, texto) { if (vivo(tk)) aviso(icono, texto); },
+      decir: function (texto, alEmpezar) { cuandoCalle(function () { if (!vivo(tk)) return; profe(texto); if (alEmpezar) alEmpezar(); }, 0.1); },
       pintado: function (color) { pet.color = color; guardar(); },
       alimentar: function (n) { PET.sumar(pet, 'panza', n); PET.sumar(pet, 'alegria', 2); guardar(); pintarHUD(); },
       acercarPip: function (on) { if (vivo(tk)) acercar(on); },
@@ -354,7 +392,7 @@
   }
   var BIEN = ['Yes!', 'Great!', 'Good job!', 'Super!'];
   function responder(w) {
-    var p = S.paso, err = V.errorEleccion(p.w, w);
+    var p = S.paso, j = JG.get(p.juego), err = j && j.error ? j.error(p.w, w) : V.errorEleccion(p.w, w);
     if (S.fase === 'fin') return { ignorar: true };
     if (S.fase === 'muestra') { if (err) return { ignorar: true }; S.fase = 'fin'; acierto(false, true); return { ok: true }; }
     S.intento++;
@@ -707,7 +745,7 @@
       bano: function () { bano(); }, dormir: function () { dormitorio(); }, patio: function () { patio(); }, apagar: function () { apagar(); }, despertar: function () { despertar(); },
       patear: function (k, x) { if (S.futbol) S.futbol.patear(k, x); }, burbujas: function () { return (S.burbujas || []).filter(function (b) { return !b.userData.rota; }); },
       pagar: function () { (S.monedas || []).forEach(function (m) { if (m.userData.tocar) m.userData.tocar(); }); },
-      tocar: function (parte) { if (S.tocarPip) S.tocarPip(parte); },
+      tocar: function (parte) { if (S.tocarPip) S.tocarPip(parte); }, juego: function (id) { jugarSolo(id); }, sentir: function (id) { pip.sentir(id); },
       incorrecta: function () { var o = (S.opciones || []).filter(function (x) { return x.w !== S.paso.w; })[0]; if (o) o.elegir(); return o && o.w.en; } };
   }
   inicio();

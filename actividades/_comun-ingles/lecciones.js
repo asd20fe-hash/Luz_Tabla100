@@ -1,4 +1,4 @@
-/* Inglés — armado de lecciones (parte pura). window.ING_LECC / require. Versión 1.0.0 (2026-10-15).
+/* Inglés — armado de lecciones (parte pura). window.ING_LECC / require. Versión 1.1.0 (2026-10-15): + el juego puede completar el paso (preparar).
    Una lección es una lista de pasos (datos), que la actividad ejecuta en orden:
      {tipo:'hola'}                      la profe saluda
      {tipo:'presenta', w}               la profe muestra una palabra nueva (sin error posible)
@@ -15,7 +15,9 @@
 
   function pasoJuego(w, nivel, az) {
     var j = JG.deTema(w.tema);
-    return { tipo: 'juego', juego: j.id, w: w, opciones: j.opciones(w, nivel, az) };
+    var p = { tipo: 'juego', juego: j.id, w: w, opciones: j.opciones(w, nivel, az) };
+    if (j.preparar) j.preparar(p, nivel, az);
+    return p;
   }
   // Ordena para que no queden dos iguales seguidas (si se puede): cada vez toma, de las distintas a la anterior,
   // la que más veces falta poner (a igualdad, al azar). prev: la última palabra ya puesta.
@@ -69,7 +71,7 @@
     return sinSeguidas(ws, o.az).map(function (w) { return pasoJuego(w, nivel, o.az); });
   }
 
-  var api = { VERSION: '1.0.0', NUEVAS: NUEVAS, PRACTICA: PRACTICA, armar: armar, rondaJuego: rondaJuego, pool: pool, sinSeguidas: sinSeguidas };
+  var api = { VERSION: '1.1.0', NUEVAS: NUEVAS, PRACTICA: PRACTICA, armar: armar, rondaJuego: rondaJuego, pool: pool, sinSeguidas: sinSeguidas };
   if (EnNode) module.exports = api;
   else root.ING_LECC = api;
 })(typeof window !== 'undefined' ? window : this);

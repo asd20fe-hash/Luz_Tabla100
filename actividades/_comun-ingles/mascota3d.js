@@ -1,4 +1,5 @@
-/* Inglés — la mascota en 3D, hecha con formas (sin modelos). window.ING_MASCOTA3D. Versión 1.1.1 (2026-10-15).
+/* Inglés — la mascota en 3D, hecha con formas (sin modelos). window.ING_MASCOTA3D. Versión 1.2.0 (2026-10-15).
+   v1.2.0 + sentir(id): actúa los sentimientos (llora, bosteza, tiembla de frío, se enoja…) para "How is Pip?".
    v1.1.1 Nariz más grande, con contorno y zona de toque más grande (antes casi no se veía ni se podía tocar).
    v1.1.0 + estornudar, orejear, guinar (juego "Touch Pip!") e irA (va saltando hasta otro lugar: supermercado).
    crear(M, {color}) → P. Cabezona tipo juguete de vinilo, con contorno de dibujito.
@@ -116,6 +117,38 @@
         function () { cuerpo.rotation.z = 0; A.ladeo = 0; A.abre = 0; if (fin) fin(); }, 'lineal');
       cabeza.getWorldPosition(tmp); M.particulas('nota', tmp.clone().add(new T.Vector3(0, 0.6, 0.3)), 3);
     };
+    // sentir(id, fin): actúa un sentimiento (tema sentimientos: happy, sad, hungry, sleepy, angry, scared, surprised, cold, hot) y vuelve a la normalidad.
+    P.sentir = function (id, fin) {
+      var VZ = ING_VOZ, en = function (dx, dy, dz) { cabeza.getWorldPosition(tmp); return tmp.clone().add(new T.Vector3(dx, dy, dz)); };
+      var listo = function () { A.orejas = 0; A.giroX = 0; A.ladeo = 0; A.abre = 0; A.sx = 1; A.sy = 1; cuerpo.rotation.z = 0; A.durmiendo = false; if (fin) fin(); };
+      var temblor = function (ms, amp, vel, despues) { M.tween(ms, function (k) { cuerpo.rotation.z = Math.sin(k * Math.PI * vel) * amp; }, function () { cuerpo.rotation.z = 0; despues(); }, 'lineal'); };
+      var gota = function (dx, color) { M.particulas('gota', en(dx, 0, 0.5), 3, { color: color || '#7cc4ff', arriba: 0.2, fuerza: 0.3, gravedad: 1.2, vida: 1, tam: 0.12 }); };
+      if (id === 'happy') return P.feliz(fin);
+      if (id === 'sad') {
+        VZ.balbuceo(2, false); A.orejas = 0.6; M.tween(500, function (k) { A.giroX = 0.3 * k; A.sy = 1 - 0.08 * k; });
+        M.esperar(400, function () { gota(-0.2); }); M.esperar(1100, function () { gota(0.2); });
+        return M.esperar(2100, function () { M.tween(400, function (k) { A.giroX = 0.3 * (1 - k); A.sy = 0.92 + 0.08 * k; }, listo); });
+      }
+      if (id === 'hungry') {
+        VZ.sfx('nam'); P.mirar(0, 0.6); M.esperar(500, function () { gota(0.08, '#cfefff'); });
+        return M.tween(1500, function (k) { A.abre = Math.abs(Math.sin(k * Math.PI * 4)) * 0.8; A.sx = 1 + Math.abs(Math.sin(k * Math.PI * 4)) * 0.04; }, function () { P.mirar(0, 0); listo(); }, 'lineal');
+      }
+      if (id === 'sleepy') {
+        A.abre = 0.9; M.tween(600, function (k) { A.ladeo = 0.25 * k; }, function () { A.abre = 0; A.durmiendo = true; });
+        M.esperar(700, function () { M.particulas('zzz', en(0.25, 0.4, 0), 1, { arriba: 0.6, fuerza: 0.3, vida: 2 }); });
+        M.esperar(1500, function () { M.particulas('zzz', en(0.25, 0.4, 0), 1, { arriba: 0.6, fuerza: 0.3, vida: 2 }); });
+        return M.esperar(2500, function () { A.durmiendo = false; M.tween(400, function (k) { A.ladeo = 0.25 * (1 - k); }, listo); });
+      }
+      if (id === 'angry') { VZ.balbuceo(2, false); A.orejas = 0.5; A.giroX = 0.15; P.destello('#ff5a5a', 900); return temblor(1100, 0.07, 16, listo); }
+      if (id === 'scared') { A.orejas = 0.6; P.destello('#dfe6ff', 900); M.tween(250, function (k) { A.sy = 1 - 0.15 * k; A.sx = 1 - 0.06 * k; }); return temblor(1400, 0.04, 36, listo); }
+      if (id === 'surprised') { VZ.sfx('pio'); A.abre = 1; A.orejas = -0.3; M.particulas('estrella', en(0, 0.5, 0.2), 6); return P.saltar(0.9, function () { M.esperar(400, listo); }); }
+      if (id === 'cold') { VZ.balbuceo(2, false); P.destello('#8fd3ff', 1300); M.tween(300, function (k) { A.sy = 1 - 0.08 * k; }); return temblor(1600, 0.045, 40, listo); }
+      if (id === 'hot') {
+        P.destello('#ff8a5c', 1300); M.esperar(300, function () { gota(0.3, '#bfe6ff'); }); M.esperar(900, function () { gota(-0.3, '#bfe6ff'); });
+        return M.tween(1700, function (k) { A.abre = 0.3 + Math.abs(Math.sin(k * Math.PI * 6)) * 0.4; }, listo, 'lineal');
+      }
+      P.saltar(0.4, fin);
+    };
     P.hablar = function (on) { A.hablando = !!on; };
     P.posBoca = function () { return boca.getWorldPosition(new T.Vector3()); };
     // comer: lleva el objeto a la boca, lo achica, mastica y queda feliz.
@@ -176,5 +209,5 @@
     P.esMio = function (hit) { var o = hit && hit.obj; while (o) { if (o === raiz) return true; o = o.parent; } return false; };
     return P;
   }
-  root.ING_MASCOTA3D = { VERSION: '1.1.1', crear: crear };
+  root.ING_MASCOTA3D = { VERSION: '1.2.0', crear: crear };
 })(window);

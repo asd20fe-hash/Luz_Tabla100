@@ -8,10 +8,11 @@
      + Trampas de oído desde el nivel 2: palabras que suenan parecido (THREE/TREE, BEAR/PEAR).
      + Si se equivoca, escucha la palabra que tocó y otra vez la pedida; al acertar ve la traducción y hay fuegos.
      + Registro de cada intento (CONFUNDE_TEMA, CONFUNDE_PARECIDA…) y repaso espaciado de las palabras que erra.
+   v1.0.1  (2026-10-15) La bandera de inicio es la de Estados Unidos (la voz ya prefería inglés de EE. UU.).
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.0', ACT = '1ro-ingles';
+  var VERSION = '1.0.1', ACT = '1ro-ingles';
   var IN = INGLES1, RP = REPASO1, L = LENGUA1, UI = REF4_UI, esc = UI1.esc, T = UI1.txt, F = UI1.frase;
   var ctx = UI1.base({ act: ACT, version: VERSION, titulo: 'English', alCambiarCaso: function () { render(); } });
   if (!ctx) return;
@@ -76,7 +77,7 @@
   function render() {
     if (!R) return;
     if (R.inicio) {
-      app.innerHTML = '<div class="l1-panel ing-inicio"><div class="ing-bandera">🇬🇧 🇺🇸</div><h2 class="l1-letra">English!</h2>' +
+      app.innerHTML = '<div class="l1-panel ing-inicio"><div class="ing-bandera">🇺🇸</div><h2 class="l1-letra">English!</h2>' +
         (!voz ? '<p class="l1-msg mal">' + esc(F('Este dispositivo no tiene voz en inglés.')) + '</p>' : (!UI.sonidoOn() ? '<p class="l1-msg mal">' + esc(F('Prendé el sonido 🔊 para escuchar.')) + '</p>' : '')) +
         '<div class="l1-fila"><button class="l1-btn main ing-play" id="empezar">▶ ' + esc(F('¡A jugar!')) + '</button></div></div>';
       $('#empezar').onclick = function () { R.inicio = false; nuevoItem(); };

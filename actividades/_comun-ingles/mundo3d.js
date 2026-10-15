@@ -1,4 +1,5 @@
-/* Inglés — mundo 3D (three.js r128). window.ING_MUNDO. Versión 1.1.0 (2026-10-15).
+/* Inglés — mundo 3D (three.js r128). window.ING_MUNDO. Versión 1.2.0 (2026-10-15).
+   v1.2.0 + M.inclinacion(): al inclinar la tablet la cámara se corre un poco (giroscopio; en iPad pide permiso, llamarla desde un toque).
    v1.1.0 + M.atenuar(k) (apagar la luz al dormir), M.sala({piso, bordePiso, pared, texPiso, sinPared}) para armar otras habitaciones.
    crear(canvas) → M: una habitación tipo maqueta (plataforma redonda, pared curva con ventana, alfombra) con fondo transparente
    (se ve el fondo global de la app), luces toon, cámara que se acomoda a la pantalla y una ventana de día o de noche según la hora.
@@ -156,7 +157,7 @@
     if (root.matchMedia) { var mq = matchMedia('(prefers-color-scheme: dark)'); if (mq.addEventListener) mq.addEventListener('change', aplicarTema); }
 
     /* ---------- cámara ---------- */
-    var mira = new T.Vector3(0, 1.0, 0), parallax = { x: 0, y: 0 }, W = 1, H = 1;
+    var mira = new T.Vector3(0, 1.0, 0), parallax = { x: 0, y: 0 }, incl = { x: 0, y: 0, ox: 0, oy: 0 }, W = 1, H = 1;
     M.vertical = function () { return W / H < 0.85; };
     function acomodar() {
       W = canvas.clientWidth || root.innerWidth; H = canvas.clientHeight || root.innerHeight;
@@ -166,11 +167,28 @@
       camera.updateProjectionMatrix(); ubicarCamara();
     }
     function ubicarCamara() {
-      camera.position.set(parallax.x * 0.35, 3.0 + (M.vertical() ? 0.6 : 0) + parallax.y * 0.15, M.dist);
+      camera.position.set(parallax.x * 0.35 + incl.x * 0.6, 3.0 + (M.vertical() ? 0.6 : 0) + parallax.y * 0.15 + incl.y * 0.3, M.dist);
       camera.lookAt(mira.x, mira.y + (M.vertical() ? 0.25 : 0), mira.z);
     }
     M.anchoVisible = function (z) { var d = M.dist - (z || 0); return d * Math.tan(camera.fov * Math.PI / 360) * camera.aspect; };
     root.addEventListener('resize', acomodar);
+    /* Inclinación: se mide contra una posición de reposo que se acomoda despacio (unos segundos), así responde al movimiento
+       y no a cómo la sostiene. Con la pantalla girada se cambian los ejes. Hasta ±1 a los 20°. */
+    var reposo = null, oyendo = false, lim1 = function (v) { return Math.max(-1, Math.min(1, v)); };
+    function alGirar(e) {
+      if (e.beta == null || e.gamma == null) return;
+      var ang = (root.screen && screen.orientation && screen.orientation.angle) || root.orientation || 0, x = e.gamma, y = e.beta;
+      if (ang === 90) { x = e.beta; y = -e.gamma; } else if (ang === 270 || ang === -90) { x = -e.beta; y = e.gamma; }
+      if (!reposo) reposo = { x: x, y: y };
+      reposo.x += (x - reposo.x) * 0.006; reposo.y += (y - reposo.y) * 0.006;
+      incl.ox = lim1((x - reposo.x) / 20); incl.oy = lim1((y - reposo.y) / 20);
+    }
+    M.inclinacion = function () {
+      if (oyendo || !root.DeviceOrientationEvent) return; oyendo = true;
+      var escuchar = function () { root.addEventListener('deviceorientation', alGirar); };
+      if (typeof DeviceOrientationEvent.requestPermission === 'function') DeviceOrientationEvent.requestPermission().then(function (r) { if (r === 'granted') escuchar(); }).catch(function () { oyendo = false; });
+      else escuchar();
+    };
 
     /* ---------- tiempo: tweens, efectos y cuadros ---------- */
     var tweens = [], fxs = [], cuadros = [];
@@ -272,6 +290,7 @@
       }
       fxs = fxs.filter(function (f) { return f.update(dt) !== false; });
       cuadros.slice().forEach(function (f) { f(dt, t); });
+      var ki = Math.min(1, dt * 5); incl.x += (incl.ox - incl.x) * ki; incl.y += (incl.oy - incl.y) * ki;
       ubicarCamara();
       renderer.render(scene, camera);
     }
@@ -282,5 +301,5 @@
     return M;
   }
 
-  root.ING_MUNDO = { VERSION: '1.1.0', crear: crear, EASE: EASE };
+  root.ING_MUNDO = { VERSION: '1.2.0', crear: crear, EASE: EASE };
 })(window);

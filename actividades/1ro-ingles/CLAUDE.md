@@ -1,4 +1,4 @@
-# English (1ro) — v1.0.0
+# English (1ro) — v1.0.1
 
 Inglés oral con dibujos para Luz: escucha una palabra en inglés y toca el dibujo. Es la actividad simple, en 2D; la versión con mascota 3D es `1ro-ingles-mascota` (que tiene su propio vocabulario en `_comun-ingles/`: los dos no comparten listas).
 
@@ -19,4 +19,4 @@ Inglés oral con dibujos para Luz: escucha una palabra en inglés y toca el dibu
 ## Pruebas
 `node tests/lectoescritura-1ro/run.js` (`test-ingles.js`: vocabulario, rondas por nivel con semilla y errores).
 
-En Windows el ícono 🇬🇧 del menú se ve como "GB" (Windows no dibuja banderas); en Android y iPad se ve bien.
+En Windows el ícono 🇺🇸 del menú se ve como "US" (Windows no dibuja banderas); en Android y iPad se ve bien.
