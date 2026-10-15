@@ -1,6 +1,8 @@
 /* Escritura de 1ro — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.2  (2026-10-14) Fuegos encima de la pantalla
+     + Los fuegos artificiales quedaban debajo del contenido (faltaba su estilo en 1ro); ahora se ven encima.
    v1.0.1  (2026-10-14) Fuegos artificiales
      + Cada palabra terminada (bien, corregida o copiada) tiene fuegos artificiales hasta tocar Siguiente.
    v1.0.0  (2026-10-14) Primera versión
@@ -15,7 +17,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.1', ACT = '1ro-escritura', TAM = 6;
+  var VERSION = '1.0.2', ACT = '1ro-escritura', TAM = 6;
   var L = LENGUA1, RP = REPASO1, UI = REF4_UI, esc = UI1.esc, T = UI1.txt;
   var ctx = UI1.base({ act: ACT, version: VERSION, titulo: 'Escribí lo que ves', alCambiarCaso: function () { render(); } });
   if (!ctx) return;

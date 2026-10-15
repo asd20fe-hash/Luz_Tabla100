@@ -1,6 +1,8 @@
 /* Lectura de 1ro — interfaz.
    ------------------------------------------------------------
    Historial de cambios
+   v1.0.2  (2026-10-14) Fuegos encima de la pantalla
+     + Los fuegos artificiales quedaban debajo del contenido (faltaba su estilo en 1ro); ahora se ven encima.
    v1.0.1  (2026-10-14) Fuegos artificiales
      + Cada pregunta contestada bien tiene fuegos artificiales hasta tocar Siguiente.
    v1.0.0  (2026-10-14) Primera versión
@@ -14,7 +16,7 @@
    ------------------------------------------------------------ */
 (function () {
   'use strict';
-  var VERSION = '1.0.1', ACT = '1ro-lectura';
+  var VERSION = '1.0.2', ACT = '1ro-lectura';
   var L = LENGUA1, LE = LECT1, RP = REPASO1, UI = REF4_UI, esc = UI1.esc, T = UI1.txt;
   var ctx = UI1.base({ act: ACT, version: VERSION, titulo: 'Leé y contestá', alCambiarCaso: function () { render(); } });
   if (!ctx) return;

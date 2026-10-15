@@ -4,7 +4,7 @@ Guía para Claude Code (claude.ai/code) en este repositorio.
 
 ## Qué es
 
-"Matemática": app de práctica de matemática para Luz (1ro, 6 años) e Ian (4to, 10 años). Un shell con perfiles y menú abre actividades independientes. Luz tiene la Tabla del 100 (`actividades/1ro-tabla100/`), Escritura y Lectura (`actividades/1ro-escritura/`, `actividades/1ro-lectura/`); Ian, las actividades de refuerzo de 4to y las de fracciones (`actividades/4to-*`). El diseño de la estructura está en `PLAN.md`.
+"Matemática": app de práctica de matemática para Luz (1ro, 6 años) e Ian (4to, 10 años). Un shell con perfiles y menú abre actividades independientes. Luz tiene la Tabla del 100 (`actividades/1ro-tabla100/`), Escritura, Lectura e Inglés (`actividades/1ro-escritura/`, `actividades/1ro-lectura/`, `actividades/1ro-ingles/`); Ian, las actividades de refuerzo de 4to y las de fracciones (`actividades/4to-*`). El diseño de la estructura está en `PLAN.md`.
 
 - **Ejecutar:** abrir `index.html` en el navegador, o servir la carpeta (`python -m http.server`). Con `file://` Chrome comparte localStorage entre archivos y Firefox lo aísla por archivo; con `http://localhost` todo se comparte. El perfil, el tema y el fondo viajan también por la URL (`?p=luz&t=dark&f=oceano`). Hace falta internet para three.js r128 (cdnjs) y la fuente Fredoka.
 - **Depurar:** logs con prefijo `[Mate vX.Y]` (core y shell) y `[Tabla100 vX.Y]` (actividad).
@@ -66,7 +66,8 @@ Orden de scripts: `core.js`, `perfiles.js`, `registro.js`, y después el de la p
 - **MAYÚS/minús**: por perfil en `mate.<perfil>.1ro-lengua.caso`; cada evento lleva `forma`. `UI1.txt` para letras sueltas, `UI1.frase` para oraciones.
 - **Repaso**: lo que sale mal al primer intento vuelve seguido hasta que se afirma y después cada tanto (`REPASO1.elegir` con `minRepaso`). Se guarda en `mate.<perfil>.<act>.repaso`.
 - **Panel**: `analisis:'palabras'|'preguntas'` en el registro arma la tabla por ítem en "Registro en la nube".
-- **Pruebas:** `node tests/lectoescritura-1ro/run.js` (lectura con 1000 rondas por nivel y semilla fija).
+- **Inglés** (`1ro-ingles`): oral y con dibujos; voz en inglés propia de la actividad (en-US/en-GB). Para escribir en inglés, `LENGUA1.clasificar(…, {idioma:'en'})` (sin reglas del castellano).
+- **Pruebas:** `node tests/lectoescritura-1ro/run.js` (lectura e inglés con 1000 rondas por nivel y semilla fija).
 
 ## Actividades de 4to: convenciones
 

@@ -129,7 +129,7 @@
     }
     function cuadro(ts) {
       var dt = Math.min(0.05, (ts - (ult || ts)) / 1000); ult = ts;
-      var w = cv.width = innerWidth, h = cv.height = innerHeight;
+      var w = cv.width = document.documentElement.clientWidth, h = cv.height = innerHeight;
       if (activo && ts >= prox) { lanzar(w, h); if (Math.random() < 0.4) lanzar(w, h); prox = ts + 550 + Math.random() * 500; }
       cx.clearRect(0, 0, w, h); var os = !root.MATE || MATE.tema.oscuro(); // en claro, chispas más oscuras para que se vean
       cohetes = cohetes.filter(function (c) {
@@ -152,7 +152,7 @@
       iniciar: function () {
         if (activo || (root.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
         activo = true; prox = 0; ult = 0;
-        if (!cv) { cv = document.createElement('canvas'); cv.className = 'ref-fuegos'; cv.setAttribute('aria-hidden', 'true'); document.body.appendChild(cv); cx = cv.getContext('2d'); }
+        if (!cv) { cv = document.createElement('canvas'); cv.className = 'ref-fuegos'; cv.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:55;pointer-events:none'; cv.setAttribute('aria-hidden', 'true'); document.body.appendChild(cv); cx = cv.getContext('2d'); }
         if (!raf) raf = requestAnimationFrame(cuadro);
       },
       parar: function () { activo = false; quitar(); },

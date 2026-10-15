@@ -1,5 +1,6 @@
 /* Lengua de 1ro — parte pura (sin DOM): sílabas, comparación de palabras y clasificación de errores de escritura.
-   Patrón UMD: window.LENGUA1 en el navegador, require en node. Versión 1.0.0 (2026-10-14). */
+   Patrón UMD: window.LENGUA1 en el navegador, require en node. Versión 1.0.1 (2026-10-14).
+   v1.0.1  + clasificar(…, {idioma:'en'}): sin las reglas del castellano (B/V, LL/Y, H…), solo letras que faltan, sobran o cambian. */
 (function (root) {
   'use strict';
   var VOCALES = 'AEIOUÁÉÍÓÚÜ', FUERTES = 'AEOÁÉÓÍÚ';   // la débil con tilde (Í, Ú) hace hiato: cuenta como fuerte
@@ -122,8 +123,9 @@
     if (!R) cod.VACIA = 1;
     else if (al.dist > Math.max(2, Math.ceil(E.length * 0.6))) cod.OTRA_PALABRA = 1;
     else {
-      REGLAS.forEach(function (r) { if (alinear(r[1](E), r[1](R)).dist < al.dist) cod[r[0]] = 1; });
-      var orto = fonetica(E) === fonetica(R);
+      var es = op.idioma !== 'en';   // en inglés no valen las reglas de ortografía del castellano
+      if (es) REGLAS.forEach(function (r) { if (alinear(r[1](E), r[1](R)).dist < al.dist) cod[r[0]] = 1; });
+      var orto = es && fonetica(E) === fonetica(R);
       if (!orto) {
         if (E.indexOf(R) === 0 && E.length - R.length >= 2) cod.INCOMPLETA = 1;
         al.ops.forEach(function (o) {
@@ -159,7 +161,7 @@
     return mejor;
   }
 
-  var api = { VERSION: '1.0.0', sinTildes: sinTildes, limpiar: limpiar, silabas: silabas, fonetica: fonetica, alinear: alinear, clasificar: clasificar,
+  var api = { VERSION: '1.0.1', sinTildes: sinTildes, limpiar: limpiar, silabas: silabas, fonetica: fonetica, alinear: alinear, clasificar: clasificar,
     elegirMejor: elegirMejor, ERRORES: ERRORES, PRIORIDAD: PRIORIDAD };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.LENGUA1 = api;
