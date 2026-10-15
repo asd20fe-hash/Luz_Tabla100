@@ -35,14 +35,21 @@
        ("A red hat!", "Bye bye, hat!") y lo puesto queda guardado. La primera vez le regalan un sombrero rojo.
      + 🛍️ Tienda de ropa en el cambiador: cada prenda cuesta 2, 3 o 4 ⭐ y se paga contando en inglés.
      + Juego "Dress up!": "Put the hat on Mimi!" (nivel 1) o "Put a red hat on Mimi!" (color + prenda); error nuevo COLOR_MAL.
+   v1.5.0  (2026-10-15) Verbos y álbum
+     + Tema acciones (jump, dance, clap, wave, spin, run, sleep, sing, laugh, sneeze): la mascota las actúa.
+     + Juego "Mimi says!": "Mimi, jump!" y Luz toca la carta (la mascota salta), o al revés: la mascota hace algo y la profe
+       pregunta "What is Mimi doing?" ("Mimi is jumping!").
+     + 📒 Álbum de figuritas: una página por tema; cada palabra jugada se gana como figurita (sobre 🎁 que se abre y se pega),
+       las que todavía no jugó se ven como sombra y las que sabe bien son de oro. Tocarlas las dice y la mascota las actúa.
    ------------------------------------------------------------
    El entorno J que reciben los juegos (ING_JUEGOS) se arma en entorno(): M, O, pip, hoot, az, nivel, nombre, debug,
    posiciones(n), responder(w) → {ok, mostrar, ignorar}, opciones(lista), aviso(icono, texto), pintado(color), alimentar(n),
-   decir(texto, alEmpezar) (la profe habla cuando se calla lo anterior: la cuenta de "How many?"). */
+   decir(texto, alEmpezar) (la profe habla cuando se calla lo anterior: la cuenta de "How many?"), nombreVoz ("Mimi"),
+   alOir(fn) (el 🔊 además hace fn: en "Mimi says!" al revés la mascota lo vuelve a actuar). */
 (function () {
   'use strict';
-  var VERSION = '1.4.0', ACT = '1ro-ingles-mascota';
-  var ROPA = ING_ROPA, R3 = ING_ROPA3D, V = ING_VOCAB, JG = ING_JUEGOS, LC = ING_LECC, PET = ING_PET, TD = ING_TIENDA, VZ = ING_VOZ, O = ING_OBJ3D, RP = REPASO1, UI = REF4_UI;
+  var VERSION = '1.5.0', ACT = '1ro-ingles-mascota';
+  var ROPA = ING_ROPA, R3 = ING_ROPA3D, AL = ING_ALBUM, V = ING_VOCAB, JG = ING_JUEGOS, LC = ING_LECC, PET = ING_PET, TD = ING_TIENDA, VZ = ING_VOZ, O = ING_OBJ3D, RP = REPASO1, UI = REF4_UI;
   var esc = UI1.esc, TX = UI1.txt, F = UI1.frase;
   var ctx = UI1.base({ act: ACT, version: VERSION, titulo: 'Mi mascota', alCambiarCaso: function () { pintarHUD(); if (S.banner) banner(S.banner); } });
   if (!ctx) return;
@@ -102,7 +109,7 @@
   var frase = function (w) { return (w.art ? w.art + ' ' : '') + w.en.toLowerCase(); };   // "an apple", "blue"
 
   /* ---------- interfaz encima ---------- */
-  function velo(html) { $('#panel').innerHTML = html; $('#velo').hidden = !html; }
+  function velo(html, clase) { var pn = $('#panel'); pn.className = 'ing-panel ing-card' + (clase ? ' ' + clase : ''); pn.innerHTML = html; pn.scrollTop = 0; $('#velo').hidden = !html; }
   function dib(w) { return w.color ? '<span class="ing-color" style="background:' + w.color + '"></span>' : esc(w.img); }
   function banner(o) {
     S.banner = o; var b = $('#banner');
@@ -124,10 +131,10 @@
     var ab = $('#abajo');
     if (S.modo === 'casa') {
       ab.innerHTML = '<button class="ing-btn main' + (pet.lecciones ? '' : ' late') + '" id="b-leccion"><span class="ic">🦉</span>' + esc(F('¡A aprender!')) + '</button>' +
-        '<button class="ing-btn" id="b-juegos"><span class="ic">🎮</span>' + esc(F('Juegos')) + '</button>' +
+        '<button class="ing-btn" id="b-juegos"><span class="ic">🎮</span>' + esc(F('Juegos')) + '</button>' + botonAlbum() +
         LUGARES.map(function (l) { return '<button class="ing-btn ing-lugar' + (S.sugerido === l[0] ? ' late' : '') + '" data-l="' + l[0] + '" title="' + l[2] + '">' + l[1] + '</button>'; }).join('') +
         (TD.cuantas(pet) ? '<button class="ing-btn ing-lugar' + (S.recienCompro ? ' main late' : '') + '" id="b-comida" title="Su comida">🧺<b>' + TD.cuantas(pet) + '</b></button>' : '');
-      $('#b-leccion').onclick = leccion; $('#b-juegos').onclick = menuJuegos; if ($('#b-comida')) $('#b-comida').onclick = despensa;
+      $('#b-leccion').onclick = leccion; $('#b-juegos').onclick = menuJuegos; $('#b-album').onclick = function () { album(); }; if ($('#b-comida')) $('#b-comida').onclick = despensa;
       ab.querySelectorAll('[data-l]').forEach(function (b) { b.onclick = function () { ({ super: supermercado, ropa: cambiador, bano: bano, dormir: dormitorio, patio: patio })[b.dataset.l](); }; });
     } else if (S.modo === 'leccion' || S.modo === 'libre') {
       ab.innerHTML = '<button class="ing-btn" id="b-salir" title="Volver a la casa">✖</button><div class="ing-prog ing-card">' + S.res.map(function (r, i) {
@@ -162,9 +169,9 @@
   }
   var LUGARES = [['super', '🛒', 'Súper'], ['ropa', '👗', 'Ropa'], ['bano', '🛁', 'Baño'], ['dormir', '🛏️', 'Dormitorio'], ['patio', '⚽', 'Patio']];
   function menuJuegos() {
-    velo('<h2>🎮 ' + esc(F('Juegos')) + '</h2><div class="ing-nombres">' + JG.lista().map(function (j) {
+    velo('<h2>🎮 ' + esc(F('Juegos')) + '</h2><div class="ing-nombres juegos">' + JG.lista().map(function (j) {
       return '<button class="ing-btn" data-j="' + j.id + '"><span class="ic">' + j.icono + '</span>' + esc(j.nombre.replace('Pip', nombreVoz())) + '</button>'; }).join('') +
-      '</div><div class="l1-fila"><button class="ing-btn" id="v-no">✖ ' + esc(F('Cerrar')) + '</button></div>');
+      '</div><div class="l1-fila"><button class="ing-btn" id="v-no">✖ ' + esc(F('Cerrar')) + '</button></div>', 'ancho');
     $('#panel').querySelectorAll('[data-j]').forEach(function (b) { b.onclick = function () { velo(''); jugarSolo(b.dataset.j); }; });
     $('#v-no').onclick = function () { velo(''); };
   }
@@ -272,7 +279,7 @@
 
   /* ---------- casa ---------- */
   function casa(saludo) {
-    S.modo = 'casa'; S.token++; S.oirActual = null; S.tocarPip = null; limpiarEscena(); banner(null); chip(null); aviso(); UI.fuegos.parar();
+    S.modo = 'casa'; S.token++; S.oirActual = null; S.tocarPip = null; S.alOir = null; limpiarEscena(); banner(null); chip(null); aviso(); UI.fuegos.parar();
     salirLugares(); vestirGuardado(); pintarHUD(); S.recienCompro = false;
     if (!saludo) return;
     var an = PET.animo(pet), tk = S.token;
@@ -331,7 +338,7 @@
   function leccion() { empezar('leccion', LC.armar({ nivel: nivel(), rep: rep, az: ctx.az })); }
   function jugarSolo(id) { empezar('libre', LC.rondaJuego({ juego: id, nivel: nivel(), rep: rep, az: ctx.az, n: 6 })); }
   function siguientePaso() {
-    var tk = ++S.token; limpiarEscena(); aviso(); hoot.senalar(false); S.tocarPip = null; acercar(false); vestirGuardado();
+    var tk = ++S.token; limpiarEscena(); aviso(); hoot.senalar(false); S.tocarPip = null; S.alOir = null; acercar(false); vestirGuardado();
     S.i++; var p = S.pasos[S.i]; S.paso = p; S.oirActual = null;
     if (!p) return terminar();
     ({ hola: hola, presenta: presenta, juego: juego, chau: chau })[p.tipo](p, tk);
@@ -347,9 +354,11 @@
     obj.position.set(M.vertical() ? 0.9 : 1.5, 0, 1.0); obj.scale.setScalar(0.01); M.scene.add(obj);
     M.tween(600, function (k) { obj.scale.setScalar(Math.max(0.01, k)); }, function () { fl = O.flotar(M, obj, 0.08); }, 'rebote');
     var aura = M.aura(obj, 2); VZ.sfx('brillo'); hoot.senalar(true); pip.mirarA(obj.position);
-    var decirla = function () { charla([{ t: 'Look! ' + (w.art ? w.art + ' ' : '') + w.en.toLowerCase() + '.' }, { t: w.en.toLowerCase() + '!', lento: true }]); };
+    var dichos = function () { return [{ t: w.accion ? 'Look! ' + nombreVoz() + ' can ' + w.en.toLowerCase() + '!' : 'Look! ' + frase(w) + '.' }, { t: w.en.toLowerCase() + '!', lento: true }]; };
+    var decirla = function () { charla(dichos()); if (w.accion) actuar(w); };
     banner({ w: w, en: w.en, es: w.es, oir: decirla }); S.oirActual = decirla;
-    charla([{ t: 'Look! ' + frase(w) + '.' }, { t: w.en.toLowerCase() + '!', lento: true }], function () {
+    if (w.accion) M.esperar(700, function () { if (vivo(tk)) actuar(w); });
+    charla(dichos(), function () {
       if (!vivo(tk)) return;
       listo = true; mano.position.set(obj.position.x + 0.25, 1.9, obj.position.z + 0.3); M.scene.add(mano); aviso('👆', 'Tocalo');
     });
@@ -357,7 +366,7 @@
       if (!listo || !vivo(tk)) return;
       listo = false; mano.userData.quitar(); aviso(); hoot.senalar(false); aura.quitar(); if (fl) fl.parar();
       VZ.sfx('pop'); M.particulas('estrella', obj.position.clone().setY(0.9), 10);
-      if (w.color) pip.destello(w.color, 900); else if (w.sentir) pip.sentir(w.sentir); else pip.saltar(0.5);
+      actuar(w, true);
       if (w.tema === 'ropa') { R3.poner(M, pip, { en: w.en, color: ctx.az.elegir(['RED', 'BLUE', 'GREEN', 'YELLOW']) }); VZ.sfx('brillo'); }
       M.tween(350, function (k) { obj.scale.setScalar(Math.max(0.01, 1 + 0.3 * k - 1.3 * k * k)); }, function () { M.limpiar([obj]); });
       pipDice(w.en + '!', function () { if (vivo(tk)) M.esperar(400, siguientePaso); });
@@ -368,7 +377,8 @@
     o = o || {};
     S.k++; S.intento = 0; S.fase = 'responde'; S.t0 = Date.now(); S.repite = 0; pintarHUD(); chip(null);
     var j = JG.get(p.juego); S.orden = o.orden || j.orden(p.w, nombreVoz(), p); S.quienOrden = o.quien || 'profe';
-    var oir = function () { (S.quienOrden === 'pip' ? pipDice : profe)(S.orden); };
+    S.alOir = null;
+    var oir = function () { (S.quienOrden === 'pip' ? pipDice : profe)(S.orden); if (S.alOir) S.alOir(); };
     banner({ icono: o.icono || j.accion, en: S.orden, oir: oir }); S.oirActual = oir;
     ctx.log('juego', p.juego, p.w.en, p.opciones.map(function (w) { return w.en; }).join(','));
     j.jugar(entorno(tk), p, function () {
@@ -385,7 +395,8 @@
   // El entorno de cada paso: si el paso ya terminó (se salió a la casa), lo que llegue tarde no hace nada.
   function entorno(tk) {
     return {
-      M: M, O: O, pip: pip, hoot: hoot, az: ctx.az, nivel: nivel(), nombre: nombre(), debug: ctx.debug, posiciones: posiciones,
+      M: M, O: O, pip: pip, hoot: hoot, az: ctx.az, nivel: nivel(), nombre: nombre(), nombreVoz: nombreVoz(), debug: ctx.debug, posiciones: posiciones,
+      alOir: function (fn) { S.alOir = fn && vivo(tk) ? fn : null; },
       responder: function (w, det) { return vivo(tk) ? responder(w, det) : { ignorar: true }; },
       vestir: function (en, color) { if (vivo(tk)) R3.poner(M, pip, { en: en, color: color }); },
       opciones: function (lista) { S.opciones = lista; },
@@ -448,11 +459,14 @@
     guardar(); banner(null); chip(null); limpiarEscena(); S.modo = 'resumen'; pintarHUD();
     UI.fuegos.iniciar(); VZ.sfx('brillo'); pip.feliz();
     var e = ''; for (var i = 1; i <= 3; i++) e += '<span class="' + (i <= r.estrellas ? '' : 'off') + '">⭐</span>';
+    var fig = AL.cuenta(rep, pet).nuevas;
     var nuevas = S.nuevas.length ? '<p>' + esc(F('Palabras nuevas:')) + '</p><div class="ing-palabras">' + S.nuevas.map(function (w) { return '<span>' + dib(w) + ' ' + esc(TX(w.en)) + '</span>'; }).join('') + '</div>' : '';
     velo('<h2>' + esc(F(r.estrellas === 3 ? '¡Excelente!' : (r.estrellas === 2 ? '¡Muy bien!' : '¡Buen trabajo!'))) + '</h2><div class="ing-estrellas">' + e + '</div>' +
       '<p>' + esc(F(ok1 + ' de ' + n + ' bien a la primera')) + '</p><p>' + esc(F('Ganaste')) + ' ⭐ ' + S.ganadas + '</p>' + nuevas +
       (r.cambio === 1 ? '<p><b>' + esc(F('¡Subiste al nivel ' + r.nivel + '!')) + '</b></p>' : '') +
+      (fig ? '<p><button class="ing-btn alb-abrir late" id="v-album">📒 ' + esc(F(fig === 1 ? '¡Una figurita nueva!' : '¡' + fig + ' figuritas nuevas!')) + '</button></p>' : '') +
       '<div class="l1-fila"><button class="ing-btn" id="v-casa">🏠 ' + esc(F('Casa')) + '</button><button class="ing-btn main" id="v-otra">▶ ' + esc(F('Otra vez')) + '</button></div>');
+    if (fig) $('#v-album').onclick = function () { album(); };
     var modo = S.pasos.some(function (p) { return p.tipo === 'hola'; }) ? 'leccion' : S.pasos[0].juego;
     $('#v-casa').onclick = function () { velo(''); casa(false); };
     $('#v-otra').onclick = function () { velo(''); if (modo === 'leccion') leccion(); else jugarSolo(modo); };
@@ -624,7 +638,7 @@
   function entrar(modo, lugar) {
     VZ.callar(); velo(''); limpiarEscena(); chip(null); aviso(); banner(null); UI.fuegos.parar();
     salirLugares(); if (lugar) lugar.mostrar(true); VZ.sfx('woosh');
-    S.modo = modo; S.fase = null; S.paso = null; S.opciones = null; S.oirActual = null; S.tocarPip = null; S.res = []; S.k = -1;
+    S.modo = modo; S.fase = null; S.paso = null; S.opciones = null; S.oirActual = null; S.tocarPip = null; S.alOir = null; S.res = []; S.k = -1;
     var tk = ++S.token; pintarHUD(); return tk;
   }
   // Una palabra del tema (con repaso), distinta de la anterior.
@@ -843,6 +857,72 @@
     }, 0.2);
   }
 
+  /* ---------- álbum de figuritas ---------- */
+  // La mascota actúa la palabra (color, sentimiento o acción); sin encimar animaciones si se toca seguido (salvo forzar).
+  var actuaHasta = 0;
+  function actuar(w, forzar) {
+    if (!forzar && Date.now() < actuaHasta) return;
+    actuaHasta = Date.now() + 2600; pip.mirar(0, 0);
+    if (w.color) pip.destello(w.color, 900); else if (w.sentir) pip.sentir(w.sentir); else if (w.accion) pip.hacer(w.accion); else pip.saltar(0.5);
+  }
+  function botonAlbum() {
+    var n = AL.cuenta(rep, pet).nuevas;
+    return '<button class="ing-btn ing-lugar' + (n ? ' late' : '') + '" id="b-album" title="Álbum">📒' + (n ? '<b class="alb-badge">' + n + '</b>' : '') + '</button>';
+  }
+  // album(tema): abre el álbum en esa página (si no, en la primera con figuritas para pegar).
+  function album(tema) {
+    var pags = AL.paginas(rep, pet), c = AL.cuenta(rep, pet);
+    if (!tema || !pags.some(function (x) { return x.id === tema; })) tema = (pags.filter(function (x) { return x.nuevas; })[0] || pags[0]).id;
+    var pg = pags.filter(function (x) { return x.id === tema; })[0];
+    S.album = { tema: tema, cartas: pg.cartas };
+    var tabs = pags.map(function (x) {
+      return '<button class="alb-tab' + (x.id === tema ? ' activo' : '') + (x.completa ? ' completa' : '') + '" data-t="' + x.id + '" title="' + esc(F(x.nombre)) + '">' + x.icono +
+        '<b>' + (x.tiene - x.nuevas) + '/' + x.total + '</b>' + (x.nuevas ? '<i class="alb-punto">' + x.nuevas + '</i>' : '') + '</button>'; }).join('');
+    velo('<div class="alb-cab"><h2>📒 ' + esc(F('Álbum')) + '</h2><span class="alb-cuenta" id="alb-cuenta"></span><button class="ing-btn alb-cerrar" id="alb-x" title="Cerrar">✖</button></div>' +
+      '<div class="alb-tabs">' + tabs + '</div>' +
+      '<div class="alb-pag"><div class="alb-tit">' + pg.icono + ' ' + esc(F(pg.nombre)) + (pg.completa ? ' <span class="alb-trofeo">🏆 ' + esc(F('¡Completa!')) + '</span>' : '') + '</div>' +
+      '<div class="alb-ver" id="alb-ver">' + esc(F(pg.nuevas ? 'Tocá los sobres 🎁 para pegar las figuritas' : (pg.tiene ? 'Tocá una figurita para escucharla' : 'Jugá para ganar figuritas'))) + '</div>' +
+      '<div class="alb-grilla">' + pg.cartas.map(figHTML).join('') + '</div></div>', 'alb');
+    cuentaAlbum(c);
+    $('#alb-x').onclick = cerrarAlbum;
+    $('#panel').querySelectorAll('[data-t]').forEach(function (b) { b.onclick = function () { VZ.sfx('woosh'); album(b.dataset.t); }; });
+    $('#panel').querySelectorAll('[data-i]').forEach(function (b) { b.onclick = function () { tocarFig(+b.dataset.i, b); }; });
+  }
+  function cuentaAlbum(c) { c = c || AL.cuenta(rep, pet); var e = $('#alb-cuenta'); if (e) e.textContent = c.pegadas + '/' + c.total + (c.oro ? ' · 🌟 ' + c.oro : ''); }
+  function cerrarAlbum() { VZ.callar(); S.album = null; velo(''); if (S.modo === 'resumen') casa(false); else pintarHUD(); }
+  function figHTML(c, i) {
+    var w = c.w, cara;
+    if (c.estado === 'falta') cara = '<span class="alb-dib sombra">' + dib(w) + '</span><span class="alb-en">?</span>';
+    else if (c.estado === 'nueva') cara = '<span class="alb-sobre">🎁</span><span class="alb-new">NEW!</span>';
+    else cara = '<span class="alb-dib">' + dib(w) + '</span><span class="alb-en">' + esc(TX(w.en)) + '</span>' + (c.oro ? '<span class="alb-oro">🌟</span>' : '');
+    return '<button class="alb-fig ' + c.estado + (c.oro && c.estado === 'pegada' ? ' oro' : '') + '" data-i="' + i + '">' + cara + '</button>';
+  }
+  function verFig(c) {
+    var w = c.w;
+    $('#alb-ver').innerHTML = '<span class="alb-dib">' + dib(w) + '</span><span><b class="alb-en">' + esc(TX(w.en)) + '</b><span class="alb-es">' + esc(TX(w.es)) + '</span></span>' + (c.oro ? '<span title="La sabe muy bien">🌟</span>' : '');
+  }
+  function tocarFig(i, el) {
+    var c = S.album && S.album.cartas[i]; if (!c) return;
+    var w = c.w, dicho = w.en.toLowerCase() + '!';
+    if (c.estado === 'falta') { VZ.sfx('mal'); el.classList.remove('tiembla'); void el.offsetWidth; el.classList.add('tiembla'); $('#alb-ver').textContent = F('Todavía no la ganaste: jugá con Miss Hoot'); return; }
+    if (c.estado === 'nueva') {
+      if (el.classList.contains('gira')) return;
+      el.classList.add('gira'); VZ.sfx('figurita');
+      setTimeout(function () {
+        AL.pegar(pet, w.en); guardar(); c.estado = 'pegada';
+        el.outerHTML = figHTML(c, i).replace('alb-fig ', 'alb-fig recien ');
+        var nuevo = $('#panel').querySelector('[data-i="' + i + '"]'); if (nuevo) nuevo.onclick = function () { tocarFig(i, nuevo); };
+        verFig(c); cuentaAlbum(); profe(dicho); actuar(w); ctx.log('figurita', w.en);
+        var quedan = S.album.cartas.filter(function (x) { return x.estado === 'nueva'; }).length, tab = $('#panel').querySelector('.alb-tab.activo .alb-punto');
+        if (tab) { if (quedan) tab.textContent = quedan; else tab.remove(); }
+        if (!quedan) setTimeout(function () { if (S.album) { VZ.sfx('brillo'); album(S.album.tema); } }, 1400);    // repinta: contadores y 🏆 si se completó
+      }, 230);
+      return;
+    }
+    el.classList.remove('salta'); void el.offsetWidth; el.classList.add('salta');
+    VZ.sfx('pop'); verFig(c); profe(dicho); actuar(w);
+  }
+
   /* ---------- debug ---------- */
   if (ctx.debug) {
     var fps = document.createElement('div'); fps.className = 'ing-fps'; document.body.appendChild(fps);
@@ -850,6 +930,7 @@
     window.__pip = { S: S, M: M, pip: pip, pet: pet, rep: rep, inicio: function () { $('#v-jugar').click(); },
       elegir: function (en) { var o = (S.opciones || []).filter(function (x) { return x.w.en === en; })[0]; if (o) o.elegir(); return !!o; },
       correcta: function () { var p = S.paso, o = (S.opciones || []).filter(function (x) { return x.w === p.w && (!p.color || x.color === p.color); })[0]; if (o) o.elegir(); return !!o; },
+      album: function (t) { album(t); }, figurita: function (i) { var b = $('#panel').querySelector('[data-i="' + i + '"]'); if (b) b.click(); return S.album && S.album.cartas[i] && S.album.cartas[i].w.en; },
       ropa: function () { cambiador(); }, tocarRopa: function (i) { var x = (S.itemsRopa || [])[i]; if (x) x.tocar(); return x && x.it; }, verRopa: function (v) { verRopa(v); },
       super: function () { supermercado(); }, despensa: function () { despensa(); }, TD: TD, LG: LG,
       bano: function () { bano(); }, dormir: function () { dormitorio(); }, patio: function () { patio(); }, apagar: function () { apagar(); }, despertar: function () { despertar(); },
