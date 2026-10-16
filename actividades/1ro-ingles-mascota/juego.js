@@ -41,15 +41,27 @@
        pregunta "What is Mimi doing?" ("Mimi is jumping!").
      + 📒 Álbum de figuritas: una página por tema; cada palabra jugada se gana como figurita (sobre 🎁 que se abre y se pega),
        las que todavía no jugó se ven como sombra y las que sabe bien son de oro. Tocarlas las dice y la mascota las actúa.
+   v1.6.0  (2026-10-15) Salidas: café, restaurante, escuela y cine
+     + 🚌 Salidas (el colectivo cruza la pantalla): cuatro lugares nuevos en 3D.
+     + ☕ Café: la mascota pide ("I want a juice!"), Luz se lo da y después paga contando monedas.
+     + 🍽️ Restaurante: Miss Hoot de moza ("What would you like?"), la mascota pide ("Can I have some soup, please?") y
+       desde el nivel 2 también postre; al final, la cuenta.
+     + 🏫 Escuela: "Pack the bag!" (los útiles a la mochila) y el pizarrón ("How many stars?", "What color are the hearts?");
+       es una clase con resumen, estrellas y ⭐ como la lección.
+     + 🎬 Cine: entradas ("Two tickets, please!"), pochoclos, pagar y una película con escenas (un fantasma, una torta,
+       un helado que se cae…): la mascota la siente y Luz dice cómo está ("How is Mimi?").
+     + Temas nuevos: cafe, platos y escuela, con sus juegos "Snack time!", "Dinner time!" y "Pack the bag!" (también en la
+       lección, en 🎮 Juegos y en el álbum).
    ------------------------------------------------------------
    El entorno J que reciben los juegos (ING_JUEGOS) se arma en entorno(): M, O, pip, hoot, az, nivel, nombre, debug,
    posiciones(n), responder(w) → {ok, mostrar, ignorar}, opciones(lista), aviso(icono, texto), pintado(color), alimentar(n),
    decir(texto, alEmpezar) (la profe habla cuando se calla lo anterior: la cuenta de "How many?"), nombreVoz ("Mimi"),
-   alOir(fn) (el 🔊 además hace fn: en "Mimi says!" al revés la mascota lo vuelve a actuar). */
+   alOir(fn) (el 🔊 además hace fn: en "Mimi says!" al revés la mascota lo vuelve a actuar), mochila (la del aula, en la escuela).
+   Un paso puede traer su propio jugar, orden, icono y errorFn(esperada, elegida) (pizarrón y entradas del cine, sin juego registrado). */
 (function () {
   'use strict';
-  var VERSION = '1.5.0', ACT = '1ro-ingles-mascota';
-  var ROPA = ING_ROPA, R3 = ING_ROPA3D, AL = ING_ALBUM, V = ING_VOCAB, JG = ING_JUEGOS, LC = ING_LECC, PET = ING_PET, TD = ING_TIENDA, VZ = ING_VOZ, O = ING_OBJ3D, RP = REPASO1, UI = REF4_UI;
+  var VERSION = '1.6.0', ACT = '1ro-ingles-mascota';
+  var ROPA = ING_ROPA, R3 = ING_ROPA3D, AL = ING_ALBUM, SA = ING_SALIDAS, V = ING_VOCAB, JG = ING_JUEGOS, LC = ING_LECC, PET = ING_PET, TD = ING_TIENDA, VZ = ING_VOZ, O = ING_OBJ3D, RP = REPASO1, UI = REF4_UI;
   var esc = UI1.esc, TX = UI1.txt, F = UI1.frase;
   var ctx = UI1.base({ act: ACT, version: VERSION, titulo: 'Mi mascota', alCambiarCaso: function () { pintarHUD(); if (S.banner) banner(S.banner); } });
   if (!ctx) return;
@@ -75,8 +87,8 @@
   }
   var pip = ING_MASCOTA3D.crear(M, { color: pet.color || '#f4f0ff', escala: PET.etapa(pet).escala });
   var hoot = ING_PROFE3D.crear(M);
-  var SUP = ING_SUPER3D.crear(M), LG = ING_LUGARES.crear(M);
-  addEventListener('resize', function () { if (SUP.grupo.visible) { hoot.ponerEn(SUP.lugarProfe()); var lp = SUP.lugarPip(); pip.ponerEn(lp[0], lp[1]); pip.escala(PET.etapa(pet).escala * SUP.escalaPip()); } });
+  var SUP = ING_SUPER3D.crear(M), LG = ING_LUGARES.crear(M), SAL = ING_SALIDAS3D.crear(M);
+  addEventListener('resize', function () { if (S.profeLugar) hoot.ponerEn(S.profeLugar()); if (SUP.grupo.visible) { hoot.ponerEn(SUP.lugarProfe()); var lp = SUP.lugarPip(); pip.ponerEn(lp[0], lp[1]); pip.escala(PET.etapa(pet).escala * SUP.escalaPip()); } });
   pip.visible(pet.nacido);
   function vestirGuardado() { R3.vestir(M, pip, pet.puesto); }
   vestirGuardado();
@@ -135,12 +147,12 @@
         LUGARES.map(function (l) { return '<button class="ing-btn ing-lugar' + (S.sugerido === l[0] ? ' late' : '') + '" data-l="' + l[0] + '" title="' + l[2] + '">' + l[1] + '</button>'; }).join('') +
         (TD.cuantas(pet) ? '<button class="ing-btn ing-lugar' + (S.recienCompro ? ' main late' : '') + '" id="b-comida" title="Su comida">🧺<b>' + TD.cuantas(pet) + '</b></button>' : '');
       $('#b-leccion').onclick = leccion; $('#b-juegos').onclick = menuJuegos; $('#b-album').onclick = function () { album(); }; if ($('#b-comida')) $('#b-comida').onclick = despensa;
-      ab.querySelectorAll('[data-l]').forEach(function (b) { b.onclick = function () { ({ super: supermercado, ropa: cambiador, bano: bano, dormir: dormitorio, patio: patio })[b.dataset.l](); }; });
-    } else if (S.modo === 'leccion' || S.modo === 'libre') {
+      ab.querySelectorAll('[data-l]').forEach(function (b) { b.onclick = function () { ({ super: supermercado, salir: menuSalidas, ropa: cambiador, bano: bano, dormir: dormitorio, patio: patio })[b.dataset.l](); }; });
+    } else if (S.modo === 'leccion' || S.modo === 'libre' || S.modo === 'escuela') {
       ab.innerHTML = '<button class="ing-btn" id="b-salir" title="Volver a la casa">✖</button><div class="ing-prog ing-card">' + S.res.map(function (r, i) {
         return '<i class="' + (r || (i === S.k ? 'actual' : '')) + '"></i>'; }).join('') + '</div><span style="width:64px"></span>';
       $('#b-salir').onclick = function () { VZ.callar(); casa(false); };
-    } else if (S.modo === 'super') {
+    } else if (S.lista && (S.modo === 'super' || GASTA[S.modo])) {
       ab.innerHTML = '<button class="ing-btn" id="b-salir" title="Volver a la casa">✖</button><div class="ing-lista ing-card">' + S.lista.map(function (it, i) {
         var hecho = S.compra[i] >= it.n, cual = hecho || i < S.k ? dib(it.w) : '❔';
         return '<span class="' + (hecho ? 'ok' : (i === S.k ? 'actual' : '')) + '">' + cual + (it.n > 1 ? '<b>×' + it.n + '</b>' : '') + '</span>';
@@ -167,7 +179,7 @@
       if ($('#b-super')) $('#b-super').onclick = supermercado;
     } else ab.innerHTML = '';
   }
-  var LUGARES = [['super', '🛒', 'Súper'], ['ropa', '👗', 'Ropa'], ['bano', '🛁', 'Baño'], ['dormir', '🛏️', 'Dormitorio'], ['patio', '⚽', 'Patio']];
+  var LUGARES = [['super', '🛒', 'Súper'], ['salir', '🚌', 'Salidas'], ['ropa', '👗', 'Ropa'], ['bano', '🛁', 'Baño'], ['dormir', '🛏️', 'Dormitorio'], ['patio', '⚽', 'Patio']];
   function menuJuegos() {
     velo('<h2>🎮 ' + esc(F('Juegos')) + '</h2><div class="ing-nombres juegos">' + JG.lista().map(function (j) {
       return '<button class="ing-btn" data-j="' + j.id + '"><span class="ic">' + j.icono + '</span>' + esc(j.nombre.replace('Pip', nombreVoz())) + '</button>'; }).join('') +
@@ -341,7 +353,7 @@
     var tk = ++S.token; limpiarEscena(); aviso(); hoot.senalar(false); S.tocarPip = null; S.alOir = null; acercar(false); vestirGuardado();
     S.i++; var p = S.pasos[S.i]; S.paso = p; S.oirActual = null;
     if (!p) return terminar();
-    ({ hola: hola, presenta: presenta, juego: juego, chau: chau })[p.tipo](p, tk);
+    ({ hola: hola, presenta: presenta, juego: juego, chau: chau, clase: clase, finClase: finClase })[p.tipo](p, tk);
   }
   var vivo = function (tk) { return tk === S.token; };
   function hola(p, tk) {
@@ -376,12 +388,12 @@
   function juego(p, tk, o) {
     o = o || {};
     S.k++; S.intento = 0; S.fase = 'responde'; S.t0 = Date.now(); S.repite = 0; pintarHUD(); chip(null);
-    var j = JG.get(p.juego); S.orden = o.orden || j.orden(p.w, nombreVoz(), p); S.quienOrden = o.quien || 'profe';
+    var j = JG.get(p.juego) || {}; S.orden = o.orden || p.orden || j.orden(p.w, nombreVoz(), p); S.quienOrden = o.quien || 'profe';
     S.alOir = null;
     var oir = function () { (S.quienOrden === 'pip' ? pipDice : profe)(S.orden); if (S.alOir) S.alOir(); };
-    banner({ icono: o.icono || j.accion, en: S.orden, oir: oir }); S.oirActual = oir;
+    banner({ icono: o.icono || p.icono || j.accion, en: S.orden, oir: oir }); S.oirActual = oir;
     ctx.log('juego', p.juego, p.w.en, p.opciones.map(function (w) { return w.en; }).join(','));
-    j.jugar(entorno(tk), p, function () {
+    (p.jugar || j.jugar)(entorno(tk), p, function () {
       if (!vivo(tk)) return;
       S.fase = 'fin'; cuandoCalle(function () { if (vivo(tk)) M.esperar(350, o.fin || siguientePaso); });
     });
@@ -405,7 +417,8 @@
       pintado: function (color) { pet.color = color; guardar(); },
       alimentar: function (n) { PET.sumar(pet, 'panza', n); PET.sumar(pet, 'alegria', 2); guardar(); pintarHUD(); },
       acercarPip: function (on) { if (vivo(tk)) acercar(on); },
-      destino: S.modo === 'dormir' ? function () { return LG.dormitorio.posCaja(); } : null,
+      destino: S.modo === 'dormir' ? function () { return LG.dormitorio.posCaja(); } : (S.modo === 'escuela' ? SAL.escuela.boca : null),
+      mochila: S.modo === 'escuela' ? SAL.escuela.mochila : null,
       tocarPip: function (fn) { S.tocarPip = fn && vivo(tk) ? fn : null; }
     };
   }
@@ -423,7 +436,7 @@
   // Cómo se dice lo elegido: "a blue hat" si la prenda tiene color pedido, si no "an apple".
   var dicho = function (w, color) { return color ? ROPA.frase({ en: w.en, color: color }) : frase(w); };
   function responder(w, det) {
-    var p = S.paso, j = JG.get(p.juego), err = j && j.error ? j.error(p.w, w, p, det) : V.errorEleccion(p.w, w), dc = det && p.color ? det.color : null;
+    var p = S.paso, j = JG.get(p.juego), err = p.errorFn ? p.errorFn(p.w, w) : (j && j.error ? j.error(p.w, w, p, det) : V.errorEleccion(p.w, w)), dc = det && p.color ? det.color : null;
     if (S.fase === 'fin') return { ignorar: true };
     if (S.fase === 'muestra') { if (err) return { ignorar: true }; S.fase = 'fin'; acierto(false, true); return { ok: true }; }
     S.intento++;
@@ -440,7 +453,7 @@
     VZ.sfx('ok'); hoot.aplaudir();
     chip(dib(w) + ' ' + esc(TX(w.en)) + ' = ' + esc(TX(w.es)), false, S.modo === 'super' ? 2200 : 0);
     if (S.modo === 'super') { PET.sumar(pet, 'alegria', 2); guardar(); return; }      // en el súper se gasta, no se gana (y lo que se dice lo pone el súper)
-    if (!mostrado && S.modo !== 'despensa') {
+    if (!mostrado && S.modo !== 'despensa' && !GASTA[S.modo]) {
       PET.premiar(pet, primera); S.ganadas += primera ? 2 : 1;
       setTimeout(function () { VZ.sfx('monedas'); pintarHUD(); saltarMonedas(); }, 400);
     }
@@ -453,9 +466,10 @@
   }
   function terminar() {
     acercar(false); vestirGuardado();
-    var tk = ++S.token, n = S.res.length, ok1 = S.res.filter(function (r) { return r === 'ok'; }).length, pct = n ? Math.round(100 * ok1 / n) : 100;
+    var modo0 = S.modo, tk = ++S.token, n = S.res.length, ok1 = S.res.filter(function (r) { return r === 'ok'; }).length, pct = n ? Math.round(100 * ok1 / n) : 100;
     var r = ctx.reg.cerrarRonda(pct, Date.now() - S.t0r, false, 3);
     if (S.modo === 'leccion') pet.lecciones++;
+    if (S.modo === 'escuela') pet.salidas.escuela = (pet.salidas.escuela || 0) + 1;
     guardar(); banner(null); chip(null); limpiarEscena(); S.modo = 'resumen'; pintarHUD();
     UI.fuegos.iniciar(); VZ.sfx('brillo'); pip.feliz();
     var e = ''; for (var i = 1; i <= 3; i++) e += '<span class="' + (i <= r.estrellas ? '' : 'off') + '">⭐</span>';
@@ -467,9 +481,9 @@
       (fig ? '<p><button class="ing-btn alb-abrir late" id="v-album">📒 ' + esc(F(fig === 1 ? '¡Una figurita nueva!' : '¡' + fig + ' figuritas nuevas!')) + '</button></p>' : '') +
       '<div class="l1-fila"><button class="ing-btn" id="v-casa">🏠 ' + esc(F('Casa')) + '</button><button class="ing-btn main" id="v-otra">▶ ' + esc(F('Otra vez')) + '</button></div>');
     if (fig) $('#v-album').onclick = function () { album(); };
-    var modo = S.pasos.some(function (p) { return p.tipo === 'hola'; }) ? 'leccion' : S.pasos[0].juego;
+    var modo = modo0 === 'escuela' ? 'escuela' : (S.pasos.some(function (p) { return p.tipo === 'hola'; }) ? 'leccion' : S.pasos[0].juego);
     $('#v-casa').onclick = function () { velo(''); casa(false); };
-    $('#v-otra').onclick = function () { velo(''); if (modo === 'leccion') leccion(); else jugarSolo(modo); };
+    $('#v-otra').onclick = function () { velo(''); if (modo === 'leccion') leccion(); else if (modo === 'escuela') escuela(); else jugarSolo(modo); };
     if (vivo(tk)) ctx.log('fin', pct + '%', r.estrellas + '⭐', 'nivel', r.nivel);
   }
 
@@ -483,13 +497,7 @@
     S.lista = lista; S.compra = lista.map(function () { return 0; }); S.k = -1; S.res = lista.map(function () { return null; });
     SUP.mostrar(true); hoot.ponerEn(SUP.lugarProfe()); VZ.sfx('woosh'); pip.ponerEn(0, -0.2); var lp = SUP.lugarPip(); pip.escala(PET.etapa(pet).escala * SUP.escalaPip()); pip.irA(lp[0], lp[1]);
     pintarHUD();
-    if (!lista.length) {
-      banner({ icono: '🛒', en: 'No coins!', es: 'Necesitás ⭐: jugá con Miss Hoot para ganar' });
-      charla([{ t: 'Oh no! No coins!' }, { t: "Let's learn and get some stars!" }]);
-      $('#abajo').innerHTML = '<button class="ing-btn" id="b-salir">🏠 ' + esc(F('Casa')) + '</button><button class="ing-btn main" id="b-l"><span class="ic">🦉</span>' + esc(F('¡A aprender!')) + '</button>';
-      $('#b-salir').onclick = function () { casa(false); }; $('#b-l').onclick = function () { casa(false); leccion(); };
-      return;
-    }
+    if (!lista.length) return sinMonedas('🛒');
     ctx.log('súper', lista.map(function (x) { return x.n + ' ' + x.w.en; }).join(', '), 'total', TD.total(lista));
     // la góndola, con el precio de cada cosa
     var huecos = SUP.huecos();
@@ -627,6 +635,8 @@
   function salirLugares() {
     if (SUP.grupo.visible) { SUP.mostrar(false); hoot.volver(); }
     ['bano', 'dormitorio', 'patio'].forEach(function (k) { if (LG[k].grupo.visible) LG[k].mostrar(false); });
+    ['cafe', 'resto', 'escuela', 'cine'].forEach(function (k) { if (SAL[k].grupo.visible) SAL[k].mostrar(false); });
+    if (S.profeLugar) { S.profeLugar = null; hoot.volver(); }
     if (S.futbol) { S.futbol.parar(); S.futbol = null; }
     if (S.zzz) { S.zzz(); S.zzz = null; }
     if (S.mirarPelota) { S.mirarPelota(); S.mirarPelota = null; }
@@ -638,7 +648,7 @@
   function entrar(modo, lugar) {
     VZ.callar(); velo(''); limpiarEscena(); chip(null); aviso(); banner(null); UI.fuegos.parar();
     salirLugares(); if (lugar) lugar.mostrar(true); VZ.sfx('woosh');
-    S.modo = modo; S.fase = null; S.paso = null; S.opciones = null; S.oirActual = null; S.tocarPip = null; S.alOir = null; S.res = []; S.k = -1;
+    S.modo = modo; S.fase = null; S.paso = null; S.opciones = null; S.oirActual = null; S.tocarPip = null; S.alOir = null; S.res = []; S.k = -1; S.lista = null;
     var tk = ++S.token; pintarHUD(); return tk;
   }
   // Una palabra del tema (con repaso), distinta de la anterior.
@@ -768,6 +778,208 @@
       alTocar: function () { banner({ icono: '👇', en: 'Pull and kick!', es: 'Arrastrá desde la pelota hacia abajo y soltá' }); }
     });
     S.mirarPelota = M.cuadro(function () { if (S.futbol) pip.mirarA(S.futbol.pelota.position); });
+  }
+
+  /* ---------- salidas: café, restaurante, escuela y cine ---------- */
+  var GASTA = { super: 1, cafe: 1, resto: 1, cine: 1 };          // ahí se paga: los aciertos no dan monedas
+  function menuSalidas() {
+    velo('<h2>🚌 ' + esc(F('¿Adónde vamos?')) + '</h2><div class="ing-nombres juegos">' + SA.LUGARES.map(function (l) {
+      return '<button class="ing-btn" data-s="' + l.id + '"><span class="ic">' + l.icono + '</span>' + esc(l.en) + '</button>'; }).join('') +
+      '</div><p>' + esc(F('En el café, el restaurante y el cine se paga con ⭐')) + '</p><div class="l1-fila"><button class="ing-btn" id="v-no">✖ ' + esc(F('Cerrar')) + '</button></div>', 'ancho');
+    $('#panel').querySelectorAll('[data-s]').forEach(function (b) { b.onclick = function () { velo(''); salida(b.dataset.s, true); }; });
+    $('#v-no').onclick = function () { velo(''); };
+  }
+  function salida(id, conViaje) {
+    var fn = { cafe: cafe, resto: restaurante, escuela: escuela, cine: cine }[id]; if (!fn) return;
+    if (!conViaje) return fn();
+    // el colectivo cruza la pantalla mientras cambia el lugar
+    var d = document.createElement('div'); d.className = 'ing-viaje'; d.innerHTML = '<span>🚌</span>'; document.body.appendChild(d);
+    VZ.sfx('rueda'); setTimeout(fn, 450); setTimeout(function () { d.remove(); }, 1150);
+  }
+  function profeEn(fn) { S.profeLugar = fn; hoot.ponerEn(fn()); }
+  function sinMonedas(icono) {
+    banner({ icono: icono, en: 'No coins!', es: 'Necesitás ⭐: jugá con Miss Hoot para ganar' });
+    charla([{ t: 'Oh no! No coins!' }, { t: "Let's learn and get some stars!" }]);
+    $('#abajo').innerHTML = '<button class="ing-btn" id="b-salir">🏠 ' + esc(F('Casa')) + '</button><button class="ing-btn main" id="b-l"><span class="ic">🦉</span>' + esc(F('¡A aprender!')) + '</button>';
+    $('#b-salir').onclick = function () { casa(false); }; $('#b-l').onclick = function () { casa(false); leccion(); };
+  }
+  // Un juego de tocar la ficha correcta (pizarrón, entradas del cine); paso.alAcertar(ficha, fin) hace lo que sigue.
+  function jugarFichas(J, paso, fin) {
+    var pos = posiciones(paso.opciones.length), fichas = [], hecho = false, aura = null;
+    paso.opciones.forEach(function (w, i) {
+      var f = O.palabra(M, w, 0.8); f.userData.w = w; f.position.copy(pos[i]); f.scale.setScalar(0.01); M.scene.add(f); fichas.push(f);
+      M.esperar((paso.demora || 0) + i * 90, function () { VZ.sfx('pop'); M.tween(450, function (k) { f.scale.setScalar(Math.max(0.01, k)); }, null, 'rebote'); });
+      M.tocable(f, function () { elegir(f); });
+    });
+    J.opciones(fichas.map(function (f) { return { w: f.userData.w, elegir: function () { elegir(f); } }; }));
+    function elegir(f) {
+      if (hecho || f.userData.fuera) return;
+      var r = J.responder(f.userData.w); if (r.ignorar) return;
+      if (r.ok) {
+        hecho = true; J.aviso(); if (aura) aura.quitar(); O.rebotar(M, f, 0.5);
+        fichas.forEach(function (x) { M.esperar(x === f ? 700 : 0, function () { M.tween(300, function (k) { x.scale.setScalar(Math.max(0.01, 1 - k)); }, function () { M.limpiar([x]); }); }); });
+        if (paso.alAcertar) paso.alAcertar(f, fin); else pip.feliz(fin);
+        return;
+      }
+      f.userData.fuera = true; O.temblar(M, f); O.apagar(f, true); pip.no();
+      if (r.mostrar) { var c = fichas.filter(function (x) { return x.userData.w === paso.w; })[0]; aura = M.aura(c, 1.5); O.rebotar(M, c, 0.35); }
+    }
+  }
+  var cantidadMal = function (a, b) { return a === b ? null : 'CANTIDAD_MAL'; };
+  // cobrar: las monedas aparecen adelante y se tocan de a una (la profe cuenta); vuelan hasta Miss Hoot.
+  function cobrar(total, tk, fin, dicho) {
+    var pagadas = 0, monedas = S.monedas = [], pos = SUP.bandeja(total).map(function (v) { if (!M.vertical()) { v.y += 0.75; v.z -= 0.3; } return v; });   // más arriba que en el súper: abajo está el aviso
+    S.fase = 'pagar'; S.paso = null; S.opciones = null; pintarHUD();
+    var oir = function () { profe(dicho); };
+    banner({ icono: '💰', en: dicho, es: 'Pagá ' + total + ' ⭐: tocá las monedas', oir: oir }); S.oirActual = oir;
+    M.esperar(500, function () {
+      if (!vivo(tk)) return;
+      oir();
+      pos.forEach(function (p, i) {
+        var m = O.moneda(M, 1.3); m.position.copy(p); m.scale.setScalar(0.01); M.scene.add(m); monedas.push(m);
+        M.esperar(i * 80, function () { VZ.sfx('moneda'); M.tween(350, function (k) { m.scale.setScalar(Math.max(0.01, k)); }, null, 'rebote'); });
+        M.tocable(m, function () { una(m); });
+      });
+      cuandoCalle(function () { if (vivo(tk) && !pagadas) aviso('👆', 'Tocá las monedas'); });
+    });
+    function una(m) {
+      if (!vivo(tk) || m.userData.pagada) return;
+      m.userData.pagada = true; M.quitarToque(m); pagadas++; aviso();
+      var desde = m.position.clone(), hasta = hoot.grupo.getWorldPosition(new M.T.Vector3());
+      M.tween(420, function (k) { m.position.lerpVectors(desde, hasta, k); m.position.y += Math.sin(k * Math.PI) * 0.6; m.scale.setScalar(Math.max(0.01, 1 - 0.7 * k)); }, function () { M.limpiar([m]); }, 'entraSale');
+      VZ.sfx('moneda'); profe(NUMS[pagadas]); chip('⭐ ' + esc(TX(TD.numero(pagadas))) + ' = ' + pagadas, false, 1500);
+      var mon = $('#monedas'); if (mon) mon.lastChild.textContent = pet.monedas - pagadas;
+      if (pagadas === total) M.esperar(700, function () { if (!vivo(tk)) return; TD.pagar(pet, total); guardar(); VZ.sfx('caja'); hoot.aplaudir(); pintarHUD(); fin(); });
+    }
+  }
+  function contarSalida(modo) { pet.salidas[modo] = (pet.salidas[modo] || 0) + 1; PET.sumar(pet, 'alegria', 5); guardar(); }
+  function chauSalida(tk, icono, lista) {
+    S.fase = 'fin'; banner({ icono: icono, en: lista[0].t }); pip.feliz();
+    charla(lista, function () { if (!vivo(tk)) return; UI.fuegos.iniciar(); M.esperar(1600, function () { if (vivo(tk)) casa(false); }); });
+  }
+
+  // Café y restaurante: la mascota pide, Luz se lo da (como en "Feed Pip") y al final se paga la cuenta.
+  function cafe() { pedidoSal('cafe', SAL.cafe, SA.cafe, '☕', [{ t: 'Welcome to the café!' }, { t: 'What do you want, ' + nombreVoz() + '?' }]); }
+  function restaurante() { pedidoSal('resto', SAL.resto, SA.resto, '🍽️', [{ t: 'Welcome to the restaurant!' }, { t: 'A table for ' + nombreVoz() + '!' }]); }
+  function pedidoSal(modo, lugar, armar, icono, hola) {
+    var tk = entrar(modo, lugar), ped = armar({ nivel: nivel(), az: ctx.az, rep: rep, monedas: pet.monedas });
+    profeEn(lugar.lugarProfe);
+    if (!ped.items.length) return sinMonedas(icono);
+    S.lista = ped.items.map(function (w) { return { w: w, n: 1 }; }); S.compra = S.lista.map(function () { return 0; }); S.res = S.lista.map(function () { return null; }); S.k = -1;
+    ctx.log(modo, ped.items.map(function (w) { return w.en; }).join(', '), 'total', ped.total);
+    banner({ icono: icono, en: hola[0].t }); pintarHUD();
+    charla(hola, function () { if (vivo(tk)) pedirSal(0, tk, icono, ped.total); });
+  }
+  function pedirSal(i, tk, icono, total) {
+    if (!vivo(tk)) return;
+    if (i >= S.lista.length) return cobrar(total, tk, function () {
+      contarSalida(S.modo); ctx.log('pagó', S.modo, '-' + total + '⭐');
+      chauSalida(tk, icono, [{ t: 'Thank you! Come back soon!' }, { t: 'Bye bye!', quien: 'pip' }]);
+    }, SA.cuenta(total));
+    var w = S.lista[i].w, jid = w.tema === 'cafe' ? 'cafe' : (w.tema === 'platos' ? 'resto' : 'comer'), resto = S.modo === 'resto';
+    var p = { tipo: 'juego', juego: jid, w: w, opciones: JG.get(jid).opciones(w, nivel(), ctx.az) };
+    var sigue = function () {
+      if (!vivo(tk)) return; S.paso = p;
+      juego(p, tk, { orden: resto ? SA.pideResto(w) : SA.pideCafe(w), quien: 'pip', icono: icono, fin: function () { S.compra[i] = 1; pintarHUD(); pedirSal(i + 1, tk, icono, total); } });
+    };
+    if (resto) { hoot.asentir(); banner({ icono: '🦉', en: i ? 'Something sweet?' : 'What would you like?' }); charla([{ t: i ? 'Something sweet?' : 'What would you like?' }], sigue); }
+    else sigue();
+  }
+
+  // Escuela: una clase (como la lección, con resumen): útiles a la mochila y preguntas en el pizarrón.
+  function escuela() {
+    entrar('escuela', SAL.escuela); profeEn(SAL.escuela.lugarProfe); SAL.escuela.pizarra.escribir('Good morning!');
+    var nv = nivel(), pasos = [{ tipo: 'clase' }], ult = null, nuevas = 0, iq = 0;
+    var aMochila = function () {
+      var w = palabraDe('escuela', null, ult); ult = w.en;
+      if (!rep.items[w.en] && nuevas < 2 && !pasos.some(function (x) { return x.w === w; })) { nuevas++; pasos.push({ tipo: 'presenta', w: w }); }
+      pasos.push({ tipo: 'juego', juego: 'mochila', w: w, opciones: JG.get('mochila').opciones(w, nv, ctx.az) });
+    };
+    var aPizarra = function () { pasos.push(pasoPizarra(SA.pizarra(nv, ctx.az, iq++))); };
+    aMochila(); aMochila(); aPizarra(); aMochila(); aPizarra(); if (nv > 1) { aMochila(); aPizarra(); }
+    pasos.push({ tipo: 'finClase' });
+    empezar('escuela', pasos);
+  }
+  function pasoPizarra(q) {
+    var cw = V.por(q.color), forma = SA.NOMBRE_FORMA[q.forma], cuantos = q.tipo === 'cuantos', nv = nivel();
+    return { tipo: 'juego', juego: 'pizarra', w: q.w, icono: '🧑‍🏫', orden: cuantos ? 'How many ' + forma + '?' : 'What color are the ' + forma + '?',
+      opciones: cuantos ? JG.get('contar').opciones(q.w, nv, ctx.az) : V.opciones(q.w, JG.cuantas(nv), nv, ctx.az),
+      errorFn: cuantos ? cantidadMal : null, demora: q.n * (cuantos ? 260 : 120) + 300,
+      jugar: function (J, paso, fin) { pip.irA(M.vertical() ? -1.1 : -1.5, 0.3); SAL.escuela.pizarra.formas(q.n, cw.color, q.forma, cuantos ? 260 : 120); jugarFichas(J, paso, fin); },     // la mascota se corre para no tapar el pizarrón
+      alAcertar: function (f, fin) { SAL.escuela.pizarra.escribir(cuantos ? q.n + ' ' + forma : mayus(cw.en.toLowerCase()) + '!'); pip.feliz(function () { pip.irA(0, -0.2, fin); }); } };
+  }
+  function clase(p, tk) {
+    banner({ icono: '🏫', en: 'Good morning, class!' }); hoot.asentir();
+    charla([{ t: 'Good morning, class!' }, { t: 'Good morning, Miss Hoot!', quien: 'pip' }], function () { if (vivo(tk)) siguientePaso(); });
+  }
+  function finClase(p, tk) {
+    SAL.escuela.pizarra.escribir('Great job! ⭐'); banner({ icono: '🏫', en: 'Class is over!' }); hoot.aplaudir(); pip.feliz();
+    charla([{ t: 'Great job, class!' }, { t: 'Bye bye, Miss Hoot!', quien: 'pip' }], function () { if (vivo(tk)) terminar(); });
+  }
+
+  // Cine: entradas, algo para comer, pagar y la película (la mascota siente cada escena y Luz dice cómo está).
+  function cine() {
+    var tk = entrar('cine', SAL.cine), c = SA.cine({ nivel: nivel(), az: ctx.az, rep: rep, monedas: pet.monedas });
+    profeEn(SAL.cine.lugarProfe); SAL.cine.cartel('🎬 MOVIE');
+    if (!c) return sinMonedas('🎬');
+    S.cine = c; S.lista = [{ w: { img: '🎟️', en: 'TICKET' }, n: c.entradas }, { w: c.snack, n: 1 }]; S.compra = [0, 0]; S.k = -1;
+    S.res = [null, null].concat(c.escenas.map(function () { return null; }));
+    ctx.log('cine', c.entradas + ' entradas', c.snack.en, c.escenas.map(function (w) { return w.en; }).join(','), 'total', c.total);
+    banner({ icono: '🎬', en: 'Welcome to the cinema!' }); pintarHUD();
+    charla([{ t: 'Welcome to the cinema!' }, { t: 'How many tickets?' }], function () { if (vivo(tk)) entradasCine(tk); });
+  }
+  function entradasCine(tk) {
+    var n = S.cine.entradas, nums = V.palabras({ temas: ['numeros'] }).filter(function (x) { return x.n <= 4; }), w = nums.filter(function (x) { return x.n === n; })[0];
+    var ops = ctx.az.mezclar([w].concat(ctx.az.mezclar(nums.filter(function (x) { return x !== w; })).slice(0, JG.cuantas(nivel()) - 1)));
+    var p = S.paso = { tipo: 'juego', juego: 'entradas', w: w, opciones: ops, jugar: jugarFichas, errorFn: cantidadMal, alAcertar: function (f, fin) { darEntradas(n, tk, fin); } };
+    juego(p, tk, { orden: SA.pideEntradas(n), quien: 'pip', icono: '🎟️', fin: function () { S.compra[0] = n; pintarHUD(); snackCine(tk); } });
+  }
+  // Las entradas vuelan de la boletería a la mascota (la profe cuenta si son varias).
+  function darEntradas(n, tk, fin) {
+    var k = 0, T = M.T;
+    (function una() {
+      if (!vivo(tk)) return;
+      if (k >= n) { pip.feliz(fin); return; }
+      k++; var s2 = new T.Sprite(new T.SpriteMaterial({ map: M.texEmoji('🎟️'), transparent: true })); s2.scale.setScalar(0.5);
+      var desde = hoot.grupo.getWorldPosition(new T.Vector3()), hasta = pip.cabeza.getWorldPosition(new T.Vector3()); s2.position.copy(desde); M.scene.add(s2);
+      VZ.sfx('woosh'); if (n > 1) M.esperar(250, function () { if (vivo(tk)) profe(NUMS[k]); });
+      M.tween(550, function (kk) { s2.position.lerpVectors(desde, hasta, kk); s2.position.y += Math.sin(kk * Math.PI) * 0.7; }, function () { M.limpiar([s2]); VZ.sfx('pop'); M.esperar(350, una); }, 'entraSale');
+    })();
+  }
+  function snackCine(tk) {
+    var w = S.cine.snack, p = S.paso = { tipo: 'juego', juego: 'cafe', w: w, opciones: JG.get('cafe').opciones(w, nivel(), ctx.az) };
+    juego(p, tk, { orden: SA.pideCafe(w), quien: 'pip', icono: '🍿', fin: function () {
+      S.compra[1] = 1; pintarHUD();
+      cobrar(S.cine.total, tk, function () { charla([{ t: 'Thank you! Enjoy the movie!' }], function () { if (vivo(tk)) pelicula(0, tk); }); }, SA.cuenta(S.cine.total));
+    } });
+  }
+  function pelicula(i, tk) {
+    if (!vivo(tk)) return;
+    var es = S.cine.escenas, r = pip.grupo;
+    S.fase = 'peli'; S.paso = null; S.opciones = null; S.oirActual = null;
+    if (i >= es.length) return finCine(tk);
+    if (i === 0) { var lp = SAL.cine.lugarPip(); pip.irA(lp[0], lp[1]); M.atenuar(0.5, 900); banner({ icono: '🎬', en: 'Movie time!' }); profe('Shh! Movie time!'); }
+    var w = es[i];
+    M.esperar(i === 0 ? 1800 : 500, function () {
+      if (!vivo(tk)) return;
+      banner(null); var g0 = r.rotation.y;
+      M.tween(500, function (k) { r.rotation.y = g0 + (2.6 - g0) * k; }, null, 'entraSale');       // se da vuelta para mirar la pantalla
+      SAL.cine.pelicula(w.sentir, 4200, function () {
+        if (!vivo(tk)) return;
+        M.tween(450, function (k) { r.rotation.y = 2.6 * (1 - k); }, function () {
+          if (!vivo(tk)) return;
+          pip.sentir(w.sentir, function () {
+            if (!vivo(tk)) return;
+            var p = S.paso = { tipo: 'juego', juego: 'sentir', w: w, opciones: JG.get('sentir').opciones(w, nivel(), ctx.az) };
+            juego(p, tk, { orden: 'How is ' + nombreVoz() + '?', icono: '🎭', fin: function () { pelicula(i + 1, tk); } });
+          });
+        }, 'entraSale');
+      });
+    });
+  }
+  function finCine(tk) {
+    SAL.cine.cartel('THE END'); M.atenuar(1, 900); pip.irA(0, -0.2); contarSalida('cine');
+    chauSalida(tk, '🎬', [{ t: 'The end!' }, { t: 'I love movies!', quien: 'pip' }]);
   }
 
   /* ---------- cambiador: la ropa (placard de la habitación) y la tienda de ropa ---------- */
@@ -931,7 +1143,7 @@
       elegir: function (en) { var o = (S.opciones || []).filter(function (x) { return x.w.en === en; })[0]; if (o) o.elegir(); return !!o; },
       correcta: function () { var p = S.paso, o = (S.opciones || []).filter(function (x) { return x.w === p.w && (!p.color || x.color === p.color); })[0]; if (o) o.elegir(); return !!o; },
       album: function (t) { album(t); }, figurita: function (i) { var b = $('#panel').querySelector('[data-i="' + i + '"]'); if (b) b.click(); return S.album && S.album.cartas[i] && S.album.cartas[i].w.en; },
-      ropa: function () { cambiador(); }, tocarRopa: function (i) { var x = (S.itemsRopa || [])[i]; if (x) x.tocar(); return x && x.it; }, verRopa: function (v) { verRopa(v); },
+      ropa: function () { cambiador(); }, salida: function (id) { salida(id); }, SAL: SAL, hoot: hoot, tocarRopa: function (i) { var x = (S.itemsRopa || [])[i]; if (x) x.tocar(); return x && x.it; }, verRopa: function (v) { verRopa(v); },
       super: function () { supermercado(); }, despensa: function () { despensa(); }, TD: TD, LG: LG,
       bano: function () { bano(); }, dormir: function () { dormitorio(); }, patio: function () { patio(); }, apagar: function () { apagar(); }, despertar: function () { despertar(); },
       patear: function (k, x) { if (S.futbol) S.futbol.patear(k, x); }, burbujas: function () { return (S.burbujas || []).filter(function (b) { return !b.userData.rota; }); },

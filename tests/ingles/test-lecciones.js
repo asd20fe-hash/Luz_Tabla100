@@ -2,7 +2,7 @@
 var assert = require('assert'), C = require('./comun.js'), V = C.V, JG = C.JG, LC = C.LC, RP = C.RP;
 function juegos(p) { return p.filter(function (x) { return x.tipo === 'juego'; }); }
 prueba('juegos: registrados con su tema y sus frases', function () {
-  assert.deepStrictEqual(JG.lista().map(function (j) { return j.id; }), ['pintar', 'comer', 'tocar', 'buscar', 'contar', 'sentir', 'vestir', 'hacer']);
+  assert.deepStrictEqual(JG.lista().map(function (j) { return j.id; }), ['pintar', 'comer', 'tocar', 'buscar', 'contar', 'sentir', 'vestir', 'hacer', 'cafe', 'resto', 'mochila']);
   JG.lista().forEach(function (j) { assert.ok(V.getTema(j.tema), j.id); assert.strictEqual(typeof j.jugar, 'function'); });
   assert.strictEqual(JG.get('pintar').orden(V.por('BLUE'), 'Pip'), 'Paint Pip blue!');
   assert.strictEqual(JG.get('comer').orden(V.por('APPLE'), 'Mimi'), 'Give Mimi an apple!');
@@ -26,7 +26,7 @@ prueba('lección: 1000 lecciones por nivel, con semilla y repaso', function () {
       for (var i = 1; i < p.length; i++) if (p[i].tipo === 'juego' && p[i - 1].tipo === 'juego') assert.notStrictEqual(p[i].w, p[i - 1].w, 'dos seguidas');
       js.forEach(function (x) {
         assert.ok(x.w.nivel <= nv); assert.strictEqual(JG.get(x.juego).tema, x.w.tema);
-        assert.strictEqual(x.opciones.length, JG.cuantas(nv) + (x.juego === 'buscar' ? 1 : 0)); assert.ok(x.opciones.indexOf(x.w) >= 0);
+        assert.strictEqual(x.opciones.length, JG.cuantas(nv) + (x.juego === 'buscar' || x.juego === 'mochila' ? 1 : 0)); assert.ok(x.opciones.indexOf(x.w) >= 0);
         RP.registrar(rep, x.w.en, az.prob(0.8)); vistas[x.w.en] = 1;
       });
     }

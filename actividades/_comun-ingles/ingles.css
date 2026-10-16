@@ -1,4 +1,4 @@
-/* Inglés — estilos de la capa de interfaz sobre la escena 3D (v1.3.0: + álbum de figuritas; v1.2.0: + botones de lugares; v1.1.0 lista del súper). Colores con variables, en claro y oscuro. */
+/* Inglés — estilos de la capa de interfaz sobre la escena 3D (v1.4.0: + colectivo de las salidas; v1.3.0: + álbum de figuritas; v1.2.0: + botones de lugares; v1.1.0 lista del súper). Colores con variables, en claro y oscuro. */
 :root{ --ing-card:rgba(255,255,255,.88); --ing-card-borde:rgba(255,255,255,.95); --ing-tinta:#2b2453; --ing-sombra:0 8px 26px rgba(80,50,150,.22);
   --ing-anillo:#e8e0ff; --ing-moneda:#f2a20c; --ing-chip:#fff6cf; --ing-chip-tinta:#4a3800;
   --alb-hoja:#fffaf0; --alb-fig:#ffffff; --alb-falta:#ece7f7; --alb-falta-tinta:#a79fc4; --alb-oro:#e8b100; --alb-oro-bg:#fff4c2; --alb-sobre1:#ff8fb8; --alb-sobre2:#8b7bff; }
@@ -129,3 +129,8 @@ body{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:trans
 @keyframes alb-pega{0%{transform:scale(1.25);box-shadow:0 0 0 8px var(--alb-oro-bg)}100%{transform:scale(1)}}
 @keyframes alb-tiembla{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 @media (max-width:480px){ .alb-grilla{grid-template-columns:repeat(3,1fr);gap:8px} .alb-fig .alb-dib{font-size:36px} .alb-cuenta{font-size:16px} }
+/* salidas: el colectivo cruza la pantalla mientras cambia el lugar */
+.ing-viaje{position:fixed;inset:0;z-index:40;pointer-events:none;display:grid;align-items:center;overflow:hidden;background:var(--bg,#fff);animation:ing-viaje-f 1.1s ease forwards}
+.ing-viaje span{display:block;width:max-content;font-size:min(32vw,190px);line-height:1;animation:ing-viaje-b 1.1s linear forwards}
+@keyframes ing-viaje-f{0%{opacity:0}35%,65%{opacity:1}100%{opacity:0}}
+@keyframes ing-viaje-b{from{transform:translateX(100vw)}to{transform:translateX(-40vw)}}

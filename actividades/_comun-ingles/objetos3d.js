@@ -1,4 +1,5 @@
-/* Inglés — objetos 3D para los juegos. window.ING_OBJ3D. Versión 1.2.0 (2026-10-15).
+/* Inglés — objetos 3D para los juegos. window.ING_OBJ3D. Versión 1.3.0 (2026-10-15).
+   v1.3.0 + mochila (juego "Pack the bag!" y el aula): userData.boca() es adonde vuelan los útiles.
    v1.2.0 + pelota (de fútbol, con gajos pintados) y flecha (para apuntar al patear), burbuja.
    v1.1.0 + moneda (para pagar en el súper) y etiqueta (cartelito de texto: precios, cantidades).
    El truco para no modelar: cada palabra con emoji se ve como una "ficha" (el emoji en un sprite que siempre mira a la cámara,
@@ -94,6 +95,19 @@
     var s = new T.Sprite(new T.SpriteMaterial({ map: tex, transparent: true })), h = o.alto || 0.26;
     s.scale.set(h * 2, h, 1); s.raycast = function () {};
     return s;
+  };
+  // Mochila escolar: cuerpo con tapa redonda, bolsillo, manija y tiras atrás.
+  O.mochila = function (M, color) {
+    var T = M.T, g = new T.Group(), mat = M.toon(color || '#4dabf7'), mat2 = M.toon('#ffd43b'), osc = M.toon('#2b2340');
+    var cuerpo = new T.Mesh(new T.BoxGeometry(0.56, 0.5, 0.3), mat); cuerpo.position.y = 0.29; g.add(cuerpo); M.contorno(cuerpo, 0.03);
+    var tapa = new T.Mesh(new T.CylinderGeometry(0.28, 0.28, 0.3, 20, 1, false, 0, Math.PI), mat); tapa.rotation.z = Math.PI / 2; tapa.rotation.y = Math.PI / 2; tapa.position.y = 0.54; g.add(tapa); M.contorno(tapa, 0.03);
+    var bolsillo = new T.Mesh(new T.BoxGeometry(0.4, 0.22, 0.08), mat2); bolsillo.position.set(0, 0.2, 0.18); g.add(bolsillo); M.contorno(bolsillo, 0.04);
+    var cierre = new T.Mesh(new T.BoxGeometry(0.3, 0.025, 0.02), osc); cierre.position.set(0, 0.29, 0.225); g.add(cierre);
+    var manija = new T.Mesh(new T.TorusGeometry(0.08, 0.02, 6, 14, Math.PI), osc); manija.position.set(0, 0.8, 0); g.add(manija);
+    [-1, 1].forEach(function (s2) { var tira = new T.Mesh(new T.BoxGeometry(0.06, 0.5, 0.03), mat2); tira.position.set(s2 * 0.16, 0.36, -0.17); g.add(tira); });
+    g.add(M.sombra(0.45));
+    g.userData = { boca: function () { return g.localToWorld(new T.Vector3(0, 0.75, 0)); }, mats: [mat, mat2] };
+    return g;
   };
   var texPelota = null;
   O.pelota = function (M, r) {
